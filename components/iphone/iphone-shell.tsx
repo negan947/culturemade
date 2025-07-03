@@ -15,31 +15,62 @@ const IPhoneShell: FC = () => {
   const isLocked = useSelector((state: RootState) => state.interface.isLocked);
 
   return (
-    <div className="select-none p-6 sizing box-border flex justify-center">
-      <motion.main className="relative overflow-hidden aspect-iphone h-[890px] border-[13px] border-black bg-black box-content rounded-[60px]">
-        <LayoutView />
-        <Image
-          className="absolute w-full h-full object-cover"
-          draggable={false}
-          src="/images/wallpaper.png"
-          width={2000}
-          height={3000}
-          priority
-          alt="wallpaper"
-        />
-        <motion.div className="relative z-30 h-full">
-          <AnimatePresence mode="wait">
-            {isLocked ? (
-              <LockScreen key="lockscreen" />
-            ) : (
-              <>
-                <Home key="home" />
-                {currentApp && <AppView key={"appview"} appId={currentApp} />}
-              </>
-            )}
-          </AnimatePresence>
-        </motion.div>
-      </motion.main>
+    <div className="select-none flex justify-center items-center min-h-screen bg-black">
+      {/* Desktop view - iPhone with frame */}
+      <div className="hidden sm:block p-6">
+        <motion.main className="relative overflow-hidden aspect-iphone h-[890px] border-[13px] border-black bg-black box-content rounded-[60px] shadow-2xl">
+          <LayoutView />
+          <Image
+            className="absolute w-full h-full object-cover"
+            draggable={false}
+            src="/images/wallpaper.png"
+            width={2000}
+            height={3000}
+            priority
+            alt="wallpaper"
+          />
+          <motion.div className="relative z-30 h-full">
+            <AnimatePresence mode="wait">
+              {isLocked ? (
+                <LockScreen key="lockscreen" />
+              ) : (
+                <>
+                  <Home key="home" />
+                  {currentApp && <AppView key={"appview"} appId={currentApp} />}
+                </>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </motion.main>
+      </div>
+
+      {/* Mobile view - Full screen iPhone experience */}
+      <div className="block sm:hidden w-full h-screen">
+        <motion.main className="relative overflow-hidden w-full h-full bg-black">
+          <LayoutView />
+          <Image
+            className="absolute w-full h-full object-cover"
+            draggable={false}
+            src="/images/wallpaper.png"
+            width={2000}
+            height={3000}
+            priority
+            alt="wallpaper"
+          />
+          <motion.div className="relative z-30 h-full">
+            <AnimatePresence mode="wait">
+              {isLocked ? (
+                <LockScreen key="lockscreen" />
+              ) : (
+                <>
+                  <Home key="home" />
+                  {currentApp && <AppView key={"appview"} appId={currentApp} />}
+                </>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </motion.main>
+      </div>
     </div>
   );
 };
