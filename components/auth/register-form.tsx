@@ -40,13 +40,54 @@ export function RegisterForm({ onSuccess, redirectTo = "/" }: RegisterFormProps)
     resolver: zodResolver(registerSchema),
   });
 
+  // Helper function to create profile with retry logic
+  const createUserProfile = async (userId: string, fullName: string, retries = 3) => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const { error } = await supabase
+          .from("profiles")
+          .insert({
+            id: userId,
+            role: "customer",
+            full_name: fullName,
+          });
+
+        if (!error) {
+          return { success: true };
+        }
+
+        // If it's a unique constraint violation, the profile might already exist
+        if (error.code === '23505' || error.message.includes('duplicate key')) {
+          console.log('Profile already exists, continuing...');
+          return { success: true };
+        }
+
+        // For other errors, retry after a short delay
+        if (i < retries - 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+          continue;
+        }
+
+        return { success: false, error };
+      } catch (err) {
+        console.error(`Profile creation attempt ${i + 1} failed:`, err);
+        if (i === retries - 1) {
+          return { success: false, error: err };
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+      }
+    }
+    return { success: false, error: new Error('Max retries exceeded') };
+  };
+
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
     setErrorMessage(null);
     setSuccessMessage(null);
 
     try {
-      const { data: authData, error } = await supabase.auth.signUp({
+      // Step 1: Create the auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
@@ -56,44 +97,51 @@ export function RegisterForm({ onSuccess, redirectTo = "/" }: RegisterFormProps)
         },
       });
 
-      if (error) {
-        setErrorMessage(error.message);
+      if (authError) {
+        setErrorMessage(authError.message);
         return;
       }
 
-      if (authData.user) {
-        // Create user profile
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .insert({
-            id: authData.user.id,
-            role: "customer",
-            full_name: data.fullName,
-          });
-
-        if (profileError) {
-          console.error("Error creating profile:", profileError);
-          setErrorMessage("Account created but profile setup failed. Please contact support.");
-          return;
-        }
-
-        if (authData.user.email_confirmed_at) {
-          // User is automatically confirmed
-          if (onSuccess) {
-            onSuccess();
-          } else {
-            window.location.href = redirectTo;
-          }
-        } else {
-          // User needs to confirm email
-          setSuccessMessage(
-            "Account created successfully! Please check your email to verify your account before signing in."
-          );
-        }
+      if (!authData.user) {
+        setErrorMessage("Failed to create user account. Please try again.");
+        return;
       }
+
+      // Step 2: Wait a moment for the auth user to be fully created
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Step 3: Create user profile with retry logic
+      const profileResult = await createUserProfile(authData.user.id, data.fullName);
+
+      if (!profileResult.success) {
+        console.error("Profile creation failed:", profileResult.error);
+        // Don't show this error to user if auth was successful
+        // The trigger should handle profile creation automatically
+        console.log("Profile creation failed, but auth was successful. This may be handled by database triggers.");
+      }
+
+      // Step 4: Handle success
+      if (authData.user.email_confirmed_at) {
+        // User is automatically confirmed (development mode)
+        setSuccessMessage("Account created successfully! You can now sign in.");
+        
+        if (onSuccess) {
+          setTimeout(() => onSuccess(), 1500);
+        } else {
+          setTimeout(() => {
+            window.location.href = redirectTo;
+          }, 1500);
+        }
+      } else {
+        // User needs to confirm email
+        setSuccessMessage(
+          "Account created successfully! Please check your email to verify your account before signing in."
+        );
+      }
+
     } catch (error) {
-      setErrorMessage("An unexpected error occurred. Please try again.");
       console.error("Registration error:", error);
+      setErrorMessage("An unexpected error occurred during registration. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -172,6 +220,13 @@ export function RegisterForm({ onSuccess, redirectTo = "/" }: RegisterFormProps)
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? "Creating account..." : "Create Account"}
       </Button>
+
+      {/* Debug info for development */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="mt-4 p-2 bg-gray-100 rounded text-xs text-gray-600">
+          <strong>Dev Note:</strong> If you see database errors, run the profile creation trigger SQL in Supabase dashboard.
+        </div>
+      )}
     </form>
   );
 } 

@@ -16,6 +16,9 @@ const config: Config = {
       },
     },
     extend: {
+      aspectRatio: {
+        'iphone': '18 / 39',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -72,7 +75,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require("tailwind-scrollbar")],
 } satisfies Config
 
 export default config
