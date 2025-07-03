@@ -2,7 +2,7 @@
 
 ## 🎯 Project Overview
 
-CultureMade is a fully customizable e-commerce platform built from scratch, offering Shopify-level functionality with complete control over every aspect of the system. The platform will handle clothing sales with a modern, scalable architecture.
+CultureMade is a revolutionary e-commerce platform built from scratch with a unique iPhone simulation interface for customers. The platform offers Shopify-level functionality with complete control over every aspect of the system, featuring an innovative customer experience through a realistic iPhone interface with lock screen and native-style apps, while maintaining a traditional admin dashboard for management.
 
 ### Core Technologies
 
@@ -23,11 +23,12 @@ CultureMade is a fully customizable e-commerce platform built from scratch, offe
 ┌─────────────────────────────────────────────────────────────────┐
 │                          Frontend (Next.js 15)                   │
 ├─────────────────────────┬───────────────────────────────────────┤
-│    Customer Portal      │           Admin Dashboard              │
-│  - Product Browsing     │    - Inventory Management            │
-│  - Shopping Cart        │    - Order Processing                │
-│  - Checkout Flow        │    - Analytics & Reports             │
-│  - Order Tracking       │    - Customer Management             │
+│   iPhone Interface      │           Admin Dashboard              │
+│  - Lock Screen Auth     │    - Inventory Management            │
+│  - iPhone Apps Grid     │    - Order Processing                │
+│  - CultureMade App      │    - Analytics & Reports             │
+│  - Native-Style UI      │    - Customer Management             │
+│  - Phone/Camera/etc     │    - Traditional Web Interface       │
 └────────────┬───────────┴──────────────┬────────────────────────┘
              │                          │
              ▼                          ▼
@@ -48,6 +49,90 @@ CultureMade is a fully customizable e-commerce platform built from scratch, offe
 │  - File Storage         │   │                                │
 └─────────────────────────┘   └─────────────────────────────────┘
 ```
+
+### iPhone Interface Architecture
+
+#### Core iPhone Components
+
+```typescript
+// iPhone Shell - Main container mimicking iPhone hardware
+components/iphone/
+├── iphone-shell.tsx          // iPhone hardware simulation
+├── lock-screen.tsx           // Passcode protection screen
+├── home-screen.tsx           // Apps grid and dock
+├── app-icon.tsx              // Individual app icons
+├── app-renderer.tsx          // App switching system
+├── status-bar.tsx            // Time, battery, signal
+└── apps/
+    ├── phone-app.tsx         // Phone app simulation
+    ├── camera-app.tsx        // Camera interface
+    ├── photos-app.tsx        // Gallery with CultureMade photos
+    ├── settings-app.tsx      // iPhone settings
+    ├── safari-app.tsx        // Browser simulation
+    ├── messages-app.tsx      // SMS simulation
+    ├── calculator-app.tsx    // Working calculator
+    ├── weather-app.tsx       // Weather info
+    ├── clock-app.tsx         // Clock/timer
+    ├── calendar-app.tsx      // Calendar
+    ├── notes-app.tsx         // Notes app
+    ├── music-app.tsx         // Music player
+    ├── mail-app.tsx          // Email simulation
+    ├── appstore-app.tsx      // App Store simulation
+    └── culturemade-app.tsx   // Main e-commerce app
+```
+
+#### iPhone State Management
+
+```typescript
+// iPhone-specific hooks and context
+hooks/
+├── use-iphone-state.ts       // Main iPhone state management
+├── use-app-switching.ts      // App navigation and multitasking
+├── use-gestures.ts           // Swipe, tap, long press gestures
+└── use-animations.ts         // iPhone-style transitions
+
+// Context providers
+contexts/
+├── iphone-context.tsx        // Global iPhone state
+├── apps-context.tsx          // Apps management
+└── animations-context.tsx    // Animation system
+```
+
+#### Key Features
+
+1. **Realistic iPhone Hardware Simulation**
+   - Accurate iPhone 14 Pro dimensions and styling
+   - Dynamic notch with status information
+   - Home indicator and gesture recognition
+   - Realistic bezels and shadow effects
+
+2. **Lock Screen System**
+   - 6-digit passcode protection (configurable)
+   - Real-time clock and date display
+   - Beautiful gradient backgrounds
+   - Error handling with animations
+   - Optional Face ID/Touch ID simulation
+
+3. **Native-Style Apps**
+   - 16 realistic iPhone apps with full functionality
+   - Each app as independent React component
+   - Smooth iOS-style animations and transitions
+   - App icons with press animations
+   - Dock with 4 primary apps
+
+4. **CultureMade E-Commerce App**
+   - Product browsing optimized for iPhone interface
+   - Native-style shopping cart
+   - Touch-optimized checkout flow
+   - User authentication within app
+   - Push notification simulations
+
+5. **Advanced Interactions**
+   - Swipe gestures for navigation
+   - Long press for app management
+   - Multi-touch support
+   - Haptic feedback simulation
+   - App switching animations
 
 ### Database Schema Design
 
@@ -427,54 +512,125 @@ CREATE POLICY "Users can manage own cart" ON cart_items
 - [ ] Implement role-based access control (RBAC)
 - [ ] Add password reset and email verification flows
 
-### Phase 2: Core E-Commerce Features (Weeks 2-3)
+### Phase 1.5: iPhone Interface System (Week 2)
 
-#### 2.1 Product Management
+#### 1.5.1 iPhone Hardware Simulation
 
-- [ ] Product CRUD operations
-- [ ] Product variants system
-- [ ] Image upload and optimization
-- [ ] Category and collection management
-- [ ] Inventory tracking system
-- [ ] Product search and filtering
+- [ ] Create iPhone shell component with accurate dimensions
+- [ ] Implement responsive design for different screen sizes
+- [ ] Add realistic bezels, notch, and home indicator
+- [ ] Create status bar with time, battery, and signal
+- [ ] Add iPhone-specific styling and shadows
 
-#### 2.2 Shopping Cart
+#### 1.5.2 Lock Screen & Security
 
+- [ ] Implement passcode-protected lock screen
+- [ ] Add real-time clock and date display
+- [ ] Create beautiful gradient backgrounds
+- [ ] Add error handling with shake animations
+- [ ] Optional Face ID/Touch ID simulation
+
+#### 1.5.3 Home Screen & Apps
+
+- [ ] Create apps grid with 16 realistic iPhone apps
+- [ ] Implement app icons with press animations
+- [ ] Add dock with 4 primary apps
+- [ ] Create multiple home screen pages
+- [ ] Add page dots indicator
+
+#### 1.5.4 Core iPhone Apps Development
+
+- [ ] Phone app with dialer simulation
+- [ ] Camera app with photo interface
+- [ ] Photos app with gallery functionality
+- [ ] Settings app with iPhone settings
+- [ ] Safari browser simulation
+- [ ] Messages app with SMS interface
+- [ ] Calculator with full functionality
+- [ ] Weather app with weather data
+- [ ] Clock app with timer/alarm
+- [ ] Calendar with date management
+- [ ] Notes app for text notes
+- [ ] Music app with player interface
+- [ ] Mail app with email simulation
+- [ ] App Store with app browsing
+
+#### 1.5.5 iPhone State Management
+
+- [ ] Create iPhone state management hooks
+- [ ] Implement app switching system
+- [ ] Add gesture recognition (swipe, tap, long press)
+- [ ] Create animation system for iOS-style transitions
+- [ ] Add haptic feedback simulation
+
+### Phase 2: Core E-Commerce Features (Weeks 3-4)
+
+#### 2.1 CultureMade iPhone App
+
+- [ ] Create main CultureMade app within iPhone interface
+- [ ] Design app icon and branding for iPhone
+- [ ] Implement product browsing optimized for iPhone screen
+- [ ] Create native-style navigation and UI components
+- [ ] Add touch-optimized interactions and gestures
+- [ ] Integrate with iPhone notifications system
+
+#### 2.2 Product Management (iPhone Optimized)
+
+- [ ] Product CRUD operations accessible via iPhone interface
+- [ ] Product variants system with touch-friendly selection
+- [ ] Image upload and optimization for iPhone display
+- [ ] Category and collection management within app
+- [ ] Inventory tracking system with real-time updates
+- [ ] Product search and filtering optimized for mobile
+
+#### 2.3 Shopping Cart (iPhone Native)
+
+- [ ] Native-style cart interface within CultureMade app
+- [ ] Swipe gestures for cart item management
 - [ ] Persistent cart for logged-in users
-- [ ] Session-based cart for anonymous users
-- [ ] Cart merge on login
-- [ ] Real-time inventory checking
-- [ ] Cart abandonment tracking
+- [ ] Session-based cart for anonymous users (using iPhone storage)
+- [ ] Cart merge on login within iPhone interface
+- [ ] Real-time inventory checking with iPhone-style alerts
+- [ ] Cart abandonment tracking with push notifications
 
-#### 2.3 Checkout Flow
+#### 2.4 Checkout Flow (iPhone Optimized)
 
-- [ ] Multi-step checkout process
-- [ ] Address management
-- [ ] Shipping method selection
-- [ ] Tax calculation
-- [ ] Discount/coupon application
-- [ ] Stripe payment integration
-- [ ] Order confirmation emails
+- [ ] Multi-step checkout process within iPhone constraints
+- [ ] Touch-optimized address management
+- [ ] Native-style shipping method selection
+- [ ] Tax calculation with clear mobile display
+- [ ] Discount/coupon application with iPhone keyboard
+- [ ] Stripe payment integration optimized for iPhone
+- [ ] Order confirmation with iPhone notification style
 
-### Phase 3: Customer Portal (Week 4)
+### Phase 3: Customer Portal (iPhone Interface) (Week 5)
 
-#### 3.1 Account Management
+#### 3.1 Account Management (Within CultureMade App)
 
-- [ ] User dashboard
-- [ ] Profile management
-- [ ] Address book
-- [ ] Order history
-- [ ] Order tracking
-- [ ] Wishlist functionality
+- [ ] User dashboard with iPhone-style interface
+- [ ] Profile management with touch-optimized forms
+- [ ] Address book with native-style editing
+- [ ] Order history with swipe gestures
+- [ ] Order tracking with real-time updates
+- [ ] Wishlist functionality with heart animations
 
-#### 3.2 Product Discovery
+#### 3.2 Product Discovery (iPhone Optimized)
 
-- [ ] Product listing pages with filters
-- [ ] Product detail pages
-- [ ] Product reviews and ratings
-- [ ] Recently viewed products
-- [ ] Recommended products
-- [ ] Search functionality with autocomplete
+- [ ] Product listing with infinite scroll and touch gestures
+- [ ] Product detail pages with pinch-to-zoom
+- [ ] Product reviews and ratings with iPhone-style stars
+- [ ] Recently viewed products with horizontal scroll
+- [ ] Recommended products with native-style cards
+- [ ] Search functionality with iPhone keyboard and autocomplete
+
+#### 3.3 iPhone Integration Features
+
+- [ ] Add to Home Screen functionality for CultureMade app
+- [ ] Push notifications for order updates and new products
+- [ ] Share products via iPhone share sheet simulation
+- [ ] Camera integration for product photos and AR try-on
+- [ ] Location services for store finder (if applicable)
+- [ ] Contacts integration for shipping addresses
 
 ### Phase 4: Admin Dashboard (Weeks 5-6)
 
@@ -608,6 +764,35 @@ culturemade/
 │   │   ├── card.tsx
 │   │   ├── input.tsx
 │   │   └── ... (shadcn/ui components)
+│   ├── iphone/
+│   │   ├── iphone-shell.tsx
+│   │   ├── lock-screen.tsx
+│   │   ├── home-screen.tsx
+│   │   ├── app-icon.tsx
+│   │   ├── app-renderer.tsx
+│   │   ├── status-bar.tsx
+│   │   └── apps/
+│   │       ├── phone-app.tsx
+│   │       ├── camera-app.tsx
+│   │       ├── photos-app.tsx
+│   │       ├── settings-app.tsx
+│   │       ├── safari-app.tsx
+│   │       ├── messages-app.tsx
+│   │       ├── calculator-app.tsx
+│   │       ├── weather-app.tsx
+│   │       ├── clock-app.tsx
+│   │       ├── calendar-app.tsx
+│   │       ├── notes-app.tsx
+│   │       ├── music-app.tsx
+│   │       ├── mail-app.tsx
+│   │       ├── appstore-app.tsx
+│   │       └── culturemade-app/
+│   │           ├── index.tsx
+│   │           ├── product-grid.tsx
+│   │           ├── product-detail.tsx
+│   │           ├── cart.tsx
+│   │           ├── checkout.tsx
+│   │           └── profile.tsx
 │   ├── customer/
 │   │   ├── header.tsx
 │   │   ├── footer.tsx
@@ -638,6 +823,10 @@ culturemade/
 │   ├── use-cart.ts
 │   ├── use-auth.ts
 │   ├── use-products.ts
+│   ├── use-iphone-state.ts
+│   ├── use-app-switching.ts
+│   ├── use-gestures.ts
+│   ├── use-animations.ts
 │   └── ...
 ├── types/
 │   ├── database.ts
@@ -740,28 +929,35 @@ culturemade/
 4. **Customer Satisfaction**: > 4.5/5 rating
 5. **Admin Efficiency**: < 5 min order processing
 
-## 🎯 MVP Features (4 weeks)
+## 🎯 MVP Features (5 weeks)
 
-### Week 1-2: Foundation
+### Week 1: Foundation
 
 - Basic auth system
-- Product listing and details
-- Shopping cart functionality
-- Stripe checkout integration
+- Database setup
+- Core Next.js structure
 
-### Week 3: Customer Features
+### Week 2: iPhone Interface
 
-- Order management
-- User accounts
-- Basic search
-- Mobile responsive design
+- iPhone hardware simulation
+- Lock screen with passcode
+- Home screen with apps
+- Basic iPhone apps functionality
+- iPhone state management
 
-### Week 4: Admin Essentials
+### Week 3-4: E-Commerce Features
 
-- Admin authentication
-- Product management
-- Order management
-- Basic analytics
+- CultureMade app within iPhone
+- Product listing and details (iPhone optimized)
+- Shopping cart functionality (native-style)
+- Stripe checkout integration (iPhone UI)
+
+### Week 5: Admin & Polish
+
+- Admin authentication (traditional web interface)
+- Product management dashboard
+- Order management system
+- iPhone interface polish and optimization
 
 ## 🚦 Post-MVP Roadmap
 
