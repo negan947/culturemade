@@ -1,7 +1,6 @@
 "use client";
 
 import { RootState } from "@/store/store";
-import Image from "next/image";
 import { FC } from "react";
 import { useSelector } from "react-redux";
 import { AnimatePresence, motion } from "framer-motion";
