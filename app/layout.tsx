@@ -5,20 +5,44 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CultureMade - Coming Soon",
-  description: "Something amazing is coming soon. We're crafting a premium e-commerce experience that will revolutionize how you shop for culture and style.",
-  keywords: ["ecommerce", "culture", "fashion", "coming soon", "premium"],
+  title: "CULTUREMADE - Coming Soon",
+  description: "Something raw is coming. A space where culture meets commerce, where every piece tells a story, where authenticity isn't just a word.",
+  keywords: ["culture", "streetwear", "fashion", "authentic", "exclusive", "coming soon"],
   authors: [{ name: "CultureMade" }],
+  icons: {
+    icon: [
+      { url: "/CM_Logo.jpg", sizes: "32x32", type: "image/jpeg" },
+      { url: "/CM_Logo.jpg", sizes: "16x16", type: "image/jpeg" },
+    ],
+    apple: [
+      { url: "/CM_Logo.jpg", sizes: "180x180", type: "image/jpeg" },
+    ],
+    other: [
+      {
+        rel: "apple-touch-icon-precomposed",
+        url: "/CM_Logo.jpg",
+      },
+    ],
+  },
   openGraph: {
-    title: "CultureMade - Coming Soon",
-    description: "Something amazing is coming soon. Premium e-commerce experience launching soon.",
+    title: "CULTUREMADE - Something Raw is Coming",
+    description: "A space where culture meets commerce, where every piece tells a story, where authenticity isn't just a word.",
     type: "website",
     locale: "en_US",
+    images: [
+      {
+        url: "/CM_Logo.jpg",
+        width: 1200,
+        height: 630,
+        alt: "CultureMade Logo",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "CultureMade - Coming Soon",
-    description: "Something amazing is coming soon. Premium e-commerce experience launching soon.",
+    title: "CULTUREMADE - Something Raw is Coming",
+    description: "A space where culture meets commerce. Coming soon.",
+    images: ["/CM_Logo.jpg"],
   },
   robots: {
     index: false,
@@ -33,7 +57,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${inter.className} antialiased bg-black`}>
         {children}
       </body>
     </html>

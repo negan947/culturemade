@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { createAuthMiddleware } from './lib/supabase/middleware';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // Allow API routes and static assets to pass through
+  // Always allow API routes, static assets, and favicon
   if (
     pathname.startsWith('/api/') ||
     pathname.startsWith('/_next/') ||
@@ -14,14 +15,22 @@ export function middleware(request: NextRequest) {
   ) {
     return NextResponse.next();
   }
+
+  // Check if we're in development mode with site lock
+  const isDevelopmentLocked = process.env.NODE_ENV === 'development' && process.env.SITE_LOCKED === 'true';
   
-  // If already on home page, allow it
-  if (pathname === '/') {
-    return NextResponse.next();
+  if (isDevelopmentLocked) {
+    // Development mode - redirect everything to home page
+    if (pathname === '/') {
+      return NextResponse.next();
+    }
+    
+    // Redirect all other routes to home page (development page)
+    return NextResponse.redirect(new URL('/', request.url));
   }
-  
-  // Redirect all other routes to home page (development page)
-  return NextResponse.redirect(new URL('/', request.url));
+
+  // Production mode or development with site unlocked - use full auth middleware
+  return createAuthMiddleware(request);
 }
 
 export const config = {
