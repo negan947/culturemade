@@ -8,9 +8,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import AppView from "./Interface/AppView/AppView";
 import LayoutView from "./Interface/SystemLayout/LayoutView";
 import Home from "./Interface/Home/Home";
+import LockScreen from "./Interface/LockScreen/LockScreen";
 
 const IPhoneShell: FC = () => {
   const currentApp = useSelector((state: RootState) => state.interface.appId);
+  const isLocked = useSelector((state: RootState) => state.interface.isLocked);
 
   return (
     <div className="select-none p-6 sizing box-border flex justify-center">
@@ -26,9 +28,15 @@ const IPhoneShell: FC = () => {
           alt="wallpaper"
         />
         <motion.div className="relative z-30 h-full">
-          <AnimatePresence>
-            <Home />
-            {currentApp && <AppView key={"appview"} appId={currentApp} />}
+          <AnimatePresence mode="wait">
+            {isLocked ? (
+              <LockScreen key="lockscreen" />
+            ) : (
+              <>
+                <Home key="home" />
+                {currentApp && <AppView key={"appview"} appId={currentApp} />}
+              </>
+            )}
           </AnimatePresence>
         </motion.div>
       </motion.main>
