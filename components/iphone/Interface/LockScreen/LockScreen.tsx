@@ -22,11 +22,14 @@ const LockScreen: FC = () => {
   }, []);
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: false,
-    });
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    
+    // Format like iOS (9:41 style)
+    const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+    const displayMinutes = minutes.toString().padStart(2, '0');
+    
+    return `${displayHours}:${displayMinutes}`;
   };
 
   const formatDate = (date: Date) => {
@@ -65,6 +68,20 @@ const LockScreen: FC = () => {
     setPasscode(passcode.slice(0, -1));
   };
 
+  // iOS Camera Icon
+  const CameraIcon = () => (
+    <svg width="28" height="22" viewBox="0 0 28 22" fill="currentColor">
+      <path d="M26 5H22.5L20.5 2H16C15.5 2 15 1.5 15 1C15 0.5 14.5 0 14 0C13.5 0 13 0.5 13 1C13 1.5 12.5 2 12 2H7.5L5.5 5H2C0.9 5 0 5.9 0 7V19C0 20.1 0.9 21 2 21H26C27.1 21 28 20.1 28 19V7C28 5.9 27.1 5 26 5ZM14 18C10.7 18 8 15.3 8 12C8 8.7 10.7 6 14 6C17.3 6 20 8.7 20 12C20 15.3 17.3 18 14 18ZM14 8C11.8 8 10 9.8 10 12C10 14.2 11.8 16 14 16C16.2 16 18 14.2 18 12C18 9.8 16.2 8 14 8Z"/>
+    </svg>
+  );
+
+  // iOS Flashlight Icon  
+  const FlashlightIcon = () => (
+    <svg width="16" height="28" viewBox="0 0 16 28" fill="currentColor">
+      <path d="M8 0C7.4 0 7 0.4 7 1V2H9V1C9 0.4 8.6 0 8 0ZM1.5 2.5L0.1 3.9L2.8 6.6L4.2 5.2L1.5 2.5ZM14.5 2.5L11.8 5.2L13.2 6.6L15.9 3.9L14.5 2.5ZM8 4C5.8 4 4 5.8 4 8C4 8.3 4 8.5 4.1 8.8L4.8 11L11.2 11L11.9 8.8C11.9 8.5 12 8.3 12 8C12 5.8 10.2 4 8 4ZM5.5 13V26.5C5.5 27.3 6.2 28 7 28H9C9.8 28 10.5 27.3 10.5 26.5V13H5.5Z"/>
+    </svg>
+  );
+
   const PasscodeKeypad = () => (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -94,7 +111,7 @@ const LockScreen: FC = () => {
           <motion.button
             key={digit}
             onClick={() => handlePasscodeInput(digit)}
-            className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white text-2xl font-light active:bg-white/20 transition-colors"
+            className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white text-2xl font-light active:bg-white/20 transition-colors sf-pro-display"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -102,11 +119,10 @@ const LockScreen: FC = () => {
           </motion.button>
         ))}
         
-        {/* Emergency and 0 and Delete */}
         <div></div>
         <motion.button
           onClick={() => handlePasscodeInput('0')}
-          className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white text-2xl font-light active:bg-white/20 transition-colors"
+          className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white text-2xl font-light active:bg-white/20 transition-colors sf-pro-display"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -124,10 +140,9 @@ const LockScreen: FC = () => {
         </motion.button>
       </div>
       
-      {/* Cancel */}
       <motion.button
         onClick={() => setShowPasscode(false)}
-        className="absolute bottom-4 right-6 text-white/60 text-sm"
+        className="absolute bottom-4 right-6 text-white/60 text-sm sf-pro-text"
         whileTap={{ scale: 0.95 }}
       >
         Cancel
@@ -150,96 +165,78 @@ const LockScreen: FC = () => {
       }}
     >
       {/* Blur overlay */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-md" />
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
       
       {/* Main Content */}
       <div className="relative z-10 h-full flex flex-col">
-        {/* Top section with time and date */}
-        <div className="flex-1 flex flex-col justify-center px-6 pt-20 pb-4">
-          {/* Time */}
-          <motion.div
-            className="text-center mb-2"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <div className="text-6xl sm:text-7xl font-thin tracking-tight">
-              {formatTime(currentTime)}
-            </div>
-          </motion.div>
-
+        {/* Top section with time and date - positioned like iOS */}
+        <div className="pt-20 px-6">
           {/* Date */}
           <motion.div
-            className="text-center mb-8"
+            className="text-center mb-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.2 }}
           >
-            <div className="text-lg font-medium opacity-80">
+            <div className="text-lg font-medium opacity-90 sf-pro-text tracking-tight">
               {formatDate(currentTime)}
             </div>
           </motion.div>
 
-          {/* CultureMade Branding */}
+          {/* Time */}
           <motion.div
-            className="text-center px-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
+            className="text-center mb-8"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.4 }}
           >
-            <div className="text-sm font-semibold tracking-[0.3em] uppercase mb-2 opacity-90">
-              CULTUREMADE
-            </div>
-            <div className="text-xs opacity-60">
-              Something Raw is Coming
+            <div className="text-8xl font-thin tracking-tighter sf-pro-display" style={{ fontSize: '96px', lineHeight: '1', fontWeight: '100' }}>
+              {formatTime(currentTime)}
             </div>
           </motion.div>
         </div>
 
+        {/* Spacer to push bottom content down */}
+        <div className="flex-1" />
+
         {/* Bottom section */}
         {!showPasscode && (
           <motion.div
-            className="pb-8 px-6"
+            className="pb-10 px-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
+            transition={{ delay: 0.6 }}
           >
             {/* Camera and Flashlight shortcuts */}
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-8">
               <motion.button
-                className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center"
+                className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
-                  <circle cx="12" cy="13" r="3"/>
-                </svg>
+                <FlashlightIcon />
               </motion.button>
 
               <motion.button
-                className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center"
+                className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 18V5l3-3 3 3v13"/>
-                  <circle cx="12" cy="2" r="1"/>
-                </svg>
+                <CameraIcon />
               </motion.button>
             </div>
 
-            {/* Swipe indicator */}
+            {/* Swipe indicator - exactly like iOS */}
             <div className="text-center">
               <motion.div
-                className="inline-flex items-center space-x-2 text-sm opacity-60"
-                animate={{ y: [-2, 2, -2] }}
-                transition={{ repeat: Infinity, duration: 2 }}
+                className="flex flex-col items-center space-y-2"
+                animate={{ y: [-1, 1, -1] }}
+                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
               >
-                <span>Swipe up to unlock</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="m18 15-6-6-6 6"/>
-                </svg>
+                <div className="text-base font-medium opacity-60 sf-pro-text tracking-tight">
+                  Swipe up to unlock
+                </div>
+                <div className="w-32 h-1 bg-white/40 rounded-full" />
               </motion.div>
             </div>
           </motion.div>

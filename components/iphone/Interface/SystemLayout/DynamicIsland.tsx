@@ -9,7 +9,13 @@ const DynamicIsland = () => {
       onClick={() => {
         dispatch(interfaceActions.exitApp());
       }}
-      className="z-50 absolute left-1/2 -translate-x-1/2 w-3/12 h-7 rounded-3xl top-3 bg-black pointer-events-auto"
+      className="z-50 absolute left-1/2 -translate-x-1/2 rounded-full bg-black pointer-events-auto shadow-lg"
+      style={{
+        width: '126px',
+        height: '37px',
+        top: '11px',
+        borderRadius: '19px',
+      }}
     />
   );
 };

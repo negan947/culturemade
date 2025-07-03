@@ -50,7 +50,7 @@ const HomeAppShortcut: FC<Props> = ({ appId, icon, name }) => {
         }}
       />
       {name && (
-        <p className="text-white/95 whitespace-nowrap text-ellipsis overflow-hidden text-xs font-normal">
+        <p className="text-white/95 whitespace-nowrap text-ellipsis overflow-hidden text-xs font-medium sf-pro-text tracking-tight" style={{ fontSize: '12px' }}>
           {name}
         </p>
       )}
