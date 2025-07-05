@@ -98,13 +98,15 @@ const StatusBar = () => {
     // Update time initially
     setTime(updateTime());
     
-    // Update time every minute instead of every second to reduce re-renders
-    const interval = setInterval(() => {
-      setTime(updateTime());
-    }, 60000); // Update every minute
-    
-    return () => clearInterval(interval);
-  }, []);
+    // Only update time when not locked to prevent interference with lock screen
+    if (!isLocked) {
+      const interval = setInterval(() => {
+        setTime(updateTime());
+      }, 60000); // Update every minute
+      
+      return () => clearInterval(interval);
+    }
+  }, [isLocked]);
 
   return (
     <motion.div
