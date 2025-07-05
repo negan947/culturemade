@@ -95,7 +95,7 @@ const iPhoneSlice = createSlice({
   initialState: {
     // Lock Screen & Security
     isLocked: true,
-    passcode: process.env.NEXT_PUBLIC_IPHONE_PASSCODE || "123456",
+    passcode: process.env.NEXT_PUBLIC_IPHONE_PASSCODE || "947491",
     biometricEnabled: true,
     
     // App Management
@@ -126,7 +126,7 @@ const iPhoneSlice = createSlice({
     flashlight: false,
     
     // Personalization
-    wallpaper: "/wallpapers/default.jpg",
+    wallpaper: "/images/wallpaper-ios.jpg",
     theme: "dark" as const,
     dynamicIsland: true,
     

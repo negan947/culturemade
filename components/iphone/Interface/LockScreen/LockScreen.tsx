@@ -11,15 +11,18 @@ const LockScreen: FC = () => {
   const [showPasscode, setShowPasscode] = useState(false);
   const [passcode, setPasscode] = useState("");
   const [isShaking, setIsShaking] = useState(false);
-  const correctPasscode = "9474";
+  const correctPasscode = "947491";
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+    // Only update time if not showing passcode to prevent unnecessary re-renders
+    if (!showPasscode) {
+      const timer = setInterval(() => {
+        setCurrentTime(new Date());
+      }, 1000);
 
-    return () => clearInterval(timer);
-  }, []);
+      return () => clearInterval(timer);
+    }
+  }, [showPasscode]);
 
   const formatTime = (date: Date) => {
     const hours = date.getHours();
@@ -46,11 +49,11 @@ const LockScreen: FC = () => {
   };
 
   const handlePasscodeInput = (digit: string) => {
-    if (passcode.length < 4) {
+    if (passcode.length < 6) {
       const newPasscode = passcode + digit;
       setPasscode(newPasscode);
       
-      if (newPasscode.length === 4) {
+      if (newPasscode.length === 6) {
         setTimeout(() => {
           if (newPasscode === correctPasscode) {
             dispatch(interfaceActions.unlock());
@@ -68,6 +71,13 @@ const LockScreen: FC = () => {
     setPasscode(passcode.slice(0, -1));
   };
 
+  // Lock Icon
+  const LockIcon = () => (
+    <svg width="24" height="30" viewBox="0 0 24 30" fill="currentColor">
+      <path d="M12 0C8.7 0 6 2.7 6 6V10H4C2.9 10 2 10.9 2 12V26C2 27.1 2.9 28 4 28H20C21.1 28 22 27.1 22 26V12C22 10.9 21.1 10 20 10H18V6C18 2.7 15.3 0 12 0ZM12 2C14.2 2 16 3.8 16 6V10H8V6C8 3.8 9.8 2 12 2ZM12 18C13.1 18 14 17.1 14 16C14 14.9 13.1 14 12 14C10.9 14 10 14.9 10 16C10 17.1 10.9 18 12 18Z"/>
+    </svg>
+  );
+
   // iOS Camera Icon
   const CameraIcon = () => (
     <svg width="28" height="22" viewBox="0 0 28 22" fill="currentColor">
@@ -82,20 +92,57 @@ const LockScreen: FC = () => {
     </svg>
   );
 
-  const PasscodeKeypad = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 50 }}
-      className="absolute bottom-0 left-0 right-0 px-6 pb-8"
-    >
-      {/* Passcode Dots */}
-      <div className="flex justify-center mb-8">
+  // Keypad data with letters
+  const keypadData = [
+    { digit: '1', letters: '' },
+    { digit: '2', letters: 'ABC' },
+    { digit: '3', letters: 'DEF' },
+    { digit: '4', letters: 'GHI' },
+    { digit: '5', letters: 'JKL' },
+    { digit: '6', letters: 'MNO' },
+    { digit: '7', letters: 'PQRS' },
+    { digit: '8', letters: 'TUV' },
+    { digit: '9', letters: 'WXYZ' },
+  ];
+
+  const PasscodeKeypad = () => {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 50 }}
+        className="absolute inset-0 flex flex-col justify-center px-6"
+        style={{
+          background: `
+            linear-gradient(180deg, 
+              #1e3a8a 0%,
+              #0891b2 25%, 
+              #059669 50%, 
+              #dc2626 75%, 
+              #be123c 100%
+            )
+          `
+        }}
+      >
+      {/* Lock Icon */}
+      <div className="flex justify-center mb-8 mt-20">
+        <div className="text-white opacity-90">
+          <LockIcon />
+        </div>
+      </div>
+
+      {/* Enter Passcode Text */}
+      <div className="text-center mb-8">
+        <h2 className="text-white text-lg ios-medium sf-pro-text">Enter Passcode</h2>
+      </div>
+
+      {/* Passcode Dots - Changed to 6 */}
+      <div className="flex justify-center mb-16">
         <div className="flex space-x-4">
-          {[0, 1, 2, 3].map((index) => (
+          {[0, 1, 2, 3, 4, 5].map((index) => (
             <motion.div
               key={index}
-              className={`w-4 h-4 rounded-full border-2 border-white/60 ${
+              className={`w-3 h-3 rounded-full border border-white/60 ${
                 index < passcode.length ? 'bg-white' : 'bg-transparent'
               }`}
               animate={isShaking ? { x: [-2, 2, -2, 2, 0] } : {}}
@@ -105,50 +152,67 @@ const LockScreen: FC = () => {
         </div>
       </div>
 
-      {/* Keypad */}
-      <div className="grid grid-cols-3 gap-6 max-w-xs mx-auto">
-        {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((digit) => (
+      {/* Keypad with letters */}
+      <div className="grid grid-cols-3 gap-x-8 gap-y-5 max-w-sm mx-auto mb-8">
+        {keypadData.map(({ digit, letters }) => (
           <motion.button
             key={digit}
             onClick={() => handlePasscodeInput(digit)}
-            className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white text-2xl font-light active:bg-white/20 transition-colors sf-pro-display"
+            className="relative w-20 h-20 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm flex flex-col items-center justify-center text-white transition-all"
             whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: 0.95, backgroundColor: 'rgba(255,255,255,0.2)' }}
           >
-            {digit}
+            <span className="text-3xl font-light leading-none">{digit}</span>
+            {letters && (
+              <span className="text-[10px] font-medium tracking-wider mt-0.5 opacity-80">
+                {letters}
+              </span>
+            )}
           </motion.button>
         ))}
         
+        {/* Empty space, 0, Delete */}
         <div></div>
         <motion.button
           onClick={() => handlePasscodeInput('0')}
-          className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white text-2xl font-light active:bg-white/20 transition-colors sf-pro-display"
+          className="relative w-20 h-20 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm flex items-center justify-center text-white transition-all"
           whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          whileTap={{ scale: 0.95, backgroundColor: 'rgba(255,255,255,0.2)' }}
         >
-          0
+          <span className="text-3xl font-light">0</span>
         </motion.button>
         <motion.button
           onClick={handleDelete}
-          className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white active:bg-white/20 transition-colors"
+          className="relative w-20 h-20 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm flex items-center justify-center text-white transition-all"
           whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          whileTap={{ scale: 0.95, backgroundColor: 'rgba(255,255,255,0.2)' }}
         >
-          <svg width="20" height="16" viewBox="0 0 20 16" fill="currentColor">
-            <path d="M8 0C9.1 0 10.1 0.4 10.8 1.1L12.4 2.7C12.7 3 13.1 3.2 13.5 3.2H18C19.1 3.2 20 4.1 20 5.2V12.8C20 13.9 19.1 14.8 18 14.8H13.5C13.1 14.8 12.7 14.6 12.4 14.3L10.8 12.7C10.1 12 9.1 11.6 8 11.6H2C0.9 11.6 0 10.7 0 9.6V2C0 0.9 0.9 0 2 0H8ZM13.7 5.7L12.3 4.3L10 6.6L7.7 4.3L6.3 5.7L8.6 8L6.3 10.3L7.7 11.7L10 9.4L12.3 11.7L13.7 10.3L11.4 8L13.7 5.7Z"/>
+          {/* Simplified iOS-style delete icon */}
+          <svg width="24" height="18" viewBox="0 0 24 18" fill="currentColor" className="opacity-90">
+            <path d="M8.5 0L0 9L8.5 18H24V0H8.5ZM22 16H9.5L2.5 9L9.5 2H22V16ZM11.5 5L10 6.5L13.5 10L10 13.5L11.5 15L15 11.5L18.5 15L20 13.5L16.5 10L20 6.5L18.5 5L15 8.5L11.5 5Z"/>
           </svg>
         </motion.button>
       </div>
       
-      <motion.button
-        onClick={() => setShowPasscode(false)}
-        className="absolute bottom-4 right-6 text-white/60 text-sm sf-pro-text"
-        whileTap={{ scale: 0.95 }}
-      >
-        Cancel
-      </motion.button>
+      {/* Bottom buttons */}
+      <div className="flex justify-between items-center px-6 pb-12">
+        <motion.button
+          className="text-white text-base ios-medium opacity-90"
+          whileTap={{ scale: 0.95, opacity: 0.6 }}
+        >
+          Emergency
+        </motion.button>
+        <motion.button
+          onClick={() => setShowPasscode(false)}
+          className="text-white text-base ios-medium opacity-90"
+          whileTap={{ scale: 0.95, opacity: 0.6 }}
+        >
+          Cancel
+        </motion.button>
+      </div>
     </motion.div>
-  );
+    );
+  };
 
   return (
     <motion.div
@@ -163,38 +227,48 @@ const LockScreen: FC = () => {
           handleSwipeUp();
         }
       }}
+      style={{
+        background: showPasscode ? 'transparent' : `
+          linear-gradient(180deg, 
+            #1e3a8a 0%,
+            #0891b2 25%, 
+            #059669 50%, 
+            #dc2626 75%, 
+            #be123c 100%
+          )
+        `
+      }}
     >
-      {/* Blur overlay */}
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
-      
       {/* Main Content */}
       <div className="relative z-10 h-full flex flex-col">
         {/* Top section with time and date - positioned like iOS */}
-        <div className="pt-20 px-6">
-          {/* Date */}
-          <motion.div
-            className="text-center mb-2"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <div className="text-lg font-medium opacity-90 sf-pro-text tracking-tight">
-              {formatDate(currentTime)}
-            </div>
-          </motion.div>
+        {!showPasscode && (
+          <div className="pt-20 px-6">
+            {/* Date */}
+            <motion.div
+              className="text-center mb-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <div className="ios-lock-date opacity-90">
+                {formatDate(currentTime)}
+              </div>
+            </motion.div>
 
-          {/* Time */}
-          <motion.div
-            className="text-center mb-8"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            <div className="text-8xl font-thin tracking-tighter sf-pro-display" style={{ fontSize: '96px', lineHeight: '1', fontWeight: '100' }}>
-              {formatTime(currentTime)}
-            </div>
-          </motion.div>
-        </div>
+            {/* Time */}
+            <motion.div
+              className="text-center mb-8"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+            >
+              <div className="ios-lock-time">
+                {formatTime(currentTime)}
+              </div>
+            </motion.div>
+          </div>
+        )}
 
         {/* Spacer to push bottom content down */}
         <div className="flex-1" />
@@ -202,13 +276,13 @@ const LockScreen: FC = () => {
         {/* Bottom section */}
         {!showPasscode && (
           <motion.div
-            className="pb-10 px-8"
+            className="pb-8 px-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
           >
             {/* Camera and Flashlight shortcuts */}
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex justify-between items-center mb-4">
               <motion.button
                 className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"
                 whileHover={{ scale: 1.1 }}
@@ -233,7 +307,7 @@ const LockScreen: FC = () => {
                 animate={{ y: [-1, 1, -1] }}
                 transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
               >
-                <div className="text-base font-medium opacity-60 sf-pro-text tracking-tight">
+                <div className="text-base ios-medium opacity-60 sf-pro-text tracking-tight">
                   Swipe up to unlock
                 </div>
                 <div className="w-32 h-1 bg-white/40 rounded-full" />

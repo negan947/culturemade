@@ -19,6 +19,11 @@ const config: Config = {
       aspectRatio: {
         'iphone': '18 / 39',
       },
+      fontFamily: {
+        'sf-pro-display': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'system-ui', 'sans-serif'],
+        'sf-pro-text': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'system-ui', 'sans-serif'],
+        'sf-pro-rounded': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Rounded', 'SF Pro Display', 'system-ui', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
