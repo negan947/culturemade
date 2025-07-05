@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { interfaceActions } from "@/store/interface-slice";
 
 // Isolated PasscodeKeypad component - completely separate from parent state
-const PasscodeKeypad = React.memo(({ 
+const PasscodeKeypad = React.memo(function PasscodeKeypad({ 
   passcode, 
   isShaking, 
   onPasscodeInput, 
@@ -18,7 +18,7 @@ const PasscodeKeypad = React.memo(({
   onPasscodeInput: (digit: string) => void;
   onDelete: () => void;
   onCancel: () => void;
-}) => {
+}) {
   // Stable keypad data that never changes
   const keypadData = useMemo(() => [
     { digit: '1', letters: '' },
@@ -225,13 +225,6 @@ const LockScreen: FC = () => {
   const handleCancelPasscode = useCallback(() => {
     setShowPasscode(false);
   }, []);
-
-  // Lock Icon
-  const LockIcon = () => (
-    <svg width="24" height="30" viewBox="0 0 24 30" fill="currentColor">
-      <path d="M12 0C8.7 0 6 2.7 6 6V10H4C2.9 10 2 10.9 2 12V26C2 27.1 2.9 28 4 28H20C21.1 28 22 27.1 22 26V12C22 10.9 21.1 10 20 10H18V6C18 2.7 15.3 0 12 0ZM12 2C14.2 2 16 3.8 16 6V10H8V6C8 3.8 9.8 2 12 2ZM12 18C13.1 18 14 17.1 14 16C14 14.9 13.1 14 12 14C10.9 14 10 14.9 10 16C10 17.1 10.9 18 12 18Z"/>
-    </svg>
-  );
 
   // iOS Camera Icon
   const CameraIcon = () => (
