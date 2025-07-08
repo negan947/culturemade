@@ -1,8 +1,8 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import { motion } from "framer-motion";
 
 interface Props {
-  children: JSX.Element[];
+  children: ReactNode;
 }
 
 const HomeAppPage: FC<Props> = ({ children }) => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { RootState } from "@/store/store";
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import { useSelector } from "react-redux";
 import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
 import AppView from "./Interface/AppView/AppView";
@@ -9,7 +9,7 @@ import LayoutView from "./Interface/SystemLayout/LayoutView";
 import LockScreen from "./Interface/LockScreen/LockScreen";
 
 interface Props {
-  children: JSX.Element;
+  children: ReactNode;
 }
 
 const IPhoneShell: FC<Props> = ({ children }) => {
