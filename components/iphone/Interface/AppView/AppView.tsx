@@ -35,7 +35,7 @@ const AppView: FC<Props> = ({ appId }) => {
   };
 
   return (
-    <motion.div
+    <motion.div layout
       className="absolute h-full w-full top-0 left-0 bg-white z-40 overflow-hidden"
       layoutId={appId}
       initial={{ borderRadius: 40, scale: 1 }}

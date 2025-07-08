@@ -40,5 +40,4 @@ const Home = () => {
     </motion.section>
   );
 };
-
 export default Home;

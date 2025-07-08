@@ -548,7 +548,7 @@ const LockScreen: FC = () => {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
-              <div className="ios-lock-time">
+              <div className="ios-lock-time" suppressHydrationWarning>
                 {formatTime(currentTime)}
               </div>
             </motion.div>

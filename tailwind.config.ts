@@ -17,7 +17,7 @@ const config: Config = {
     },
     extend: {
       aspectRatio: {
-        'iphone': '18 / 39',
+        iphone: "18 / 39",
       },
       fontFamily: {
         'sf-pro-display': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'system-ui', 'sans-serif'],
