@@ -8,7 +8,7 @@ const Dock = () => {
     { color: "#0018bb", id: "swift", icon: "mail" },
   ];
   return (
-    <div className="mt-auto grid grid-cols-4 gap-7 gap-y-5 p-4 m-4 rounded-[30px] bg-white/20 backdrop-blur-md">
+    <div className="mt-auto grid grid-cols-4 gap-7 gap-y-5 p-4 m-4 rounded-[30px] bg-zinc-300/30 backdrop-blur-md">
       {colors.map((app) => (
         <HomeAppShortcut key={app.id} appId={app.id} icon={app.icon} />
       ))}
