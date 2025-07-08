@@ -6,11 +6,14 @@ import { interfaceActions } from "@/store/interface-slice";
 import Dock from "./Dock";
 import HomeAppPage from "./HomeAppPage";
 import HomeAppShortcut from "./HomeAppShortcut";
+import { useMemo } from "react";
 
 const Home = () => {
   const inApp = useSelector((state: RootState) => state.interface.inApp);
   const dispatch = useDispatch();
-  const apps = getAllApps();
+  
+  // Memoize apps to prevent unnecessary re-renders
+  const apps = useMemo(() => getAllApps(), []);
 
   const handleLock = () => {
     dispatch(interfaceActions.lock());
@@ -18,7 +21,7 @@ const Home = () => {
 
   return (
     <motion.section
-      key={"home"}
+      key="home"
       animate={{
         filter: inApp ? "blur(4px)" : "blur(0px)",
         scale: inApp ? 0.95 : 1,

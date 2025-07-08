@@ -7,6 +7,12 @@ export const store = configureStore({
     interface: interfaceSlice,
     notification: notificationSlice,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['notification/addNotification'],
+      },
+    }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
