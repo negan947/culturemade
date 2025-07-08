@@ -18,18 +18,7 @@ const IPhoneShell: FC<Props> = ({ children }) => {
 
   // Shared iOS wallpaper background - single source of truth
   const iOSWallpaperStyles = {
-    background: `
-      radial-gradient(circle at 15% 25%, rgba(30, 58, 138, 0.8) 0%, transparent 60%),
-      radial-gradient(circle at 85% 20%, rgba(8, 145, 178, 0.7) 0%, transparent 55%),
-      radial-gradient(circle at 45% 80%, rgba(5, 150, 105, 0.8) 0%, transparent 50%),
-      radial-gradient(circle at 80% 85%, rgba(220, 38, 38, 0.7) 0%, transparent 45%),
-      radial-gradient(circle at 20% 90%, rgba(190, 18, 60, 0.6) 0%, transparent 40%),
-      linear-gradient(135deg, #1e3a8a 0%, #0891b2 25%, #059669 50%, #dc2626 75%, #be123c 100%)
-    `,
-    backgroundSize: '100% 100%',
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'center center',
-    backgroundAttachment: 'fixed'
+    background: `url('/images/wallpaper-cm.jpg') center / cover no-repeat`,
   };
 
   return (

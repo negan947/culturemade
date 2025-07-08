@@ -50,7 +50,7 @@ const HomeAppShortcut: FC<Props> = ({ appId, icon, name }) => {
         }}
       />
       {name && (
-        <p className="text-white/95 whitespace-nowrap text-ellipsis overflow-hidden text-xs font-normal">
+        <p className="text-zinc-800 whitespace-nowrap text-ellipsis overflow-hidden text-xs font-normal">
           {name}
         </p>
       )}

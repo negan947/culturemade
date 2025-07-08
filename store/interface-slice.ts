@@ -11,7 +11,7 @@ export interface Interface {
 const initialState: Interface = {
   appId: null,
   inApp: false,
-  statusBarColor: "light",
+  statusBarColor: "dark", // Default to dark text for light backgrounds
   isLocked: true, // Start with lockscreen
 };
 
@@ -26,7 +26,7 @@ export const interfaceSlice = createSlice({
     exitApp: (state) => {
       state.appId = null;
       state.inApp = false;
-      state.statusBarColor = "light";
+      state.statusBarColor = "dark";
     },
     changeStatusBarColor: (state, action: PayloadAction<"light" | "dark">) => {
       state.statusBarColor = action.payload;
@@ -38,7 +38,7 @@ export const interfaceSlice = createSlice({
       state.isLocked = true;
       state.appId = null;
       state.inApp = false;
-      state.statusBarColor = "light";
+      state.statusBarColor = "dark";
     },
   },
 });

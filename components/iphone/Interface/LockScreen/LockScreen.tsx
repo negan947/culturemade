@@ -63,7 +63,7 @@ const PasscodeKeypad = React.memo(function PasscodeKeypad({
           damping: 25
         }}
       >
-        <div className="text-white opacity-90">
+        <div className="text-zinc-800 opacity-90">
           <svg width="24" height="30" viewBox="0 0 24 30" fill="currentColor">
             <path d="M12 0C8.7 0 6 2.7 6 6V10H4C2.9 10 2 10.9 2 12V26C2 27.1 2.9 28 4 28H20C21.1 28 22 27.1 22 26V12C22 10.9 21.1 10 20 10H18V6C18 2.7 15.3 0 12 0ZM12 2C14.2 2 16 3.8 16 6V10H8V6C8 3.8 9.8 2 12 2ZM12 18C13.1 18 14 17.1 14 16C14 14.9 13.1 14 12 14C10.9 14 10 14.9 10 16C10 17.1 10.9 18 12 18Z"/>
           </svg>
@@ -83,7 +83,7 @@ const PasscodeKeypad = React.memo(function PasscodeKeypad({
           damping: 25
         }}
       >
-        <h2 className="text-white text-lg ios-medium sf-pro-text">Enter Passcode</h2>
+        <h2 className="text-zinc-800 text-lg ios-medium sf-pro-text">Enter Passcode</h2>
       </motion.div>
 
       {/* Passcode Dots */}
@@ -103,8 +103,8 @@ const PasscodeKeypad = React.memo(function PasscodeKeypad({
           {[0, 1, 2, 3, 4, 5].map((index) => (
             <motion.div
               key={index}
-              className={`w-3 h-3 rounded-full border border-white/60 transition-all duration-200 ${
-                index < passcode.length ? 'bg-white' : 'bg-transparent'
+              className={`w-3 h-3 rounded-full border border-zinc-500 transition-all duration-200 ${
+                index < passcode.length ? 'bg-zinc-800' : 'bg-transparent'
               } ${isShaking ? 'animate-pulse' : ''}`}
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -138,7 +138,7 @@ const PasscodeKeypad = React.memo(function PasscodeKeypad({
           <motion.button
             key={digit}
             onClick={() => onPasscodeInput(digit)}
-            className="relative rounded-full border border-white/30 bg-white/10 flex flex-col items-center justify-center text-white transition-all duration-150"
+            className="relative rounded-full border border-zinc-400/50 bg-zinc-300/30 flex flex-col items-center justify-center text-zinc-800 transition-all duration-150"
             style={{ 
               contain: 'layout style paint',
               width: '80px',
@@ -165,7 +165,7 @@ const PasscodeKeypad = React.memo(function PasscodeKeypad({
             }}
             whileTap={{ 
               scale: 0.92,
-              backgroundColor: "rgba(255, 255, 255, 0.25)",
+              backgroundColor: "rgba(100, 100, 100, 0.25)",
               transition: { 
                 type: "tween", 
                 duration: 0.05, 
@@ -186,7 +186,7 @@ const PasscodeKeypad = React.memo(function PasscodeKeypad({
         <div></div>
         <motion.button
           onClick={() => onPasscodeInput('0')}
-          className="relative rounded-full border border-white/30 bg-white/10 flex items-center justify-center text-white transition-all duration-150"
+          className="relative rounded-full border border-zinc-400/50 bg-zinc-300/30 flex items-center justify-center text-zinc-800 transition-all duration-150"
           style={{ 
             contain: 'layout style paint',
             width: '80px',
@@ -213,7 +213,7 @@ const PasscodeKeypad = React.memo(function PasscodeKeypad({
           }}
           whileTap={{ 
             scale: 0.92,
-            backgroundColor: "rgba(255, 255, 255, 0.25)",
+            backgroundColor: "rgba(100, 100, 100, 0.25)",
             transition: { 
               type: "tween", 
               duration: 0.05, 
@@ -225,7 +225,7 @@ const PasscodeKeypad = React.memo(function PasscodeKeypad({
         </motion.button>
         <motion.button
           onClick={onDelete}
-          className="relative rounded-full border border-white/30 bg-white/10 flex items-center justify-center text-white transition-all duration-150"
+          className="relative rounded-full border border-zinc-400/50 bg-zinc-300/30 flex items-center justify-center text-zinc-800 transition-all duration-150"
           style={{ 
             contain: 'layout style paint',
             width: '80px',
@@ -252,7 +252,7 @@ const PasscodeKeypad = React.memo(function PasscodeKeypad({
           }}
           whileTap={{ 
             scale: 0.92,
-            backgroundColor: "rgba(255, 255, 255, 0.25)",
+            backgroundColor: "rgba(100, 100, 100, 0.25)",
             transition: { 
               type: "tween", 
               duration: 0.05, 
@@ -261,7 +261,7 @@ const PasscodeKeypad = React.memo(function PasscodeKeypad({
           }}
           aria-label="Delete"
         >
-          <svg width="24" height="18" viewBox="0 0 24 18" fill="currentColor" className="opacity-90 pointer-events-none">
+          <svg width="24" height="18" viewBox="0 0 24 18" fill="currentColor" className="text-zinc-800 opacity-90 pointer-events-none">
             <path d="M8.5 0L0 9L8.5 18H24V0H8.5ZM22 16H9.5L2.5 9L9.5 2H22V16ZM11.5 5L10 6.5L13.5 10L10 13.5L11.5 15L15 11.5L18.5 15L20 13.5L16.5 10L20 6.5L18.5 5L15 8.5L11.5 5Z"/>
           </svg>
         </motion.button>
@@ -281,11 +281,11 @@ const PasscodeKeypad = React.memo(function PasscodeKeypad({
         }}
       >
         <motion.button 
-          className="text-white text-base ios-medium opacity-90 px-4 py-2 rounded-lg transition-all duration-150"
+          className="text-zinc-800 text-base ios-medium opacity-90 px-4 py-2 rounded-lg transition-all duration-150"
           whileTap={{ 
             scale: 0.92, 
             opacity: 0.6,
-            backgroundColor: "rgba(255, 255, 255, 0.15)",
+            backgroundColor: "rgba(100, 100, 100, 0.15)",
             transition: { 
               type: "tween", 
               duration: 0.05, 
@@ -297,11 +297,11 @@ const PasscodeKeypad = React.memo(function PasscodeKeypad({
         </motion.button>
         <motion.button 
           onClick={onCancel} 
-          className="text-white text-base ios-medium opacity-90 px-4 py-2 rounded-lg transition-all duration-150"
+          className="text-zinc-800 text-base ios-medium opacity-90 px-4 py-2 rounded-lg transition-all duration-150"
           whileTap={{ 
             scale: 0.92, 
             opacity: 0.6,
-            backgroundColor: "rgba(255, 255, 255, 0.15)",
+            backgroundColor: "rgba(100, 100, 100, 0.15)",
             transition: { 
               type: "tween", 
               duration: 0.05, 
@@ -460,7 +460,7 @@ const LockScreen: FC = () => {
 
   return (
     <motion.div
-      className="absolute inset-0 z-50 text-white overflow-hidden"
+      className="absolute inset-0 z-50 text-zinc-800 overflow-hidden"
       drag={showPasscode ? false : "y"}
       dragConstraints={{ top: -200, bottom: 0 }}
       dragElastic={0.2}
