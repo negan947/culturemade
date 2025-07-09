@@ -22,10 +22,14 @@ const IPhoneShell: FC<Props> = ({ children }) => {
   };
 
   return (
-    <div className="select-none flex justify-center items-center h-screen bg-black overflow-hidden">
+    <div className="select-none flex justify-center items-center h-screen-dvh sm:h-screen bg-black overflow-hidden pt-safe-top pb-safe-bottom">
       <motion.div
         className="relative overflow-hidden bg-black sm:border-[14px] sm:border-black sm:rounded-[60px] sm:shadow-2xl w-full h-full sm:h-[890px] sm:w-[410px]"
-        style={{ aspectRatio: '18/39' }}
+        style={{ 
+          aspectRatio: '18/39',
+          maxHeight: 'calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom))',
+          height: '100%'
+        }}
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5 }}

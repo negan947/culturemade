@@ -23,7 +23,7 @@ const Home = () => {
           bounce: 0.1,
         },
       }}
-      className="flex flex-col h-full pt-10"
+      className="flex flex-col h-full pt-10 pb-safe-bottom"
     >
       <HomeAppPage>
         {apps.map((app) => (

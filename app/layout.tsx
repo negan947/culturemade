@@ -10,6 +10,13 @@ export const metadata: Metadata = {
   description: "Something raw is coming. A space where culture meets commerce, where every piece tells a story, where authenticity isn't just a word.",
   keywords: ["culture", "streetwear", "fashion", "authentic", "exclusive", "coming soon"],
   authors: [{ name: "CultureMade" }],
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    viewportFit: 'cover'
+  },
   icons: {
     icon: [
       { url: "/CM_Logo.jpg", sizes: "32x32", type: "image/jpeg" },

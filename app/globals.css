@@ -4,12 +4,60 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Modern viewport handling for mobile browsers */
+:root {
+  /* Dynamic viewport height that accounts for browser UI */
+  --vh: 1vh;
+  --svh: 1svh;
+  --dvh: 1dvh;
+  --lvh: 1lvh;
+  
+  /* Safe area insets for iOS devices */
+  --sat: env(safe-area-inset-top);
+  --sar: env(safe-area-inset-right);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+}
+
 html,
 body {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  position: fixed; /* Prevent scrolling on mobile */
+  position: fixed;
+  
+  /* Fallback for browsers that don't support dvh */
+  height: 100vh;
+  /* Use dynamic viewport height for better mobile support */
+  height: 100dvh;
+  
+  /* Prevent rubber band scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+}
+
+/* Ensure the app doesn't scroll */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* Custom utility classes for safe area handling */
+@layer utilities {
+  .h-screen-safe {
+    height: 100vh; /* Fallback */
+    height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+  
+  .min-h-screen-safe {
+    min-height: 100vh; /* Fallback */
+    min-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+  
+  .max-h-screen-safe {
+    max-height: 100vh; /* Fallback */
+    max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
 }
 
 @layer base {
