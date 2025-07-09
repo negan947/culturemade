@@ -42,6 +42,7 @@
     "tailwind-scrollbar": "^2.1.0",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.178.0",
+    "uuid": "^11.1.0",
     "zod": "^3.25.69"
   },
   "devDependencies": {
@@ -50,6 +51,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.178.0",
+    "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
