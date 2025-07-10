@@ -23,6 +23,7 @@ const HomeBar: FC<Props> = ({ handleHomeBar, handleDragEnd }) => {
       onPanEnd={(e, info) => {
         handleDragEnd(info.offset.y);
       }}
+      style={{ touchAction: 'none' }}
       className="z-50 absolute left-0 w-full h-4 flex items-center justify-center bottom-0 pointer-events-auto"
     >
       <motion.div
