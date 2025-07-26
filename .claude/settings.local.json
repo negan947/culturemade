@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude mcp add supabasecm:*)",
+      "Bash(claude mcp:*)",
+      "mcp__supabasecm__list_tables",
+      "mcp__supabasecm__execute_sql",
+      "mcp__supabasecm__get_project_url",
+      "Bash(mkdir:*)",
+      "Bash(grep:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(find:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run seed:products:*)",
+      "Bash(npx tsc:*)",
+      "Bash(rm:*)"
+    ],
+    "deny": []
+  }
+}

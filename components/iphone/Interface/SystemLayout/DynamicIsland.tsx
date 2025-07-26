@@ -1,5 +1,6 @@
-import { interfaceActions } from "@/store/interface-slice";
-import { useDispatch } from "react-redux";
+import { useDispatch } from 'react-redux';
+
+import { interfaceActions } from '@/store/interface-slice';
 
 const DynamicIsland = () => {
   const dispatch = useDispatch();
@@ -9,7 +10,7 @@ const DynamicIsland = () => {
       onClick={() => {
         dispatch(interfaceActions.exitApp());
       }}
-      className="z-50 absolute left-1/2 -translate-x-1/2 rounded-full bg-black pointer-events-auto shadow-lg"
+      className='z-50 absolute left-1/2 -translate-x-1/2 rounded-full bg-black pointer-events-auto shadow-lg'
       style={{
         width: '126px',
         height: '37px',
@@ -20,4 +21,4 @@ const DynamicIsland = () => {
   );
 };
 
-export default DynamicIsland; 
+export default DynamicIsland;

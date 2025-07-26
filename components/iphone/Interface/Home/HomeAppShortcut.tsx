@@ -1,7 +1,8 @@
-import { FC, MouseEvent } from "react";
-import { motion, useAnimation } from "framer-motion";
-import { useDispatch } from "react-redux";
-import { interfaceActions } from "@/store/interface-slice";
+import { motion, useAnimation } from 'framer-motion';
+import { FC, MouseEvent } from 'react';
+import { useDispatch } from 'react-redux';
+
+import { interfaceActions } from '@/store/interface-slice';
 
 interface Props {
   icon?: string;
@@ -27,7 +28,7 @@ const HomeAppShortcut: FC<Props> = ({ appId, icon, name }) => {
   };
 
   return (
-    <motion.div className="w-full aspect-square flex flex-col justify-center items-center gap-1">
+    <motion.div className='w-full aspect-square flex flex-col justify-center items-center gap-1'>
       <motion.div
         animate={imgAnimation}
         onClick={() => {
@@ -36,21 +37,21 @@ const HomeAppShortcut: FC<Props> = ({ appId, icon, name }) => {
         layoutId={appId}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="w-full aspect-square"
+        className='w-full aspect-square'
         whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95, filter: "brightness(70%)" }}
+        whileTap={{ scale: 0.95, filter: 'brightness(70%)' }}
         style={{
           borderRadius: 15,
           backgroundImage: icon
             ? `url('/images/icons/${icon}.png')`
             : "url('/images/icons/empty.png')",
-          backgroundSize: "contain",
-          backgroundRepeat: "no-repeat",
-          filter: "brightness(100%)",
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          filter: 'brightness(100%)',
         }}
       />
       {name && (
-        <p className="text-zinc-800 whitespace-nowrap text-ellipsis overflow-hidden text-xs font-normal">
+        <p className='text-zinc-800 whitespace-nowrap text-ellipsis overflow-hidden text-xs font-normal'>
           {name}
         </p>
       )}
@@ -58,4 +59,4 @@ const HomeAppShortcut: FC<Props> = ({ appId, icon, name }) => {
   );
 };
 
-export default HomeAppShortcut; 
+export default HomeAppShortcut;

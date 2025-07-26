@@ -1,5 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
 
 export interface Notification {
   isActive: boolean;
@@ -16,13 +16,13 @@ interface NewNotification {
 
 const initialState: Notification = {
   isActive: false,
-  title: "",
-  message: "",
-  icon: "",
+  title: '',
+  message: '',
+  icon: '',
 };
 
 export const notificationSlice = createSlice({
-  name: "notification",
+  name: 'notification',
   initialState,
   reducers: {
     new(state, action: PayloadAction<NewNotification>) {
@@ -40,4 +40,4 @@ export const notificationSlice = createSlice({
 
 export const notificationActions = notificationSlice.actions;
 
-export default notificationSlice.reducer; 
+export default notificationSlice.reducer;

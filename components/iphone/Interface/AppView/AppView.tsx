@@ -1,9 +1,10 @@
-import { FC } from "react";
-import { motion, useAnimation } from "framer-motion";
-import { useDispatch } from "react-redux";
-import { interfaceActions } from "@/store/interface-slice";
-import HomeBar from "../SystemLayout/HomeBar";
-import { getApp } from "@/components/iphone/apps/getApp";
+import { motion, useAnimation } from 'framer-motion';
+import { FC } from 'react';
+import { useDispatch } from 'react-redux';
+
+import { getApp } from '@/components/iphone/apps/getApp';
+import HomeBar from '@/components/iphone/Interface/SystemLayout/HomeBar';
+import { interfaceActions } from '@/store/interface-slice';
 
 interface Props {
   appId: string;
@@ -35,8 +36,9 @@ const AppView: FC<Props> = ({ appId }) => {
   };
 
   return (
-    <motion.div layout
-      className="absolute h-full w-full top-0 left-0 bg-white z-40 overflow-hidden"
+    <motion.div
+      layout
+      className='absolute h-full w-full top-0 left-0 bg-white z-40 overflow-hidden'
       layoutId={appId}
       initial={{ borderRadius: 40, scale: 1 }}
       animate={animateExit}
@@ -49,4 +51,4 @@ const AppView: FC<Props> = ({ appId }) => {
   );
 };
 
-export default AppView; 
+export default AppView;

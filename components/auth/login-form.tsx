@@ -1,17 +1,19 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useState } from 'react';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { createClient } from '@/lib/supabase/client';
 
 const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -21,7 +23,7 @@ interface LoginFormProps {
   redirectTo?: string;
 }
 
-export function LoginForm({ onSuccess, redirectTo = "/" }: LoginFormProps) {
+export function LoginForm({ onSuccess, redirectTo = '/' }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const supabase = createClient();
@@ -52,23 +54,23 @@ export function LoginForm({ onSuccess, redirectTo = "/" }: LoginFormProps) {
       if (authData.user) {
         // Check if user has a profile, create one if not
         const { error: profileError } = await supabase
-          .from("profiles")
-          .select("id")
-          .eq("id", authData.user.id)
+          .from('profiles')
+          .select('id')
+          .eq('id', authData.user.id)
           .single();
 
-        if (profileError && profileError.code === "PGRST116") {
+        if (profileError && profileError.code === 'PGRST116') {
           // Profile doesn't exist, create one
           const { error: createError } = await supabase
-            .from("profiles")
+            .from('profiles')
             .insert({
               id: authData.user.id,
-              role: "customer",
-              full_name: authData.user.user_metadata?.full_name || null,
+              role: 'customer',
+              full_name: authData.user.user_metadata?.['full_name'] || null,
             });
 
           if (createError) {
-            console.error("Error creating profile:", createError);
+            console.error('Error creating profile:', createError);
           }
         }
 
@@ -79,52 +81,52 @@ export function LoginForm({ onSuccess, redirectTo = "/" }: LoginFormProps) {
         }
       }
     } catch (error) {
-      setErrorMessage("An unexpected error occurred. Please try again.");
-      console.error("Login error:", error);
+      setErrorMessage('An unexpected error occurred. Please try again.');
+      console.error('Login error:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+    <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+      <div className='space-y-2'>
+        <Label htmlFor='email'>Email</Label>
         <Input
-          id="email"
-          type="email"
-          placeholder="Enter your email"
-          {...register("email")}
+          id='email'
+          type='email'
+          placeholder='Enter your email'
+          {...register('email')}
           disabled={isLoading}
         />
         {errors.email && (
-          <p className="text-sm text-destructive">{errors.email.message}</p>
+          <p className='text-sm text-destructive'>{errors.email.message}</p>
         )}
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+      <div className='space-y-2'>
+        <Label htmlFor='password'>Password</Label>
         <Input
-          id="password"
-          type="password"
-          placeholder="Enter your password"
-          {...register("password")}
+          id='password'
+          type='password'
+          placeholder='Enter your password'
+          {...register('password')}
           disabled={isLoading}
         />
         {errors.password && (
-          <p className="text-sm text-destructive">{errors.password.message}</p>
+          <p className='text-sm text-destructive'>{errors.password.message}</p>
         )}
       </div>
 
       {errorMessage && (
-        <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+        <div className='p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md'>
           {errorMessage}
         </div>
       )}
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? "Signing in..." : "Sign In"}
+      <Button type='submit' className='w-full' disabled={isLoading}>
+        {isLoading ? 'Signing in...' : 'Sign In'}
       </Button>
     </form>
   );
-} 
+}

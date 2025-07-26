@@ -4,8 +4,15 @@ import { NextRequest } from 'next/server';
 // In production, you'd want to use Redis or similar
 const attempts = new Map<string, { count: number; resetTime: number }>();
 
-export function rateLimit(request: NextRequest, limit: number = 5, windowMs: number = 15 * 60 * 1000) {
-  const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'anonymous';
+export function rateLimit(
+  request: NextRequest,
+  limit: number = 5,
+  windowMs: number = 15 * 60 * 1000
+) {
+  const ip =
+    request.headers.get('x-forwarded-for') ||
+    request.headers.get('x-real-ip') ||
+    'anonymous';
   const now = Date.now();
   const key = `${ip}:${request.nextUrl.pathname}`;
 
@@ -44,4 +51,4 @@ export function getRateLimitHeaders(result: ReturnType<typeof rateLimit>) {
     'X-RateLimit-Remaining': result.remaining.toString(),
     'X-RateLimit-Reset': new Date(result.resetTime).toISOString(),
   };
-} 
+}

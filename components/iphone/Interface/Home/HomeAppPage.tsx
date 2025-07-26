@@ -1,5 +1,6 @@
-import { FC, ReactNode } from "react";
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
+import { FC, ReactNode } from 'react';
+
 
 interface Props {
   children: ReactNode;
@@ -7,10 +8,10 @@ interface Props {
 
 const HomeAppPage: FC<Props> = ({ children }) => {
   return (
-    <motion.section className="grid grid-cols-4 gap-9 gap-y-6 m-8">
+    <motion.section className='grid grid-cols-4 gap-9 gap-y-6 m-8'>
       {children}
     </motion.section>
   );
 };
 
-export default HomeAppPage; 
+export default HomeAppPage;

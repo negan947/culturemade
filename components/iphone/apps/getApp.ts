@@ -1,52 +1,52 @@
+import { ReactElement } from 'react';
 
-import { ReactElement } from "react";
-import Calculator from "./Calculator/Calculator";
-import Components from "./Components/Components";
-import Weather from "./Weather/Weather";
+import Calculator from './Calculator/Calculator';
+import Components from './Components/Components';
+import Weather from './Weather/Weather';
 
 interface App {
   appId: string;
   name: string;
   icon: string;
   element: () => ReactElement;
-  statusBarColor: "light" | "dark";
+  statusBarColor: 'light' | 'dark';
 }
 
 const appsBase: App[] = [
   {
-    name: "Calculator",
-    icon: "calculator",
-    appId: "calculator",
+    name: 'Calculator',
+    icon: 'calculator',
+    appId: 'calculator',
     element: Calculator,
-    statusBarColor: "light",
+    statusBarColor: 'light',
   },
   {
-    appId: "weather",
+    appId: 'weather',
     element: Weather,
-    icon: "weather",
-    name: "Weather",
-    statusBarColor: "light",
+    icon: 'weather',
+    name: 'Weather',
+    statusBarColor: 'light',
   },
   {
-    appId: "components",
+    appId: 'components',
     element: Components,
-    icon: "news",
-    name: "Components",
-    statusBarColor: "dark",
+    icon: 'news',
+    name: 'Components',
+    statusBarColor: 'dark',
   },
   {
-    appId: "test",
-    icon: "apple-tv",
-    name: "Apple TV",
+    appId: 'test',
+    icon: 'apple-tv',
+    name: 'Apple TV',
     element: Components,
-    statusBarColor: "dark",
+    statusBarColor: 'dark',
   },
   {
-    appId: "culturemade",
-    icon: "app-store",
-    name: "CultureMade",
+    appId: 'culturemade',
+    icon: 'app-store',
+    name: 'CultureMade',
     element: Components,
-    statusBarColor: "dark",
+    statusBarColor: 'dark',
   },
 ];
 
@@ -60,4 +60,4 @@ const getAllApps = () => {
   return appsBase;
 };
 
-export { getApp, getAllApps }; 
+export { getApp, getAllApps };

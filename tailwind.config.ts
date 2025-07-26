@@ -55,6 +55,52 @@ const config: Config = {
         'sf-pro-rounded': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Rounded', 'SF Pro Display', 'system-ui', 'sans-serif'],
       },
       colors: {
+        // Premium Admin Color Palette - Charcoal + Deep Violet
+        'admin': {
+          // Dark Mode - Neutrals / Background Layers
+          'bg-main': '#0F0F10',      // App background — ultra black
+          'bg-surface': '#1A1A1C',   // Cards, modals, containers
+          'bg-hover': '#232325',     // Hover/active state layers
+          
+          // Light Mode - Background Layers (adapted for light)
+          'light-bg-main': '#F8F9FA',    // Light app background
+          'light-bg-surface': '#FFFFFF', // Light cards, modals, containers
+          'light-bg-hover': '#F1F3F4',   // Light hover/active state layers
+          
+          // Dark Mode - Borders / Outlines
+          'border': '#2C2C2F',       // Standard card borders or outlines
+          'border-soft': '#3A3A3E',  // Inner dividers, subtle separation
+          
+          // Light Mode - Borders / Outlines
+          'light-border': '#E5E7EB',     // Light standard borders
+          'light-border-soft': '#F3F4F6', // Light subtle separation
+          
+          // Dark Mode - Text Colors
+          'text-primary': '#F5F5F7',   // High-priority text (not pure white)
+          'text-secondary': '#B1B1B4', // Secondary supporting text
+          'text-disabled': '#6F6F72',  // Disabled UI elements or placeholders
+          
+          // Light Mode - Text Colors
+          'light-text-primary': '#111827',   // Dark text for light backgrounds
+          'light-text-secondary': '#6B7280', // Secondary text for light mode
+          'light-text-disabled': '#9CA3AF',  // Disabled text for light mode
+          
+          // Accent System (same for both modes, good contrast)
+          'accent': '#7C3AED',         // Core brand violet — rich and energetic
+          'accent-hover': '#8B5CF6',   // Hover/active state for buttons/links
+          'accent-subtle': '#4C1D95',  // Muted violet for borders or low-emphasis UI
+          
+          // Light Mode - Accent Variations (softer for light backgrounds)
+          'light-accent-bg': '#EDE9FE',    // Light accent background
+          'light-accent-border': '#C4B5FD', // Light accent borders
+          
+          // Status Colors (same for both modes, excellent contrast)
+          'success': '#34D399',        // Emerald Green — calm and reassuring
+          'warning': '#FBBF24',        // Amber Gold — rich yellow with warmth
+          'error': '#F43F5E',          // Crimson Rose — deep cherry/crimson
+        },
+        
+        // Keep existing shadcn colors for compatibility
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -107,6 +153,12 @@ const config: Config = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+      },
+      boxShadow: {
+        'admin-soft': '0 1px 4px rgba(0, 0, 0, 0.35)',
+        'admin-popover': '0 4px 16px rgba(0, 0, 0, 0.5)',
+        'admin-glow': '0 0 0 1px #7C3AED',
+        'admin-glow-hover': '0 0 0 1px #8B5CF6',
       },
     },
   },

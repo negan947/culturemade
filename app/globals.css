@@ -11,7 +11,7 @@
   --svh: 1svh;
   --dvh: 1dvh;
   --lvh: 1lvh;
-  
+
   /* Safe area insets for iOS devices */
   --sat: env(safe-area-inset-top);
   --sar: env(safe-area-inset-right);
@@ -25,12 +25,12 @@ body {
   width: 100%;
   overflow: hidden;
   position: fixed;
-  
+
   /* Fallback for browsers that don't support dvh */
   height: 100vh;
   /* Use dynamic viewport height for better mobile support */
   height: 100dvh;
-  
+
   /* Prevent rubber band scrolling on iOS */
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: none;
@@ -46,17 +46,23 @@ body {
 @layer utilities {
   .h-screen-safe {
     height: 100vh; /* Fallback */
-    height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(
+      100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+    );
   }
-  
+
   .min-h-screen-safe {
     min-height: 100vh; /* Fallback */
-    min-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    min-height: calc(
+      100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+    );
   }
-  
+
   .max-h-screen-safe {
     max-height: 100vh; /* Fallback */
-    max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    max-height: calc(
+      100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+    );
   }
 }
 
@@ -113,7 +119,9 @@ body {
   }
   body {
     @apply bg-background text-foreground;
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+    font-family:
+      -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+      system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -121,37 +129,60 @@ body {
 
 /* San Francisco Font System - iOS Typography */
 .sf-pro-display {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 .sf-pro-text {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 .sf-pro-rounded {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Rounded', 'SF Pro Display', system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Rounded', 'SF Pro Display',
+    system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* iOS-specific font weights and sizes */
-.ios-ultra-light { font-weight: 100; }
-.ios-thin { font-weight: 200; }
-.ios-light { font-weight: 300; }
-.ios-regular { font-weight: 400; }
-.ios-medium { font-weight: 500; }
-.ios-semibold { font-weight: 600; }
-.ios-bold { font-weight: 700; }
-.ios-heavy { font-weight: 800; }
-.ios-black { font-weight: 900; }
+.ios-ultra-light {
+  font-weight: 100;
+}
+.ios-thin {
+  font-weight: 200;
+}
+.ios-light {
+  font-weight: 300;
+}
+.ios-regular {
+  font-weight: 400;
+}
+.ios-medium {
+  font-weight: 500;
+}
+.ios-semibold {
+  font-weight: 600;
+}
+.ios-bold {
+  font-weight: 700;
+}
+.ios-heavy {
+  font-weight: 800;
+}
+.ios-black {
+  font-weight: 900;
+}
 
 /* iOS Status Bar specific styles */
 .ios-status-time {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
   font-weight: 600;
   font-size: 17px;
   letter-spacing: -0.24px;
@@ -160,7 +191,8 @@ body {
 
 /* iOS Lock Screen specific styles */
 .ios-lock-time {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
   font-weight: 100;
   font-size: 96px;
   line-height: 1;
@@ -169,7 +201,8 @@ body {
 }
 
 .ios-lock-date {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
   font-weight: 500;
   font-size: 18px;
   letter-spacing: -0.24px;
@@ -178,7 +211,8 @@ body {
 
 /* iOS Keypad styles */
 .ios-keypad-digit {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
   font-weight: 300;
   font-size: 32px;
   letter-spacing: -0.02em;
@@ -186,7 +220,8 @@ body {
 }
 
 .ios-keypad-letters {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
   font-weight: 500;
   font-size: 12px;
   letter-spacing: 0.8px;

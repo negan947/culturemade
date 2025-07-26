@@ -1,7 +1,10 @@
-import { createClient } from "./server";
-import { redirect } from "next/navigation";
-import { logSecurityEvent } from "../utils/security";
-import { cache } from "react";
+import { redirect } from 'next/navigation';
+import { cache } from 'react';
+
+
+import { logSecurityEvent } from '@/lib/utils/security';
+
+import { createClient } from './server';
 
 export async function getUser() {
   const supabase = await createClient();
@@ -9,18 +12,18 @@ export async function getUser() {
     data: { user },
     error,
   } = await supabase.auth.getUser();
-  
+
   if (error) {
     logSecurityEvent('AUTH_ERROR', { error: error.message });
   }
-  
+
   return { user, error };
 }
 
 export async function requireAuth() {
   const { user, error } = await getUser();
   if (error || !user) {
-    redirect("/login");
+    redirect('/login');
   }
   return user;
 }
@@ -30,19 +33,25 @@ export async function requireAdmin() {
   const user = await requireAuth();
 
   const { data: profile, error } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
     .single();
 
   if (error) {
-    logSecurityEvent('PROFILE_FETCH_ERROR', { userId: user.id, error: error.message });
-    redirect("/");
+    logSecurityEvent('PROFILE_FETCH_ERROR', {
+      userId: user.id,
+      error: error.message,
+    });
+    redirect('/');
   }
 
-  if (profile?.role !== "admin") {
-    logSecurityEvent('UNAUTHORIZED_ADMIN_ACCESS', { userId: user.id, role: profile?.role });
-    redirect("/");
+  if (profile?.role !== 'admin') {
+    logSecurityEvent('UNAUTHORIZED_ADMIN_ACCESS', {
+      userId: user.id,
+      role: profile?.role,
+    });
+    redirect('/');
   }
 
   return user;
@@ -52,17 +61,20 @@ export async function requireAdmin() {
 export const getUserProfile = cache(async () => {
   const supabase = await createClient();
   const { user } = await getUser();
-  
+
   if (!user) return null;
 
   const { data: profile, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
     .single();
 
   if (error) {
-    logSecurityEvent('PROFILE_FETCH_ERROR', { userId: user.id, error: error.message });
+    logSecurityEvent('PROFILE_FETCH_ERROR', {
+      userId: user.id,
+      error: error.message,
+    });
     return null;
   }
 
@@ -72,7 +84,7 @@ export const getUserProfile = cache(async () => {
 // Check if user is admin
 export async function isAdmin() {
   const userProfile = await getUserProfile();
-  return userProfile?.profile?.role === "admin";
+  return userProfile?.profile?.role === 'admin';
 }
 
 // Check if user is authenticated
@@ -97,7 +109,7 @@ export async function createOrUpdateProfile(userData: {
   const user = await requireAuth();
 
   const { data, error } = await supabase
-    .from("profiles")
+    .from('profiles')
     .upsert({
       id: user.id,
       ...userData,
@@ -107,7 +119,10 @@ export async function createOrUpdateProfile(userData: {
     .single();
 
   if (error) {
-    logSecurityEvent('PROFILE_UPDATE_ERROR', { userId: user.id, error: error.message });
+    logSecurityEvent('PROFILE_UPDATE_ERROR', {
+      userId: user.id,
+      error: error.message,
+    });
     throw error;
   }
 
@@ -119,54 +134,54 @@ export async function createOrUpdateProfile(userData: {
 export async function signOut() {
   const supabase = await createClient();
   const { user } = await getUser();
-  
+
   if (user) {
     logSecurityEvent('USER_SIGNED_OUT', { userId: user.id });
   }
-  
+
   const { error } = await supabase.auth.signOut();
-  
+
   if (error) {
     logSecurityEvent('SIGN_OUT_ERROR', { error: error.message });
     throw error;
   }
-  
-  redirect("/login");
+
+  redirect('/login');
 }
 
 // Check if user has specific permission
 export async function hasPermission(permission: string) {
   const userProfile = await getUserProfile();
-  
+
   if (!userProfile) return false;
-  
+
   // Admin has all permissions
-  if (userProfile.profile?.role === "admin") return true;
-  
+  if (userProfile.profile?.role === 'admin') return true;
+
   // Add more granular permissions here if needed
   const customerPermissions = [
     'view_orders',
     'create_orders',
     'update_profile',
-    'view_profile'
+    'view_profile',
   ];
-  
-  if (userProfile.profile?.role === "customer") {
+
+  if (userProfile.profile?.role === 'customer') {
     return customerPermissions.includes(permission);
   }
-  
+
   return false;
 }
 
 // Get user's full context (user + profile + permissions)
 export async function getUserContext() {
   const userProfile = await getUserProfile();
-  
+
   if (!userProfile) return null;
-  
+
   const role = userProfile.profile?.role || 'customer';
   const isAdminUser = role === 'admin';
-  
+
   return {
     user: userProfile.user,
     profile: userProfile.profile,
@@ -178,7 +193,7 @@ export async function getUserContext() {
       canUpdateProfile: await hasPermission('update_profile'),
       canViewProfile: await hasPermission('view_profile'),
       canAccessAdmin: isAdminUser,
-    }
+    },
   };
 }
 
@@ -186,12 +201,12 @@ export async function getUserContext() {
 export async function refreshSession() {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.refreshSession();
-  
+
   if (error) {
     logSecurityEvent('SESSION_REFRESH_ERROR', { error: error.message });
     throw error;
   }
-  
+
   return data;
 }
 
@@ -199,10 +214,10 @@ export async function refreshSession() {
 export async function getSession() {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getSession();
-  
+
   if (error) {
     logSecurityEvent('SESSION_FETCH_ERROR', { error: error.message });
   }
-  
+
   return { session: data.session, error };
-} 
+}
