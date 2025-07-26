@@ -1,5 +1,6 @@
 'use client';
 
+import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import React, {
   FC,
   startTransition,
@@ -9,8 +10,6 @@ import React, {
   useRef,
   useState,
 } from 'react';
-
-import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import { useDispatch } from 'react-redux';
 
 import { interfaceActions } from '@/store/interface-slice';

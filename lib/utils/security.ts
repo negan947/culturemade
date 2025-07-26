@@ -1,5 +1,4 @@
 import { NextRequest } from 'next/server';
-
 import { z } from 'zod';
 
 // CSRF token generation and validation

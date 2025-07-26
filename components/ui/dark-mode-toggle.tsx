@@ -1,8 +1,8 @@
 'use client';
 
+import { Moon, Sun } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { Moon, Sun } from 'lucide-react';
 
 export function DarkModeToggle() {
   const [isDark, setIsDark] = useState(false);

@@ -1,8 +1,7 @@
 'use client';
 
-import { FC, ReactNode } from 'react';
-
 import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
+import { FC, ReactNode } from 'react';
 import { useSelector } from 'react-redux';
 
 import { ErrorBoundary } from '@/components/error/error-boundary';

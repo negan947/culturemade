@@ -1,8 +1,7 @@
 'use client';
 
-import { FC } from 'react';
-
 import { motion } from 'framer-motion';
+import { FC } from 'react';
 import { useSelector } from 'react-redux';
 
 import { RootState } from '@/store/store';

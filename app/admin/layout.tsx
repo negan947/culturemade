@@ -1,5 +1,3 @@
-import Link from 'next/link';
-
 import {
   BarChart3,
   Home,
@@ -9,6 +7,8 @@ import {
   ShoppingCart,
   Users,
 } from 'lucide-react';
+import Link from 'next/link';
+
 
 import { DarkModeToggle } from '@/components/ui/dark-mode-toggle';
 import { getUserContext, requireAdmin } from '@/lib/supabase/auth';
