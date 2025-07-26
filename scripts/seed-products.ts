@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Database, CategoryInsert, ProductInsert, ProductVariantInsert, ProductImageInsert } from '../types/database';
 import { config } from 'dotenv';
+
 import { generatePlaceholderImage } from '../lib/utils/image-utils';
+import type { Database, CategoryInsert, ProductInsert, ProductVariantInsert, ProductImageInsert } from '../types/database';
 
 // Load environment variables
 config({ path: '.env.local' });

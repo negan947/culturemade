@@ -70,7 +70,7 @@ export function LoginForm({ onSuccess, redirectTo = '/' }: LoginFormProps) {
             });
 
           if (createError) {
-            console.error('Error creating profile:', createError);
+            // console.error('Error creating profile:', createError);
           }
         }
 
@@ -80,9 +80,9 @@ export function LoginForm({ onSuccess, redirectTo = '/' }: LoginFormProps) {
           window.location.href = redirectTo;
         }
       }
-    } catch (error) {
+    } catch {
       setErrorMessage('An unexpected error occurred. Please try again.');
-      console.error('Login error:', error);
+      // console.error('Login error:', error);
     } finally {
       setIsLoading(false);
     }

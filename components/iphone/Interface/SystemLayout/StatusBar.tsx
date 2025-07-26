@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+
+import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
 
 import { RootState } from '@/store/store';

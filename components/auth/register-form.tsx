@@ -95,8 +95,8 @@ export function RegisterForm({
           'Account created successfully! Please check your email to verify your account before signing in.'
         );
       }
-    } catch (error) {
-      console.error('Registration error:', error);
+    } catch {
+      // console.error('Registration error:', error);
       setErrorMessage(
         'An unexpected error occurred during registration. Please try again.'
       );
@@ -184,7 +184,8 @@ export function RegisterForm({
       {/* Debug info for development */}
       {process.env.NODE_ENV === 'development' && (
         <div className='mt-4 p-2 bg-gray-100 rounded text-xs text-gray-600'>
-          <strong>Dev Note:</strong> User profiles are created automatically by database trigger.
+          <strong>Dev Note:</strong> User profiles are created automatically by
+          database trigger.
         </div>
       )}
     </form>

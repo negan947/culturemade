@@ -8,8 +8,10 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 
 interface Props {
-  handleHomeBar: (offsetX: number, offsetY: number) => void;
-  handleDragEnd: (finalOffset: number) => void;
+  // eslint-disable-next-line no-unused-vars
+  handleHomeBar: (_offsetX: number, _offsetY: number) => void;
+  // eslint-disable-next-line no-unused-vars
+  handleDragEnd: (_finalOffset: number) => void;
 }
 
 const HomeBar: FC<Props> = ({ handleHomeBar, handleDragEnd }) => {

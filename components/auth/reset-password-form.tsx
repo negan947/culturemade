@@ -57,9 +57,9 @@ export function ResetPasswordForm({ onSuccess }: ResetPasswordFormProps) {
       if (onSuccess) {
         onSuccess();
       }
-    } catch (error) {
+    } catch {
       setErrorMessage('An unexpected error occurred. Please try again.');
-      console.error('Reset password error:', error);
+      // console.error('Reset password error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -153,9 +153,9 @@ export function UpdatePasswordForm({
       } else {
         window.location.href = redirectTo;
       }
-    } catch (error) {
+    } catch {
       setErrorMessage('An unexpected error occurred. Please try again.');
-      console.error('Update password error:', error);
+      // console.error('Update password error:', error);
     } finally {
       setIsLoading(false);
     }

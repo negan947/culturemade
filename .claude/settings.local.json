@@ -14,7 +14,8 @@
       "Bash(npm install:*)",
       "Bash(npm run seed:products:*)",
       "Bash(npx tsc:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": []
   }

@@ -1,6 +1,5 @@
 'use client';
 
-import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import React, {
   FC,
   startTransition,
@@ -10,6 +9,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
+
+import { AnimatePresence, motion, useAnimation } from 'framer-motion';
 import { useDispatch } from 'react-redux';
 
 import { interfaceActions } from '@/store/interface-slice';
@@ -24,7 +25,8 @@ const PasscodeKeypad = React.memo(function PasscodeKeypad({
 }: {
   passcode: string;
   isShaking: boolean;
-  onPasscodeInput: (digit: string) => void;
+  // eslint-disable-next-line no-unused-vars
+  onPasscodeInput: (_digit: string) => void;
   onDelete: () => void;
   onCancel: () => void;
 }) {

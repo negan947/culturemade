@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
 import { Moon, Sun } from 'lucide-react';
 
 export function DarkModeToggle() {
@@ -15,7 +16,7 @@ export function DarkModeToggle() {
   const toggleDarkMode = () => {
     const newIsDark = !isDark;
     setIsDark(newIsDark);
-    
+
     if (newIsDark) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('darkMode', 'true');
@@ -36,7 +37,9 @@ export function DarkModeToggle() {
       setIsDark(false);
     } else {
       // Default to system preference
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const systemPrefersDark = window.matchMedia(
+        '(prefers-color-scheme: dark)'
+      ).matches;
       if (systemPrefersDark) {
         document.documentElement.classList.add('dark');
         setIsDark(true);
@@ -47,14 +50,10 @@ export function DarkModeToggle() {
   return (
     <button
       onClick={toggleDarkMode}
-      className="p-2 rounded-lg border border-admin-light-border dark:border-admin-border bg-admin-light-bg-surface dark:bg-admin-bg-surface text-admin-light-text-secondary dark:text-admin-text-secondary hover:text-admin-accent dark:hover:text-admin-accent hover:bg-admin-light-bg-hover dark:hover:bg-admin-bg-hover hover:shadow-admin-glow transition-all duration-200"
+      className='p-2 rounded-lg border border-admin-light-border dark:border-admin-border bg-admin-light-bg-surface dark:bg-admin-bg-surface text-admin-light-text-secondary dark:text-admin-text-secondary hover:text-admin-accent dark:hover:text-admin-accent hover:bg-admin-light-bg-hover dark:hover:bg-admin-bg-hover hover:shadow-admin-glow transition-all duration-200'
       title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
     >
-      {isDark ? (
-        <Sun className="h-4 w-4" />
-      ) : (
-        <Moon className="h-4 w-4" />
-      )}
+      {isDark ? <Sun className='h-4 w-4' /> : <Moon className='h-4 w-4' />}
     </button>
   );
 }

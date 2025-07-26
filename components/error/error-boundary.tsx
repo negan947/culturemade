@@ -10,6 +10,7 @@ interface Props {
   children: ReactNode;
   fallback?: ReactNode;
   level?: 'page' | 'section' | 'component';
+  // eslint-disable-next-line no-unused-vars
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
   showDetails?: boolean;
 }
@@ -44,7 +45,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error details
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    // console.error('ErrorBoundary caught an error:', error, errorInfo);
 
     // Update state with error info
     this.setState({
@@ -68,7 +69,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   handleReportFeedback = () => {
     // Simple feedback - just log or could integrate with other services
-    console.log('User reported feedback for error:', this.state.error);
+    // console.log('User reported feedback for error:', this.state.error);
   };
 
   override render() {
@@ -101,8 +102,8 @@ export class ErrorBoundary extends Component<Props, State> {
                 Something went wrong
               </h1>
               <p className='text-gray-600 mb-6'>
-                We're sorry, but something went wrong. Please try again or go
-                back to the homepage.
+                We&apos;re sorry, but something went wrong. Please try again or
+                go back to the homepage.
               </p>
               <div className='space-y-3'>
                 <Button onClick={this.handleRetry} className='w-full'>

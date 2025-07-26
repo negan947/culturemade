@@ -7,6 +7,7 @@ import {
   logAuthEvent,
   logDatabaseQuery,
 } from '@/lib/utils/logger';
+
 // Sentry utilities removed
 
 async function handleAuthCallback(request: NextRequest) {

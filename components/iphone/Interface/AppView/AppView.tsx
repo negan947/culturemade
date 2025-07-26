@@ -1,9 +1,10 @@
-import { motion, useAnimation } from 'framer-motion';
 import { FC } from 'react';
+
+import { motion, useAnimation } from 'framer-motion';
 import { useDispatch } from 'react-redux';
 
-import { getApp } from '@/components/iphone/apps/getApp';
 import HomeBar from '@/components/iphone/Interface/SystemLayout/HomeBar';
+import { getApp } from '@/components/iphone/apps/getApp';
 import { interfaceActions } from '@/store/interface-slice';
 
 interface Props {

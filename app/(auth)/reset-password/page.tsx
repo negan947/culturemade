@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import Link from 'next/link';
 
 import {
   ResetPasswordForm,

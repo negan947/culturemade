@@ -1,5 +1,6 @@
-import { motion, useAnimation } from 'framer-motion';
 import { FC, MouseEvent } from 'react';
+
+import { motion, useAnimation } from 'framer-motion';
 import { useDispatch } from 'react-redux';
 
 import { interfaceActions } from '@/store/interface-slice';

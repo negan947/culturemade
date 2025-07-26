@@ -5,6 +5,7 @@
 
 import { createClient } from '@supabase/supabase-js'
 import dotenv from 'dotenv'
+
 import { Database } from '../types/database'
 
 // Load environment variables

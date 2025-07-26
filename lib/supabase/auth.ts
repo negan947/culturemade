@@ -1,6 +1,6 @@
-import { redirect } from 'next/navigation';
 import { cache } from 'react';
 
+import { redirect } from 'next/navigation';
 
 import { logSecurityEvent } from '@/lib/utils/security';
 

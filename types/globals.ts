@@ -99,7 +99,8 @@ export type DeepOmit<T, K extends keyof any> = {
 };
 
 // Extract function return type
-export type ReturnTypeAsync<T> = T extends (...args: any[]) => Promise<infer R>
+// eslint-disable-next-line no-unused-vars
+export type ReturnTypeAsync<T> = T extends (..._args: any[]) => Promise<infer R>
   ? R
   : never;
 
@@ -182,7 +183,9 @@ export const CULTUREMADE_CONSTANTS = {
 
 // Extend global types if needed
 declare global {
+  // eslint-disable-next-line no-unused-vars
   namespace NodeJS {
+    // eslint-disable-next-line no-unused-vars
     interface ProcessEnv extends EnvironmentVariables {}
   }
 }

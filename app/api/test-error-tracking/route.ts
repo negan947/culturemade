@@ -11,12 +11,18 @@ async function testErrorTracking(request: NextRequest) {
 
     switch (testType) {
       case 'quick':
-        result = { success: true, message: 'Quick test completed (logging disabled)' };
+        result = {
+          success: true,
+          message: 'Quick test completed (logging disabled)',
+        };
         break;
 
       case 'all':
       default:
-        result = { success: true, message: 'All tests completed (logging disabled)' };
+        result = {
+          success: true,
+          message: 'All tests completed (logging disabled)',
+        };
         break;
     }
 
