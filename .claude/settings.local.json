@@ -15,7 +15,9 @@
       "Bash(npm run seed:products:*)",
       "Bash(npx tsc:*)",
       "Bash(rm:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npx prettier:*)",
+      "Bash(npm run format:check:*)"
     ],
     "deny": []
   }
