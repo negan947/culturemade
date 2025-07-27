@@ -1,20 +1,20 @@
-import { Suspense } from 'react';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+'use client';
+
 import { 
   ArrowLeft, 
   Save, 
-  Plus, 
-  X, 
-  Upload,
-  Eye,
-  EyeOff,
+  Loader2,
+  Plus,
   Edit3,
-  Trash2
+  Trash2,
+  Eye
 } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect, use } from 'react';
 
-import { requireAdmin } from '@/lib/supabase/auth';
-import { createClient } from '@/lib/supabase/server';
+
+import { createClient } from '@/lib/supabase/client';
 
 interface Product {
   id: string;
@@ -53,55 +53,67 @@ interface Category {
   slug: string;
 }
 
-async function getProduct(id: string): Promise<Product | null> {
-  const supabase = await createClient();
-  
-  const { data, error } = await supabase
-    .from('products')
-    .select(`
-      *,
-      product_variants(*),
-      product_categories(
-        categories(id, name, slug)
-      )
-    `)
-    .eq('id', id)
-    .single();
-
-  if (error || !data) {
-    return null;
-  }
-
-  return data;
+interface FormData {
+  name: string;
+  description: string;
+  status: 'active' | 'draft' | 'archived';
+  price: string;
+  compare_at_price: string;
+  cost_price: string;
+  sku: string;
+  featured: boolean;
+  track_inventory: boolean;
+  continue_selling_when_out_of_stock: boolean;
+  category_ids: string[];
 }
 
-async function getCategories(): Promise<Category[]> {
-  const supabase = await createClient();
-  
-  const { data, error } = await supabase
-    .from('categories')
-    .select('id, name, slug')
-    .order('name');
-
-  if (error) {
-    console.error('Error fetching categories:', error);
-    return [];
-  }
-
-  return data || [];
-}
 
 function EditProductForm({ 
   product, 
-  categories 
+  categories,
+  onSave,
+  isLoading 
 }: { 
   product: Product; 
-  categories: Category[] 
+  categories: Category[];
+  onSave: (data: FormData) => Promise<void>;
+  isLoading: boolean;
 }) {
   const selectedCategoryIds = product.product_categories.map(pc => pc.categories.id);
+  const [formData, setFormData] = useState<FormData>({
+    name: product.name,
+    description: product.description || '',
+    status: product.status,
+    price: product.price,
+    compare_at_price: product.compare_at_price || '',
+    cost_price: product.cost_price || '',
+    sku: product.sku || '',
+    featured: product.featured,
+    track_inventory: product.track_inventory,
+    continue_selling_when_out_of_stock: product.continue_selling_when_out_of_stock,
+    category_ids: selectedCategoryIds
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onSave(formData);
+  };
+
+  const handleInputChange = (name: keyof FormData, value: any) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCategoryChange = (categoryId: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      category_ids: checked 
+        ? [...prev.category_ids, categoryId]
+        : prev.category_ids.filter(id => id !== categoryId)
+    }));
+  };
 
   return (
-    <form className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-8">
       {/* Basic Information */}
       <div className="bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-6">
         <h2 className="text-lg font-semibold text-admin-light-text-primary dark:text-admin-text-primary mb-6">
@@ -117,7 +129,8 @@ function EditProductForm({
             <input
               type="text"
               required
-              defaultValue={product.name}
+              value={formData.name}
+              onChange={(e) => handleInputChange('name', e.target.value)}
               placeholder="Enter product name"
               className="w-full px-4 py-2 bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border-soft dark:border-admin-border-soft rounded-lg text-admin-light-text-primary dark:text-admin-text-primary placeholder-admin-light-text-disabled dark:placeholder-admin-text-disabled focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-admin-accent transition-colors duration-200"
             />
@@ -130,7 +143,8 @@ function EditProductForm({
             </label>
             <input
               type="text"
-              defaultValue={product.sku || ''}
+              value={formData.sku}
+              onChange={(e) => handleInputChange('sku', e.target.value)}
               placeholder="Auto-generated if empty"
               className="w-full px-4 py-2 bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border-soft dark:border-admin-border-soft rounded-lg text-admin-light-text-primary dark:text-admin-text-primary placeholder-admin-light-text-disabled dark:placeholder-admin-text-disabled focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-admin-accent transition-colors duration-200"
             />
@@ -143,7 +157,8 @@ function EditProductForm({
             </label>
             <select
               required
-              defaultValue={product.status}
+              value={formData.status}
+              onChange={(e) => handleInputChange('status', e.target.value as 'active' | 'draft' | 'archived')}
               className="w-full px-4 py-2 bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border-soft dark:border-admin-border-soft rounded-lg text-admin-light-text-primary dark:text-admin-text-primary focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-admin-accent transition-colors duration-200"
             >
               <option value="draft">Draft</option>
@@ -159,7 +174,8 @@ function EditProductForm({
             </label>
             <textarea
               rows={4}
-              defaultValue={product.description || ''}
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
               placeholder="Product description"
               className="w-full px-4 py-2 bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border-soft dark:border-admin-border-soft rounded-lg text-admin-light-text-primary dark:text-admin-text-primary placeholder-admin-light-text-disabled dark:placeholder-admin-text-disabled focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-admin-accent transition-colors duration-200 resize-vertical"
             />
@@ -188,7 +204,8 @@ function EditProductForm({
                 step="0.01"
                 min="0"
                 required
-                defaultValue={product.price}
+                value={formData.price}
+                onChange={(e) => handleInputChange('price', e.target.value)}
                 placeholder="0.00"
                 className="w-full pl-8 pr-4 py-2 bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border-soft dark:border-admin-border-soft rounded-lg text-admin-light-text-primary dark:text-admin-text-primary placeholder-admin-light-text-disabled dark:placeholder-admin-text-disabled focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-admin-accent transition-colors duration-200"
               />
@@ -208,7 +225,8 @@ function EditProductForm({
                 type="number"
                 step="0.01"
                 min="0"
-                defaultValue={product.compare_at_price || ''}
+                value={formData.compare_at_price}
+                onChange={(e) => handleInputChange('compare_at_price', e.target.value)}
                 placeholder="0.00"
                 className="w-full pl-8 pr-4 py-2 bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border-soft dark:border-admin-border-soft rounded-lg text-admin-light-text-primary dark:text-admin-text-primary placeholder-admin-light-text-disabled dark:placeholder-admin-text-disabled focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-admin-accent transition-colors duration-200"
               />
@@ -231,7 +249,8 @@ function EditProductForm({
                 type="number"
                 step="0.01"
                 min="0"
-                defaultValue={product.cost_price || ''}
+                value={formData.cost_price}
+                onChange={(e) => handleInputChange('cost_price', e.target.value)}
                 placeholder="0.00"
                 className="w-full pl-8 pr-4 py-2 bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border-soft dark:border-admin-border-soft rounded-lg text-admin-light-text-primary dark:text-admin-text-primary placeholder-admin-light-text-disabled dark:placeholder-admin-text-disabled focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-admin-accent transition-colors duration-200"
               />
@@ -255,7 +274,8 @@ function EditProductForm({
               <input
                 type="checkbox"
                 value={category.id}
-                defaultChecked={selectedCategoryIds.includes(category.id)}
+                checked={formData.category_ids.includes(category.id)}
+                onChange={(e) => handleCategoryChange(category.id, e.target.checked)}
                 className="w-4 h-4 text-admin-accent bg-admin-light-bg-main dark:bg-admin-bg-main border-admin-light-border-soft dark:border-admin-border-soft rounded focus:ring-admin-accent focus:ring-2"
               />
               <span className="text-admin-light-text-primary dark:text-admin-text-primary">
@@ -392,7 +412,8 @@ function EditProductForm({
           <label className="flex items-center space-x-3">
             <input
               type="checkbox"
-              defaultChecked={product.featured}
+              checked={formData.featured}
+              onChange={(e) => handleInputChange('featured', e.target.checked)}
               className="w-4 h-4 text-admin-accent bg-admin-light-bg-main dark:bg-admin-bg-main border-admin-light-border-soft dark:border-admin-border-soft rounded focus:ring-admin-accent focus:ring-2"
             />
             <span className="text-admin-light-text-primary dark:text-admin-text-primary">
@@ -403,7 +424,8 @@ function EditProductForm({
           <label className="flex items-center space-x-3">
             <input
               type="checkbox"
-              defaultChecked={product.track_inventory}
+              checked={formData.track_inventory}
+              onChange={(e) => handleInputChange('track_inventory', e.target.checked)}
               className="w-4 h-4 text-admin-accent bg-admin-light-bg-main dark:bg-admin-bg-main border-admin-light-border-soft dark:border-admin-border-soft rounded focus:ring-admin-accent focus:ring-2"
             />
             <span className="text-admin-light-text-primary dark:text-admin-text-primary">
@@ -414,7 +436,8 @@ function EditProductForm({
           <label className="flex items-center space-x-3">
             <input
               type="checkbox"
-              defaultChecked={product.continue_selling_when_out_of_stock}
+              checked={formData.continue_selling_when_out_of_stock}
+              onChange={(e) => handleInputChange('continue_selling_when_out_of_stock', e.target.checked)}
               className="w-4 h-4 text-admin-accent bg-admin-light-bg-main dark:bg-admin-bg-main border-admin-light-border-soft dark:border-admin-border-soft rounded focus:ring-admin-accent focus:ring-2"
             />
             <span className="text-admin-light-text-primary dark:text-admin-text-primary">
@@ -423,24 +446,173 @@ function EditProductForm({
           </label>
         </div>
       </div>
+      {/* Save Button at bottom of form */}
+      <div className="flex justify-end pt-6">
+        <button
+          type="submit"
+          disabled={isLoading}
+          className='inline-flex items-center bg-admin-accent text-white px-6 py-3 rounded-lg hover:bg-admin-accent-hover shadow-admin-soft hover:shadow-admin-glow transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
+        >
+          {isLoading ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <Save className="h-4 w-4 mr-2" />
+          )}
+          {isLoading ? 'Saving...' : 'Save Changes'}
+        </button>
+      </div>
     </form>
   );
 }
 
-export default async function EditProduct({ 
+export default function EditProduct({ 
   params 
 }: { 
-  params: { id: string } 
+  params: Promise<{ id: string }> 
 }) {
-  await requireAdmin();
+  const resolvedParams = use(params);
+  const { id } = resolvedParams;
+  const router = useRouter();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const [product, categories] = await Promise.all([
-    getProduct(params.id),
-    getCategories()
-  ]);
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const supabase = createClient();
+        
+        // Check admin authentication
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError || !user) {
+          router.push('/auth/login');
+          return;
+        }
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+        if (!profile || profile.role !== 'admin') {
+          router.push('/');
+          return;
+        }
+
+        // Load product and categories
+        const [productResult, categoriesResult] = await Promise.all([
+          supabase
+            .from('products')
+            .select(`
+              *,
+              product_variants(*),
+              product_categories(
+                categories(id, name, slug)
+              )
+            `)
+            .eq('id', id)
+            .single(),
+          supabase
+            .from('categories')
+            .select('id, name, slug')
+            .order('name')
+        ]);
+
+        if (productResult.error || !productResult.data) {
+          setError('Product not found');
+          return;
+        }
+
+        setProduct(productResult.data);
+        setCategories(categoriesResult.data || []);
+      } catch (err) {
+        setError('Failed to load product data');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadData();
+  }, [id, router]);
+
+  const handleSave = async (formData: FormData) => {
+    if (!product) return;
+    
+    setIsSaving(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    try {
+      const response = await fetch(`/api/admin/products/${product.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          description: formData.description || null,
+          status: formData.status,
+          price: formData.price,
+          compare_at_price: formData.compare_at_price || null,
+          cost_price: formData.cost_price || null,
+          sku: formData.sku || null,
+          featured: formData.featured,
+          track_inventory: formData.track_inventory,
+          continue_selling_when_out_of_stock: formData.continue_selling_when_out_of_stock,
+          category_ids: formData.category_ids
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to update product');
+      }
+
+      setSuccessMessage('Product updated successfully!');
+      
+      // Update local product state
+      setProduct(prev => prev ? { ...prev, ...result.data } : null);
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(null), 3000);
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save product');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-admin-accent" />
+      </div>
+    );
+  }
+
+  if (error && !product) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-red-500 mb-4">{error}</p>
+        <Link
+          href="/admin/products"
+          className="inline-flex items-center px-4 py-2 bg-admin-accent text-white rounded-lg hover:bg-admin-accent-hover"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Products
+        </Link>
+      </div>
+    );
+  }
 
   if (!product) {
-    notFound();
+    return null;
   }
 
   return (
@@ -478,20 +650,29 @@ export default async function EditProduct({
           >
             Cancel
           </Link>
-          <button
-            type="submit"
-            className='inline-flex items-center bg-admin-accent text-white px-4 py-2 rounded-lg hover:bg-admin-accent-hover shadow-admin-soft hover:shadow-admin-glow transition-all duration-200'
-          >
-            <Save className="h-4 w-4 mr-2" />
-            Save Changes
-          </button>
         </div>
       </div>
 
+      {/* Success/Error Messages */}
+      {successMessage && (
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+          <p className="text-green-800 dark:text-green-200">{successMessage}</p>
+        </div>
+      )}
+      
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <p className="text-red-800 dark:text-red-200">{error}</p>
+        </div>
+      )}
+
       {/* Form */}
-      <Suspense fallback={<div>Loading product...</div>}>
-        <EditProductForm product={product} categories={categories} />
-      </Suspense>
+      <EditProductForm 
+        product={product} 
+        categories={categories} 
+        onSave={handleSave}
+        isLoading={isSaving}
+      />
     </div>
   );
 }
