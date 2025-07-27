@@ -56,7 +56,7 @@ async function getDashboardStats(): Promise<DashboardStats> {
   const { data: lowStockData } = await supabase
     .from('product_variants')
     .select('product_id')
-    .lt('inventory_quantity', 10);
+    .lt('quantity', 10);
 
   const lowStockProducts = new Set(lowStockData?.map((v) => v.product_id) || [])
     .size;
