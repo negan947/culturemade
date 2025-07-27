@@ -126,8 +126,8 @@ export default async function AdminDashboard() {
   return (
     <div className='space-y-6'>
       {/* Welcome Header */}
-      <div className='bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-6'>
-        <h1 className='text-2xl font-bold text-admin-light-text-primary dark:text-admin-text-primary mb-2'>
+      <div className='bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-4 lg:p-6'>
+        <h1 className='text-xl lg:text-2xl font-bold text-admin-light-text-primary dark:text-admin-text-primary mb-2'>
           Welcome to CultureMade Admin
         </h1>
         <p className='text-admin-light-text-secondary dark:text-admin-text-secondary'>
@@ -136,20 +136,20 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Statistics Grid */}
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6'>
         {statCards.map((stat) => {
           const Icon = stat.icon;
           return (
             <div
               key={stat.title}
-              className='bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-6 hover:shadow-admin-popover transition-shadow duration-200'
+              className='bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-4 lg:p-6 hover:shadow-admin-popover transition-shadow duration-200'
             >
               <div className='flex items-center justify-between'>
                 <div>
                   <p className='text-sm font-medium text-admin-light-text-secondary dark:text-admin-text-secondary mb-1'>
                     {stat.title}
                   </p>
-                  <p className='text-2xl font-bold text-admin-light-text-primary dark:text-admin-text-primary'>
+                  <p className='text-xl lg:text-2xl font-bold text-admin-light-text-primary dark:text-admin-text-primary'>
                     {stat.value}
                   </p>
                   <p className='text-xs text-admin-light-text-disabled dark:text-admin-text-disabled'>
@@ -168,20 +168,20 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Alert Cards */}
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6'>
         {alertCards.map((alert) => {
           const Icon = alert.icon;
           return (
             <div
               key={alert.title}
-              className={`bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-6 hover:shadow-admin-popover transition-shadow duration-200 ${alert.urgent ? 'border-l-4 border-admin-error' : ''}`}
+              className={`bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-4 lg:p-6 hover:shadow-admin-popover transition-shadow duration-200 ${alert.urgent ? 'border-l-4 border-admin-error' : ''}`}
             >
               <div className='flex items-center justify-between'>
                 <div>
                   <p className='text-sm font-medium text-admin-light-text-secondary dark:text-admin-text-secondary mb-1'>
                     {alert.title}
                   </p>
-                  <p className='text-2xl font-bold text-admin-light-text-primary dark:text-admin-text-primary'>
+                  <p className='text-xl lg:text-2xl font-bold text-admin-light-text-primary dark:text-admin-text-primary'>
                     {alert.value}
                   </p>
                   <p className='text-xs text-admin-light-text-disabled dark:text-admin-text-disabled'>
@@ -200,16 +200,16 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Quick Actions */}
-      <div className='bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-6'>
+      <div className='bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-4 lg:p-6'>
         <h2 className='text-lg font-semibold text-admin-light-text-primary dark:text-admin-text-primary mb-4'>
           Quick Actions
         </h2>
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
           <a
             href='/admin/products/new'
-            className='flex items-center p-4 border border-admin-light-border dark:border-admin-border-soft rounded-lg hover:border-admin-accent hover:bg-admin-light-accent-bg dark:hover:bg-admin-bg-hover hover:shadow-admin-glow dark:hover:shadow-admin-glow transition-all duration-200'
+            className='flex items-center p-3 lg:p-4 border border-admin-light-border dark:border-admin-border-soft rounded-lg hover:border-admin-accent hover:bg-admin-light-accent-bg dark:hover:bg-admin-bg-hover hover:shadow-admin-glow dark:hover:shadow-admin-glow transition-all duration-200'
           >
-            <Package className='h-8 w-8 text-admin-accent mr-3' />
+            <Package className='h-6 w-6 lg:h-8 lg:w-8 text-admin-accent mr-3' />
             <div>
               <p className='font-medium text-admin-light-text-primary dark:text-admin-text-primary'>
                 Add New Product
@@ -222,9 +222,9 @@ export default async function AdminDashboard() {
 
           <a
             href='/admin/orders'
-            className='flex items-center p-4 border border-admin-light-border dark:border-admin-border-soft rounded-lg hover:border-admin-success hover:bg-admin-light-bg-hover dark:hover:bg-admin-bg-hover hover:shadow-admin-soft transition-all duration-200'
+            className='flex items-center p-3 lg:p-4 border border-admin-light-border dark:border-admin-border-soft rounded-lg hover:border-admin-success hover:bg-admin-light-bg-hover dark:hover:bg-admin-bg-hover hover:shadow-admin-soft transition-all duration-200'
           >
-            <ShoppingCart className='h-8 w-8 text-admin-success mr-3' />
+            <ShoppingCart className='h-6 w-6 lg:h-8 lg:w-8 text-admin-success mr-3' />
             <div>
               <p className='font-medium text-admin-light-text-primary dark:text-admin-text-primary'>
                 View Orders
@@ -237,9 +237,9 @@ export default async function AdminDashboard() {
 
           <a
             href='/admin/analytics'
-            className='flex items-center p-4 border border-admin-light-border dark:border-admin-border-soft rounded-lg hover:border-admin-warning hover:bg-admin-light-bg-hover dark:hover:bg-admin-bg-hover hover:shadow-admin-soft transition-all duration-200'
+            className='flex items-center p-3 lg:p-4 border border-admin-light-border dark:border-admin-border-soft rounded-lg hover:border-admin-warning hover:bg-admin-light-bg-hover dark:hover:bg-admin-bg-hover hover:shadow-admin-soft transition-all duration-200'
           >
-            <TrendingUp className='h-8 w-8 text-admin-warning mr-3' />
+            <TrendingUp className='h-6 w-6 lg:h-8 lg:w-8 text-admin-warning mr-3' />
             <div>
               <p className='font-medium text-admin-light-text-primary dark:text-admin-text-primary'>
                 View Analytics
@@ -253,7 +253,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* System Status */}
-      <div className='bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-6'>
+      <div className='bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-4 lg:p-6'>
         <h2 className='text-lg font-semibold text-admin-light-text-primary dark:text-admin-text-primary mb-4'>
           System Status
         </h2>

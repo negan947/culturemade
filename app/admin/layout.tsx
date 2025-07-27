@@ -2,6 +2,7 @@ import {
   BarChart3,
   Home,
   LogOut,
+  Menu,
   Package,
   Settings,
   ShoppingCart,
@@ -9,7 +10,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-
+import { MobileSidebar } from '@/components/admin/mobile-sidebar';
 import { DarkModeToggle } from '@/components/ui/dark-mode-toggle';
 import { getUserContext, requireAdmin } from '@/lib/supabase/auth';
 
@@ -64,9 +65,9 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
   ];
 
   return (
-    <div className='min-h-screen bg-admin-light-bg-main dark:bg-admin-bg-main flex'>
-      {/* Sidebar */}
-      <div className='fixed inset-y-0 left-0 z-50 w-64 bg-admin-light-bg-surface dark:bg-admin-bg-surface shadow-admin-soft border-r border-admin-light-border dark:border-admin-border'>
+    <div className='min-h-screen bg-admin-light-bg-main dark:bg-admin-bg-main'>
+      {/* Desktop Sidebar */}
+      <div className='hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:w-64 bg-admin-light-bg-surface dark:bg-admin-bg-surface shadow-admin-soft border-r border-admin-light-border dark:border-admin-border'>
         {/* Header */}
         <div className='flex items-center justify-between h-16 px-6 border-b border-admin-light-border dark:border-admin-border'>
           <div className='flex items-center space-x-3'>
@@ -139,29 +140,46 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         </div>
       </div>
 
+      {/* Mobile Sidebar */}
+      <MobileSidebar navigationItems={navigationItems} userContext={userContext} />
+
       {/* Main Content */}
-      <div className='flex-1 ml-64'>
+      <div className='flex-1 lg:ml-64'>
         {/* Top Bar */}
-        <header className='bg-admin-light-bg-surface dark:bg-admin-bg-surface shadow-admin-soft border-b border-admin-light-border dark:border-admin-border h-16 flex items-center justify-between px-6'>
+        <header className='bg-admin-light-bg-surface dark:bg-admin-bg-surface shadow-admin-soft border-b border-admin-light-border dark:border-admin-border h-16 flex items-center justify-between px-4 lg:px-6'>
           <div className='flex items-center space-x-4'>
-            <h2 className='text-xl font-semibold text-admin-light-text-primary dark:text-admin-text-primary'>
+            {/* Mobile Menu Button */}
+            <button
+              className='lg:hidden p-2 text-admin-light-text-secondary dark:text-admin-text-secondary hover:text-admin-accent dark:hover:text-admin-accent transition-colors duration-200'
+              id='mobile-menu-button'
+            >
+              <Menu className='h-6 w-6' />
+            </button>
+            <h2 className='text-lg lg:text-xl font-semibold text-admin-light-text-primary dark:text-admin-text-primary'>
               Admin Dashboard
             </h2>
           </div>
 
-          <div className='flex items-center space-x-4'>
+          <div className='flex items-center space-x-2 lg:space-x-4'>
             <DarkModeToggle />
             <Link
               href='/'
-              className='text-sm text-admin-light-text-secondary dark:text-admin-text-secondary hover:text-admin-accent dark:hover:text-admin-accent transition-colors duration-200'
+              className='hidden sm:block text-sm text-admin-light-text-secondary dark:text-admin-text-secondary hover:text-admin-accent dark:hover:text-admin-accent transition-colors duration-200'
             >
               ← View Site
+            </Link>
+            <Link
+              href='/'
+              className='sm:hidden p-2 text-admin-light-text-secondary dark:text-admin-text-secondary hover:text-admin-accent dark:hover:text-admin-accent transition-colors duration-200'
+              title='View Site'
+            >
+              <Home className='h-4 w-4' />
             </Link>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className='p-6 bg-admin-light-bg-main dark:bg-admin-bg-main min-h-[calc(100vh-4rem)]'>
+        <main className='p-4 lg:p-6 bg-admin-light-bg-main dark:bg-admin-bg-main min-h-[calc(100vh-4rem)]'>
           {children}
         </main>
       </div>

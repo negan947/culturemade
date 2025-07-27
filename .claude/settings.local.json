@@ -17,7 +17,8 @@
       "Bash(rm:*)",
       "Bash(npm run build:*)",
       "Bash(npx prettier:*)",
-      "Bash(npm run format:check:*)"
+      "Bash(npm run format:check:*)",
+      "Bash(npm run:*)"
     ],
     "deny": []
   }

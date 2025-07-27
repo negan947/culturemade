@@ -4,12 +4,12 @@ export default async function AdminSettings() {
   await requireAdmin();
 
   return (
-    <div className='space-y-6'>
-      <h1 className='text-2xl font-bold text-admin-light-text-primary dark:text-admin-text-primary'>
+    <div className='space-y-4 lg:space-y-6'>
+      <h1 className='text-xl lg:text-2xl font-bold text-admin-light-text-primary dark:text-admin-text-primary'>
         Settings
       </h1>
 
-      <div className='bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-6'>
+      <div className='bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-4 lg:p-6'>
         <p className='text-admin-light-text-secondary dark:text-admin-text-secondary'>
           System settings interface coming soon. This will include:
         </p>
