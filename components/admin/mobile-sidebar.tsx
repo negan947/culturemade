@@ -28,6 +28,14 @@ interface MobileSidebarProps {
 export function MobileSidebar({ navigationItems, userContext }: MobileSidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
 
+  // Cleanup body scroll on component mount to ensure it's not stuck
+  useEffect(() => {
+    document.body.style.overflow = '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   // Handle mobile menu button click
   useEffect(() => {
     const handleMenuClick = () => {
@@ -42,9 +50,16 @@ export function MobileSidebar({ navigationItems, userContext }: MobileSidebarPro
     return undefined;
   }, []);
 
-  // Handle escape key and outside clicks
+  // Handle escape key and outside clicks, prevent body scroll when open
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      // Re-enable body scroll when sidebar is closed
+      document.body.style.overflow = '';
+      return;
+    }
+
+    // Prevent body scroll when sidebar is open
+    document.body.style.overflow = 'hidden';
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -65,6 +80,8 @@ export function MobileSidebar({ navigationItems, userContext }: MobileSidebarPro
     return () => {
       document.removeEventListener('keydown', handleEscape);
       document.removeEventListener('mousedown', handleClickOutside);
+      // Re-enable body scroll when component unmounts
+      document.body.style.overflow = '';
     };
   }, [isOpen]);
 
@@ -81,7 +98,7 @@ export function MobileSidebar({ navigationItems, userContext }: MobileSidebarPro
       <div
         id="mobile-sidebar"
         className={`lg:hidden fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] bg-admin-light-bg-surface dark:bg-admin-bg-surface shadow-admin-soft border-r border-admin-light-border dark:border-admin-border transform transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+          isOpen ? 'translate-x-0' : '-translate-x-full pointer-events-none'
         }`}
       >
         {/* Header */}

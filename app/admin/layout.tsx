@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+import { AdminScrollFix } from '@/components/admin/admin-scroll-fix';
 import { MobileSidebar } from '@/components/admin/mobile-sidebar';
 import { DarkModeToggle } from '@/components/ui/dark-mode-toggle';
 import { getUserContext, requireAdmin } from '@/lib/supabase/auth';
@@ -65,6 +66,9 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
   ];
 
   return (
+    <>
+      <AdminScrollFix />
+      
     <div className='min-h-screen bg-admin-light-bg-main dark:bg-admin-bg-main'>
       {/* Desktop Sidebar */}
       <div className='hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:w-64 bg-admin-light-bg-surface dark:bg-admin-bg-surface shadow-admin-soft border-r border-admin-light-border dark:border-admin-border'>
@@ -197,10 +201,11 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className='p-4 lg:p-6 bg-admin-light-bg-main dark:bg-admin-bg-main min-h-[calc(100vh-4rem)]'>
+        <main className='p-4 lg:p-6 bg-admin-light-bg-main dark:bg-admin-bg-main min-h-[calc(100vh-4rem)] lg:min-h-[calc(100vh-4rem)]'>
           {children}
         </main>
       </div>
     </div>
+    </>
   );
 }
