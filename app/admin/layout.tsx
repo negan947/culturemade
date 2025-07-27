@@ -29,37 +29,37 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
     {
       name: 'Dashboard',
       href: '/admin',
-      icon: Home,
+      icon: 'Home',
       description: 'Overview and quick stats',
     },
     {
       name: 'Products',
       href: '/admin/products',
-      icon: Package,
+      icon: 'Package',
       description: 'Manage product catalog',
     },
     {
       name: 'Orders',
       href: '/admin/orders',
-      icon: ShoppingCart,
+      icon: 'ShoppingCart',
       description: 'View and manage orders',
     },
     {
       name: 'Customers',
       href: '/admin/customers',
-      icon: Users,
+      icon: 'Users',
       description: 'Customer management',
     },
     {
       name: 'Analytics',
       href: '/admin/analytics',
-      icon: BarChart3,
+      icon: 'BarChart3',
       description: 'Sales and performance data',
     },
     {
       name: 'Settings',
       href: '/admin/settings',
-      icon: Settings,
+      icon: 'Settings',
       description: 'System configuration',
     },
   ];
@@ -89,7 +89,25 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         <nav className='mt-6 px-4'>
           <div className='space-y-1'>
             {navigationItems.map((item) => {
-              const Icon = item.icon;
+              const getIcon = (iconName: string) => {
+                switch (iconName) {
+                  case 'Home':
+                    return Home;
+                  case 'Package':
+                    return Package;
+                  case 'ShoppingCart':
+                    return ShoppingCart;
+                  case 'Users':
+                    return Users;
+                  case 'BarChart3':
+                    return BarChart3;
+                  case 'Settings':
+                    return Settings;
+                  default:
+                    return Home;
+                }
+              };
+              const Icon = getIcon(item.icon);
               return (
                 <Link
                   key={item.name}

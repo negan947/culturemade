@@ -1,13 +1,13 @@
 'use client';
 
-import { LogOut, X } from 'lucide-react';
+import { BarChart3, Home, LogOut, Package, Settings, ShoppingCart, Users, X } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 interface NavigationItem {
   name: string;
   href: string;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  icon: string;
   description: string;
 }
 
@@ -68,17 +68,21 @@ export function MobileSidebar({ navigationItems, userContext }: MobileSidebarPro
     };
   }, [isOpen]);
 
-  if (!isOpen) return null;
-
   return (
     <>
       {/* Backdrop */}
-      <div className="lg:hidden fixed inset-0 z-40 bg-black bg-opacity-50" />
+      <div 
+        className={`lg:hidden fixed inset-0 z-40 bg-black transition-opacity duration-300 ease-in-out ${
+          isOpen ? 'bg-opacity-50' : 'bg-opacity-0 pointer-events-none'
+        }`}
+      />
       
       {/* Mobile Sidebar */}
       <div
         id="mobile-sidebar"
-        className="lg:hidden fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] bg-admin-light-bg-surface dark:bg-admin-bg-surface shadow-admin-soft border-r border-admin-light-border dark:border-admin-border transform transition-transform duration-300 ease-in-out"
+        className={`lg:hidden fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] bg-admin-light-bg-surface dark:bg-admin-bg-surface shadow-admin-soft border-r border-admin-light-border dark:border-admin-border transform transition-transform duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
       >
         {/* Header */}
         <div className="flex items-center justify-between h-16 px-6 border-b border-admin-light-border dark:border-admin-border">
@@ -107,7 +111,25 @@ export function MobileSidebar({ navigationItems, userContext }: MobileSidebarPro
         <nav className="mt-6 px-4">
           <div className="space-y-1">
             {navigationItems.map((item) => {
-              const Icon = item.icon;
+              const getIcon = (iconName: string) => {
+                switch (iconName) {
+                  case 'Home':
+                    return Home;
+                  case 'Package':
+                    return Package;
+                  case 'ShoppingCart':
+                    return ShoppingCart;
+                  case 'Users':
+                    return Users;
+                  case 'BarChart3':
+                    return BarChart3;
+                  case 'Settings':
+                    return Settings;
+                  default:
+                    return Home;
+                }
+              };
+              const Icon = getIcon(item.icon);
               return (
                 <Link
                   key={item.name}
