@@ -21,7 +21,8 @@
       "Bash(npm run:*)",
       "Bash(curl:*)",
       "mcp__supabasecm__get_logs",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(npx next:*)"
     ],
     "deny": []
   }

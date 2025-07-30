@@ -2,10 +2,7 @@ import {
   ArrowLeft, 
   Save, 
   Plus, 
-  X, 
-  Upload,
-  Eye,
-  EyeOff
+  Upload
 } from 'lucide-react';
 import Link from 'next/link';
 import { Suspense } from 'react';
