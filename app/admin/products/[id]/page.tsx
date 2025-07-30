@@ -89,12 +89,6 @@ function ProductOverview({ product }: { product: Product }) {
     sum + variant.quantity, 0
   );
 
-  const avgPrice = product.product_variants.length > 0
-    ? product.product_variants.reduce((sum, variant) => 
-        sum + parseFloat(variant.price || product.price), 0
-      ) / product.product_variants.length
-    : parseFloat(product.price);
-
   const profitMargin = product.cost_price 
     ? ((parseFloat(product.price) - parseFloat(product.cost_price)) / parseFloat(product.price) * 100).toFixed(1)
     : null;
