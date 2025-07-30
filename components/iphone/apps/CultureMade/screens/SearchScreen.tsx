@@ -136,7 +136,8 @@ export default function SearchScreen() {
   };
 
   return (
-    <div className="h-full bg-gray-50 relative">
+    <>
+      <div className="h-full bg-gray-50 relative">
       {/* Search Header */}
       <div className="bg-white px-4 py-3 border-b border-gray-200 relative z-20">
         <div className="flex items-center gap-3">
@@ -311,6 +312,7 @@ export default function SearchScreen() {
           )}
         </AnimatePresence>
       </div>
+      </div>
 
       {/* Product Detail Modal */}
       <ProductDetailModal
@@ -319,6 +321,6 @@ export default function SearchScreen() {
         onClose={handleCloseProductModal}
         onAddToCart={handleAddToCart}
       />
-    </div>
+    </>
   );
 }
