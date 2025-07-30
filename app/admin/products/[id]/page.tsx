@@ -1,18 +1,17 @@
-import { Suspense } from 'react';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import { 
   ArrowLeft, 
   Edit3, 
   Package, 
   DollarSign,
   BarChart3,
-  Eye,
   Calendar,
   Tag,
   Boxes,
   Image as ImageIcon
 } from 'lucide-react';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
 import { requireAdmin } from '@/lib/supabase/auth';
 import { createClient } from '@/lib/supabase/server';

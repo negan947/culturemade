@@ -6,6 +6,7 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react';
+import Link from 'next/link';
 
 import { requireAdmin } from '@/lib/supabase/auth';
 import { createClient } from '@/lib/supabase/server';
@@ -205,7 +206,7 @@ export default async function AdminDashboard() {
           Quick Actions
         </h2>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-          <a
+          <Link
             href='/admin/products/new'
             className='flex items-center p-3 lg:p-4 border border-admin-light-border dark:border-admin-border-soft rounded-lg hover:border-admin-accent hover:bg-admin-light-accent-bg dark:hover:bg-admin-bg-hover hover:shadow-admin-glow dark:hover:shadow-admin-glow transition-all duration-200'
           >
@@ -218,7 +219,7 @@ export default async function AdminDashboard() {
                 Create a new product listing
               </p>
             </div>
-          </a>
+          </Link>
 
           <a
             href='/admin/orders'

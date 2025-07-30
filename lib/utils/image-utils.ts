@@ -19,8 +19,7 @@ export interface ImageTransformOptions {
  */
 export function getStorageImageUrl(bucket: string, path: string): string {
   if (!SUPABASE_URL) {
-    // console.warn('SUPABASE_URL not found, using placeholder')
-    return generatePlaceholderImage(400, 400);
+    throw new Error('SUPABASE_URL not found');
   }
 
   return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
@@ -35,11 +34,7 @@ export function getTransformedImageUrl(
   options: ImageTransformOptions = {}
 ): string {
   if (!SUPABASE_URL) {
-    // console.warn('SUPABASE_URL not found, using placeholder')
-    return generatePlaceholderImage(
-      options.width || 400,
-      options.height || 400
-    );
+    throw new Error('SUPABASE_URL not found');
   }
 
   const params = new URLSearchParams();
@@ -107,44 +102,41 @@ export const productImageUrl = {
   },
 };
 
-/**
- * Generate placeholder image URL for development
- */
-export function generatePlaceholderImage(
-  width: number = 400,
-  height: number = 400,
-  seed?: string
-): string {
-  const seedParam = seed ? `&random=${encodeURIComponent(seed)}` : '';
-  return `https://picsum.photos/${width}/${height}?grayscale${seedParam}`;
-}
 
 /**
- * Get product image with fallback to placeholder
+ * Get product image URL for real Supabase storage paths only
+ * Returns null for missing/invalid paths - let component handle placeholders
  */
 export function getProductImageWithFallback(
   imagePath: string | null | undefined,
   size: 'thumbnail' | 'medium' | 'large' = 'medium',
   productName?: string
-): string {
+): string | null {
+  // If no image path, return null - let component show placeholder
   if (!imagePath) {
-    // Use product name as seed for consistent placeholder
-    const seed = productName
-      ? productName.toLowerCase().replace(/\s+/g, '-')
-      : undefined;
-
-    switch (size) {
-      case 'thumbnail':
-        return generatePlaceholderImage(200, 200, seed);
-      case 'medium':
-        return generatePlaceholderImage(400, 400, seed);
-      case 'large':
-        return generatePlaceholderImage(800, 800, seed);
-      default:
-        return generatePlaceholderImage(400, 400, seed);
-    }
+    return null;
   }
 
+  // If it's a placeholder URL, treat as no image
+  if (imagePath.includes('placeholder')) {
+    return null;
+  }
+
+  // If already a complete URL from external source and it's a real image, return as-is
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    // Only allow Supabase URLs for now
+    if (imagePath.includes('supabase.co')) {
+      return imagePath;
+    }
+    return null;
+  }
+
+  // If Supabase URL is not available, return null
+  if (!SUPABASE_URL) {
+    return null;
+  }
+
+  // Otherwise, treat as Supabase storage path
   return productImageUrl[size](imagePath);
 }
 

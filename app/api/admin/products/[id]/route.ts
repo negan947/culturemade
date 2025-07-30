@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
+
+import { createClient } from '@/lib/supabase/server';
 
 // Validation schemas
 const updateProductSchema = z.object({
-  name: z.string().min(1, 'Product name is required').max(255).optional(),
-  description: z.string().optional(),
-  status: z.enum(['active', 'draft', 'archived']).optional(),
-  price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, 'Invalid price').optional(),
-  compare_at_price: z.string().optional().refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0), 'Invalid compare price'),
-  cost_price: z.string().optional().refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0), 'Invalid cost price'),
-  sku: z.string().optional(),
-  featured: z.boolean().optional(),
-  track_inventory: z.boolean().optional(),
-  continue_selling_when_out_of_stock: z.boolean().optional(),
+  name: z.string().min(1, 'Product name is required').max(255),
+  description: z.union([z.string(), z.null()]).optional(),
+  status: z.enum(['active', 'draft', 'archived']),
+  price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, 'Invalid price'),
+  compare_at_price: z.union([z.string(), z.null()]).optional(),
+  cost: z.union([z.string(), z.null()]).optional(),
+  sku: z.union([z.string(), z.null()]).optional(),
+  featured: z.boolean(),
+  track_quantity: z.boolean(),
+  allow_backorder: z.boolean(),
   category_ids: z.array(z.string().uuid()).optional(),
   variants: z.array(z.object({
     id: z.string().uuid().optional(), // For updating existing variants
@@ -73,12 +74,13 @@ async function logAdminAction(supabase: any, adminId: string, action: string, de
 // GET - Get single product with all details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { user, supabase } = await requireAdmin();
     
-    const validation = productIdSchema.safeParse(params);
+    const resolvedParams = await params;
+    const validation = productIdSchema.safeParse(resolvedParams);
     if (!validation.success) {
       return NextResponse.json(
         { error: 'Invalid product ID' },
@@ -145,12 +147,13 @@ export async function GET(
 // PUT - Update product
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { user, supabase } = await requireAdmin();
     
-    const validation = productIdSchema.safeParse(params);
+    const resolvedParams = await params;
+    const validation = productIdSchema.safeParse(resolvedParams);
     if (!validation.success) {
       return NextResponse.json(
         { error: 'Invalid product ID' },
@@ -159,10 +162,24 @@ export async function PUT(
     }
 
     const { id } = validation.data;
-    const body = await request.json();
+    
+    let body;
+    try {
+      body = await request.json();
+      console.log('Received request body:', body);
+    } catch (error) {
+      console.error('Failed to parse request body:', error);
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
+    
     const updateValidation = updateProductSchema.safeParse(body);
     
     if (!updateValidation.success) {
+      console.error('Validation Error:', updateValidation.error.errors);
+      console.error('Received Data:', body);
       return NextResponse.json(
         { error: 'Invalid update data', details: updateValidation.error.errors },
         { status: 400 }
@@ -293,12 +310,13 @@ export async function PUT(
 // DELETE - Delete product
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { user, supabase } = await requireAdmin();
     
-    const validation = productIdSchema.safeParse(params);
+    const resolvedParams = await params;
+    const validation = productIdSchema.safeParse(resolvedParams);
     if (!validation.success) {
       return NextResponse.json(
         { error: 'Invalid product ID' },

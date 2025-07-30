@@ -2,6 +2,7 @@ import { ReactElement } from 'react';
 
 import Calculator from './Calculator/Calculator';
 import Components from './Components/Components';
+import CultureMade from './CultureMade/CultureMade';
 import Weather from './Weather/Weather';
 
 interface App {
@@ -45,8 +46,8 @@ const appsBase: App[] = [
     appId: 'culturemade',
     icon: 'app-store',
     name: 'CultureMade',
-    element: Components,
-    statusBarColor: 'dark',
+    element: CultureMade,
+    statusBarColor: 'light',
   },
 ];
 

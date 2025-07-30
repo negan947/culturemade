@@ -1,8 +1,9 @@
-import { Suspense } from 'react';
-import { createClient } from '@/lib/supabase/server';
-import { notFound } from 'next/navigation';
 import { Upload, Image as ImageIcon, Trash2, Plus } from 'lucide-react';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
+
+import { createClient } from '@/lib/supabase/server';
 
 interface ProductImage {
   id: string;

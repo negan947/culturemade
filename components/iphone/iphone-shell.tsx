@@ -27,7 +27,7 @@ const IPhoneShell: FC<Props> = ({ children }) => {
   return (
     <div className='select-none flex justify-center items-center h-screen-dvh sm:h-screen bg-black overflow-hidden pt-safe-top pb-safe-bottom sm:pt-0 sm:pb-0'>
       <motion.div
-        className='relative overflow-hidden bg-black sm:border-[14px] sm:border-black sm:rounded-[60px] sm:shadow-2xl w-full h-full sm:h-[890px] sm:w-[410px]'
+        className='relative bg-black sm:border-[14px] sm:border-black sm:rounded-[60px] sm:shadow-2xl w-full h-full sm:h-[890px] sm:w-[410px]'
         style={{
           aspectRatio: '18/39',
         }}

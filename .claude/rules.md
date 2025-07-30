@@ -16,7 +16,8 @@
 
 ### Database & Backend (SUPABASE ONLY)
 - **SUPABASE IS THE ONLY DATABASE** - all data (users, orders, images) lives in Supabase PostgreSQL
-- **ALWAYS use MCP tools first** - check database state before any operations
+- **Claude uses MCP tools for context** - Claude checks database state before making changes (not application code)
+- **Application uses Supabase client libraries** - standard @supabase/supabase-js for all app database operations
 - **Real data only** - no mock data, no local storage, no external databases
 - **SQL files for schema changes** - generate SQL for user to copy/paste into Supabase dashboard
 - **Stripe for payments** - real payment processing, no mocks
@@ -39,8 +40,8 @@
 ### Testing & Deployment
 - Always verify solutions with available tests
 - Check for proper lint/typecheck commands before suggesting them
-- **MANDATORY: Use MCP Supabase tools for all database operations**
-- **Check database state with MCP before making changes**
+- **Claude uses MCP tools for database context** - Claude checks database state before making changes
+- **Application uses standard Supabase clients** - @supabase/supabase-js for all app database operations
 - **Generate SQL files for schema changes** - user copies to Supabase dashboard
 - Respect the Windows development environment setup
 
@@ -61,11 +62,35 @@
 - **Update the version number and timestamp** in knowledge.md header
 - **Document the changes** in the maintenance log at the bottom
 
+## 🎯 Advanced Problem-Solving Methodology (MANDATORY FOR COMPLEX ISSUES)
+
+### Research-First Approach
+- **NEVER attempt fixes without comprehensive investigation**
+- **Use multiple tool calls in parallel** for efficient information gathering  
+- **Check GitHub issues** for library-specific bugs (especially mobile issues)
+- **Research browser limitations** (iOS Safari touch events, CSS property support)
+- **Understand architecture** before implementing solutions
+
+### Mobile Development Rules (CRITICAL)
+- **Feature-based device detection** - not user-agent sniffing
+- **Dual system architecture** - Desktop (Framer Motion) + Mobile (Native Events)
+- **iOS Safari compatibility** - Use `{ passive: false }` for preventDefault()
+- **Touch target optimization** - Minimum 25px for mobile gesture areas
+- **CSS touch properties** - `touch-action: none` for gesture areas
+
+### Implementation Standards
+- **Progressive enhancement** - Base functionality + enhanced UX + graceful degradation
+- **Fallback systems** - Always provide alternatives for unsupported features
+- **Real device testing** - Validate solutions on actual mobile devices when possible
+- **Document workarounds** - Comment known issues with links to solutions
+
 ## Preferred Tools
-- Use MCP Supabase tools for database operations
+- Claude uses MCP Supabase tools for database context checking
+- Application code uses @supabase/supabase-js client libraries
 - Prefer editing existing files over creating new ones
 - Use TodoWrite for complex multi-step tasks
 - Use Task tool for open-ended searches
+- **WebSearch extensively** - Research before implementation for complex issues
 
 ## Task Management Requirements (MANDATORY)
 - **ALWAYS include a final todo** to update `.claude/progress.md` when completing any task

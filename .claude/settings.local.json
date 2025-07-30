@@ -18,7 +18,10 @@
       "Bash(npm run build:*)",
       "Bash(npx prettier:*)",
       "Bash(npm run format:check:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(curl:*)",
+      "mcp__supabasecm__get_logs",
+      "Bash(npx eslint:*)"
     ],
     "deny": []
   }

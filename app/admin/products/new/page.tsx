@@ -1,5 +1,3 @@
-import { Suspense } from 'react';
-import Link from 'next/link';
 import { 
   ArrowLeft, 
   Save, 
@@ -9,6 +7,8 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
 import { requireAdmin } from '@/lib/supabase/auth';
 import { createClient } from '@/lib/supabase/server';

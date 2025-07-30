@@ -23,11 +23,11 @@ interface Product {
   status: 'active' | 'draft' | 'archived';
   price: string;
   compare_at_price: string | null;
-  cost_price: string | null;
+  cost: string | null;
   sku: string | null;
   featured: boolean;
-  track_inventory: boolean;
-  continue_selling_when_out_of_stock: boolean;
+  track_quantity: boolean;
+  allow_backorder: boolean;
   created_at: string;
   product_variants: ProductVariant[];
   product_categories: { categories: { id: string; name: string; slug: string } }[];
@@ -59,11 +59,11 @@ interface FormData {
   status: 'active' | 'draft' | 'archived';
   price: string;
   compare_at_price: string;
-  cost_price: string;
+  cost: string;
   sku: string;
   featured: boolean;
-  track_inventory: boolean;
-  continue_selling_when_out_of_stock: boolean;
+  track_quantity: boolean;
+  allow_backorder: boolean;
   category_ids: string[];
 }
 
@@ -84,13 +84,13 @@ function EditProductForm({
     name: product.name,
     description: product.description || '',
     status: product.status,
-    price: product.price,
-    compare_at_price: product.compare_at_price || '',
-    cost_price: product.cost_price || '',
+    price: String(product.price),
+    compare_at_price: product.compare_at_price ? String(product.compare_at_price) : '',
+    cost: product.cost ? String(product.cost) : '',
     sku: product.sku || '',
     featured: product.featured,
-    track_inventory: product.track_inventory,
-    continue_selling_when_out_of_stock: product.continue_selling_when_out_of_stock,
+    track_quantity: product.track_quantity,
+    allow_backorder: product.allow_backorder,
     category_ids: selectedCategoryIds
   });
 
@@ -249,8 +249,8 @@ function EditProductForm({
                 type="number"
                 step="0.01"
                 min="0"
-                value={formData.cost_price}
-                onChange={(e) => handleInputChange('cost_price', e.target.value)}
+                value={formData.cost}
+                onChange={(e) => handleInputChange('cost', e.target.value)}
                 placeholder="0.00"
                 className="w-full pl-8 pr-4 py-2 bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border-soft dark:border-admin-border-soft rounded-lg text-admin-light-text-primary dark:text-admin-text-primary placeholder-admin-light-text-disabled dark:placeholder-admin-text-disabled focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-admin-accent transition-colors duration-200"
               />
@@ -424,24 +424,24 @@ function EditProductForm({
           <label className="flex items-center space-x-3">
             <input
               type="checkbox"
-              checked={formData.track_inventory}
-              onChange={(e) => handleInputChange('track_inventory', e.target.checked)}
+              checked={formData.track_quantity}
+              onChange={(e) => handleInputChange('track_quantity', e.target.checked)}
               className="w-4 h-4 text-admin-accent bg-admin-light-bg-main dark:bg-admin-bg-main border-admin-light-border-soft dark:border-admin-border-soft rounded focus:ring-admin-accent focus:ring-2"
             />
             <span className="text-admin-light-text-primary dark:text-admin-text-primary">
-              Track Inventory
+              Track Quantity
             </span>
           </label>
           
           <label className="flex items-center space-x-3">
             <input
               type="checkbox"
-              checked={formData.continue_selling_when_out_of_stock}
-              onChange={(e) => handleInputChange('continue_selling_when_out_of_stock', e.target.checked)}
+              checked={formData.allow_backorder}
+              onChange={(e) => handleInputChange('allow_backorder', e.target.checked)}
               className="w-4 h-4 text-admin-accent bg-admin-light-bg-main dark:bg-admin-bg-main border-admin-light-border-soft dark:border-admin-border-soft rounded focus:ring-admin-accent focus:ring-2"
             />
             <span className="text-admin-light-text-primary dark:text-admin-text-primary">
-              Continue selling when out of stock
+              Allow backorder
             </span>
           </label>
         </div>
@@ -547,30 +547,57 @@ export default function EditProduct({
     setSuccessMessage(null);
 
     try {
+      console.log('Current formData state:', formData);
+      
+      const requestData = {
+        name: formData.name,
+        description: formData.description.trim() || null,
+        status: formData.status,
+        price: formData.price,
+        compare_at_price: formData.compare_at_price.trim() || null,
+        cost: formData.cost.trim() || null,
+        sku: formData.sku.trim() || null,
+        featured: formData.featured,
+        track_quantity: formData.track_quantity,
+        allow_backorder: formData.allow_backorder,
+        category_ids: formData.category_ids
+      };
+      
+      console.log('Sending PUT request:', {
+        url: `/api/admin/products/${product.id}`,
+        data: requestData
+      });
+      
+      console.log('Request body as JSON string:', JSON.stringify(requestData, null, 2));
+
       const response = await fetch(`/api/admin/products/${product.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: formData.name,
-          description: formData.description || null,
-          status: formData.status,
-          price: formData.price,
-          compare_at_price: formData.compare_at_price || null,
-          cost_price: formData.cost_price || null,
-          sku: formData.sku || null,
-          featured: formData.featured,
-          track_inventory: formData.track_inventory,
-          continue_selling_when_out_of_stock: formData.continue_selling_when_out_of_stock,
-          category_ids: formData.category_ids
-        }),
+        body: JSON.stringify(requestData),
       });
 
-      const result = await response.json();
+      console.log('Response status:', response.status);
+      console.log('Response headers:', [...response.headers.entries()]);
+
+      let result;
+      try {
+        result = await response.json();
+        console.log('Response JSON:', result);
+      } catch (jsonError) {
+        console.error('Failed to parse response JSON:', jsonError);
+        throw new Error(`Server returned invalid JSON (${response.status})`);
+      }
 
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to update product');
+        console.error('API Error Response:', {
+          status: response.status,
+          statusText: response.statusText,
+          result
+        });
+        console.error('Full API Error:', result);
+        throw new Error(result?.error || `Failed to update product (${response.status})`);
       }
 
       setSuccessMessage('Product updated successfully!');

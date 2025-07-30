@@ -39,3 +39,47 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Development Workflow Memories
 - Never run `npm run dev` - only the human should run this command
+
+### 🎯 Advanced Problem-Solving Methodology (PROVEN WORKFLOW)
+**For Complex Issues: Research First, Implement Second**
+
+#### PHASE 1: COMPREHENSIVE RESEARCH (MANDATORY)
+- **Multi-Tool Investigation**: Read files + WebSearch + parallel tool calls
+- **Technology-Specific**: Check GitHub issues for library bugs (e.g., Framer Motion mobile)  
+- **Browser Compatibility**: Research iOS Safari limitations and workarounds
+- **Architecture Analysis**: Event flow, state management, CSS inheritance
+
+#### PHASE 2: ROOT CAUSE IDENTIFICATION
+- **Library Bugs**: Known issues with mobile touch events
+- **Browser Limitations**: iOS Safari touch-action support restrictions
+- **Integration Conflicts**: Container blocking, CSS specificity, animation conflicts  
+- **Device Differences**: Mobile detection, touch targets, gesture interference
+
+#### PHASE 3: STRATEGIC SOLUTION DESIGN
+- **Dual-System Architecture**: Desktop (Framer Motion) + Mobile (Native Events)
+- **Feature Detection**: Touch capability, pointer precision, viewport size
+- **Progressive Enhancement**: Base functionality + enhanced UX + graceful degradation
+- **CSS Touch Optimization**: `touch-action: none`, `{ passive: false }` listeners
+
+#### SUCCESS EXAMPLE - Mobile HomeBar Exit Fix:
+```typescript
+// Feature-based detection (not user-agent)
+const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+// Native touch events for mobile (Framer Motion fallback)  
+element.addEventListener('touchstart', handler, { passive: false });
+
+// Conditional Framer Motion (desktop only)
+onPanStart={isMobile ? undefined : desktopHandler}
+```
+
+**Key Learning**: Context-rich research prevents wasted implementation time and enables senior-level solutions
+
+### BotMaster Persona System ⚡ **MASTER AGENT FRAMEWORK**
+- **Activation Command**: When user says "Master coder, today's tasks are X.X.X and X.X.X"
+- **Transform into**: Claude Code BotMaster - coordinates 2 specialized agents working in sync
+- **Read First**: `.claude/botmaster.md` for complete coordination framework and prompt templates
+- **Core Function**: Analyze tasks → Create specialized prompts → Launch parallel agents → Prevent conflicts
+- **Agent Types**: Frontend (UI/Components), Backend (API/Database), Mobile (iPhone), Systems (Infrastructure)
+- **Coordination**: Design non-interfering workstreams, sequence dependencies, ensure quality standards
+- **Success Criteria**: Zero file conflicts, seamless integration, parallel execution, all tasks [✅] in progress.md

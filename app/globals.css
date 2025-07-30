@@ -23,23 +23,48 @@ html,
 body {
   height: 100%;
   width: 100%;
-  overflow: hidden;
-  position: fixed;
 
   /* Fallback for browsers that don't support dvh */
   height: 100vh;
   /* Use dynamic viewport height for better mobile support */
   height: 100dvh;
 
-  /* Prevent rubber band scrolling on iOS */
+  /* Prevent rubber band scrolling on iOS while allowing normal scrolling */
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: none;
+  overscroll-behavior-x: none; /* Only prevent horizontal overscroll */
+  overscroll-behavior-y: auto; /* Allow vertical scrolling */
 }
 
-/* Ensure the app doesn't scroll */
+/* iOS-like touch behavior */
 * {
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
+}
+
+/* Enhanced scrolling support */
+.scrollable {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: auto;
+  touch-action: pan-y;
+}
+
+/* Mobile gesture optimization */
+.mobile-gesture-area {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* Prevent iOS Safari bounce and gestures */
+.ios-fixed-container {
+  position: fixed;
+  overflow: hidden;
+  -webkit-overflow-scrolling: auto;
+  overscroll-behavior: none;
+  touch-action: manipulation;
 }
 
 /* Custom utility classes for safe area handling */

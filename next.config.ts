@@ -77,7 +77,7 @@ const nextConfig: NextConfig = {
   // Configure images optimization
   images: {
     // Configure image domains (add your CDN domains here)
-    domains: ['localhost'],
+    domains: ['localhost', 'gaifxrqdngirhetkvaqe.supabase.co'],
 
     // Configure image formats
     formats: ['image/webp', 'image/avif'],
