@@ -52,6 +52,7 @@ module.exports = [
       // React rules
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
+      'react/no-unescaped-entities': ['error', { 'forbid': ['>', '}'] }],
 
       // Import rules
       'import/no-unresolved': 'off', // Let TypeScript handle this

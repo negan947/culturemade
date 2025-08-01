@@ -200,7 +200,7 @@ export default function SearchScreen() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="h-full overflow-y-auto px-4 py-6"
+              className="h-full overflow-y-auto culturemade-scrollable px-4 py-6"
             >
               {/* Trending Searches */}
               <div className="mb-8">

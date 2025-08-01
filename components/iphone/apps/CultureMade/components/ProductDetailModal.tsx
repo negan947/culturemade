@@ -140,7 +140,7 @@ const ProductDetailModal = ({
 
             {/* Modal Content - Scrollable */}
             <div 
-              className="flex-1 overflow-y-auto"
+              className="flex-1 overflow-y-auto culturemade-scrollable"
               id="product-modal-description"
             >
               {/* Image Gallery Section */}

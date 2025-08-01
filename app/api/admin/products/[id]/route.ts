@@ -73,7 +73,7 @@ async function logAdminAction(supabase: any, adminId: string, action: string, de
 
 // GET - Get single product with all details
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -309,7 +309,7 @@ export async function PUT(
 
 // DELETE - Delete product
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -341,16 +341,21 @@ export async function DELETE(
     }
 
     // Check if product has any orders (prevent deletion if so)
-    const { data: orderItems, error: orderCheckError } = await supabase
-      .from('order_items')
+    // First get variant IDs
+    const { data: variants } = await supabase
+      .from('product_variants')
       .select('id')
-      .in('product_variant_id', 
-        supabase
-          .from('product_variants')
+      .eq('product_id', id);
+    
+    const variantIds = variants?.map(v => v.id) || [];
+    
+    const { data: orderItems, error: orderCheckError } = variantIds.length > 0 
+      ? await supabase
+          .from('order_items')
           .select('id')
-          .eq('product_id', id)
-      )
-      .limit(1);
+          .in('product_variant_id', variantIds)
+          .limit(1)
+      : { data: null, error: null };
 
     if (orderCheckError) {
       console.error('Order check error:', orderCheckError);

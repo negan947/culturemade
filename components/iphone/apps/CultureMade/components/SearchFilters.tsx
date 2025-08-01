@@ -235,7 +235,7 @@ export default function SearchFilters({
         </div>
       </div>
 
-      <div className="max-h-96 overflow-y-auto">
+      <div className="max-h-96 overflow-y-auto culturemade-scrollable">
         {/* Sort Options */}
         <div className="border-b border-gray-100">
           <button

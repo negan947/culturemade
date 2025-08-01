@@ -14,6 +14,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { userId, sessionId } = body;
 
+    console.log('Clear cart request:', { userId, sessionId });
+
     if (!userId && !sessionId) {
       return NextResponse.json(
         { error: 'Either userId or sessionId is required' },
@@ -23,16 +25,23 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient();
 
-    // Clear all cart items for the user/session
-    const { error } = await supabase
-      .from('cart_items')
-      .delete()
-      .or(`user_id.eq.${userId},session_id.eq.${sessionId}`);
+    // Build the filter condition properly
+    let query = supabase.from('cart_items').delete();
+    
+    if (userId) {
+      query = query.eq('user_id', userId);
+    } else if (sessionId) {
+      query = query.eq('session_id', sessionId);
+    }
+    
+    const { error, data } = await query;
 
     if (error) {
+      console.error('Supabase delete error:', error);
       throw new Error(`Failed to clear cart: ${error.message}`);
     }
     
+    console.log('Clear cart success:', data);
     return NextResponse.json({ success: true });
 
   } catch (error) {

@@ -4,21 +4,22 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Minus, ShoppingBag, Trash2 } from 'lucide-react';
+import { X, ShoppingBag, Trash2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
 import { useCart } from '@/hooks/useCart';
 import { getCartSessionId } from '@/utils/cartSync';
 
-import ProductImage from './ProductImage';
+import CartItem from './CartItem';
 
 interface CartDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   userId?: string;
+  onCheckout?: () => void;
 }
 
-export function CartDrawer({ isOpen, onClose, userId }: CartDrawerProps) {
+export function CartDrawer({ isOpen, onClose, userId, onCheckout }: CartDrawerProps) {
   const sessionId = !userId ? getCartSessionId() : undefined;
   const {
     items,
@@ -79,7 +80,7 @@ export function CartDrawer({ isOpen, onClose, userId }: CartDrawerProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 z-50"
+            className="absolute inset-0 bg-black bg-opacity-50 z-50"
             onClick={onClose}
           />
 
@@ -88,8 +89,13 @@ export function CartDrawer({ isOpen, onClose, userId }: CartDrawerProps) {
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 bg-white z-50 max-h-[80vh] rounded-t-3xl shadow-2xl"
+            transition={{ 
+              type: 'spring', 
+              damping: 25, 
+              stiffness: 400,
+              duration: 0.4
+            }}
+            className="absolute bottom-0 left-0 right-0 bg-white z-50 max-h-[80vh] rounded-t-3xl shadow-2xl overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
@@ -160,86 +166,17 @@ export function CartDrawer({ isOpen, onClose, userId }: CartDrawerProps) {
                 </div>
               ) : (
                 <>
-                  {/* Cart Items */}
-                  <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                  {/* Cart Items - Using CartItem Component */}
+                  <div className="flex-1 overflow-y-auto culturemade-scrollable p-4 space-y-3">
                     {items.map((item) => (
-                      <motion.div
+                      <CartItem
                         key={item.id}
-                        layout
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="flex items-center space-x-3 bg-gray-50 rounded-xl p-3"
-                      >
-                        {/* Product Image */}
-                        <div className="flex-shrink-0">
-                          <ProductImage
-                            src={item.image_url}
-                            alt={item.image_alt || item.product_name}
-                            productName={item.product_name}
-                            className="w-16 h-16 rounded-lg"
-                          />
-                        </div>
-
-                        {/* Product Details */}
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-gray-900 truncate">
-                            {item.product_name}
-                          </h4>
-                          {item.variant_title && (
-                            <p className="text-sm text-gray-600 truncate">
-                              {item.variant_title}
-                            </p>
-                          )}
-                          <div className="flex items-center justify-between mt-1">
-                            <span className="font-semibold text-blue-600">
-                              {formatPrice(item.price)}
-                            </span>
-                            <span className="text-sm text-gray-500">
-                              Total: {formatPrice(item.total)}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Quantity Controls */}
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => handleQuantityUpdate(item.id, item.quantity - 1)}
-                            disabled={removingItem === item.id}
-                            className="p-1 text-gray-500 hover:text-gray-700 hover:bg-white rounded-full transition-colors disabled:opacity-50"
-                            aria-label="Decrease quantity"
-                          >
-                            <Minus className="h-4 w-4" />
-                          </button>
-                          
-                          <span className="w-8 text-center font-medium text-gray-900">
-                            {item.quantity}
-                          </span>
-                          
-                          <button
-                            onClick={() => handleQuantityUpdate(item.id, item.quantity + 1)}
-                            disabled={removingItem === item.id}
-                            className="p-1 text-gray-500 hover:text-gray-700 hover:bg-white rounded-full transition-colors disabled:opacity-50"
-                            aria-label="Increase quantity"
-                          >
-                            <Plus className="h-4 w-4" />
-                          </button>
-                        </div>
-
-                        {/* Remove Button */}
-                        <button
-                          onClick={() => handleRemoveItem(item.id)}
-                          disabled={removingItem === item.id}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors disabled:opacity-50"
-                          aria-label={`Remove ${item.product_name} from cart`}
-                        >
-                          {removingItem === item.id ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
-                          ) : (
-                            <X className="h-4 w-4" />
-                          )}
-                        </button>
-                      </motion.div>
+                        item={item}
+                        onQuantityUpdate={handleQuantityUpdate}
+                        onRemove={handleRemoveItem}
+                        isRemoving={removingItem === item.id}
+                        size="md"
+                      />
                     ))}
                   </div>
 
@@ -282,21 +219,18 @@ export function CartDrawer({ isOpen, onClose, userId }: CartDrawerProps) {
                         </div>
                       </div>
 
-                      {/* Checkout Button */}
+                      {/* Checkout - Primary Action */}
                       <button
-                        className="w-full bg-blue-600 text-white py-3 px-4 rounded-xl font-semibold hover:bg-blue-700 active:bg-blue-800 transition-colors"
-                        onClick={() => {
-                          // TODO: Navigate to checkout
-                          console.log('Navigate to checkout');
-                        }}
+                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-4 rounded-xl font-bold text-lg shadow-lg hover:from-blue-700 hover:to-blue-800 active:scale-98 transition-all duration-200"
+                        onClick={onCheckout}
                       >
-                        Proceed to Checkout
+                        Checkout • {formatPrice(summary.total)}
                       </button>
 
                       {/* Continue Shopping */}
                       <button
                         onClick={onClose}
-                        className="w-full mt-2 text-blue-600 py-2 px-4 font-medium hover:bg-blue-50 rounded-xl transition-colors"
+                        className="w-full mt-3 text-gray-600 py-2.5 px-4 font-medium hover:bg-gray-50 rounded-lg transition-colors text-sm"
                       >
                         Continue Shopping
                       </button>

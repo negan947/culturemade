@@ -49,6 +49,64 @@ body {
   touch-action: pan-y;
 }
 
+/* Hide scrollbar for CultureMade app on desktop */
+.culturemade-scrollable {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: auto;
+  touch-action: pan-y;
+  
+  /* Hide scrollbar for Webkit browsers (Chrome, Safari, Edge) */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.culturemade-scrollable::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Hide all scrollbars in iPhone app containers */
+.iphone-app-container,
+.iphone-app-container * {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.iphone-app-container::-webkit-scrollbar,
+.iphone-app-container *::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+  width: 0;
+  height: 0;
+}
+
+/* Additional override for any remaining scrollbars */
+.culturemade-scrollable,
+.culturemade-scrollable * {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* Internet Explorer 10+ */
+}
+
+.culturemade-scrollable::-webkit-scrollbar,
+.culturemade-scrollable *::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Opera */
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Drag scroll visual feedback */
+.drag-scroll-container {
+  cursor: grab;
+}
+
+.drag-scroll-container:active {
+  cursor: grabbing;
+}
+
+.drag-scroll-container.dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
 /* Mobile gesture optimization */
 .mobile-gesture-area {
   touch-action: none;

@@ -1,13 +1,14 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ShoppingBag, Plus, Minus, Trash2 } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import { useEffect } from 'react';
 
 import { useCart } from '@/hooks/useCart';
 import { getCartSessionId } from '@/utils/cartSync';
+import { prepareForCheckout, getCheckoutStatusMessage } from '@/utils/checkoutUtils';
 
-import ProductImage from '../components/ProductImage';
+import { DragScrollContainer, CartItem } from '../components';
 
 export default function CartScreen() {
   // TODO: Get userId from auth context when available
@@ -135,7 +136,10 @@ export default function CartScreen() {
       {/* Header */}
       <div className="bg-white px-4 py-3 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Shopping Cart</h1>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Cart Management</h1>
+            <p className="text-sm text-gray-500">Review and edit your items</p>
+          </div>
           <div className="flex items-center space-x-2">
             <span className="text-gray-500 text-sm">
               {summary?.itemCount || 0} items
@@ -143,7 +147,7 @@ export default function CartScreen() {
             {items.length > 0 && (
               <button
                 onClick={handleClearCart}
-                className="text-sm text-red-600 hover:text-red-700"
+                className="text-sm text-red-600 hover:text-red-700 font-medium"
               >
                 Clear All
               </button>
@@ -153,7 +157,7 @@ export default function CartScreen() {
       </div>
 
       {/* Cart Items */}
-      <div className="flex-1 overflow-y-auto">
+      <DragScrollContainer className="flex-1 overflow-y-auto culturemade-scrollable">
         <div className="px-4 py-4 space-y-4">
           {items.map((item, index) => (
             <motion.div
@@ -161,75 +165,19 @@ export default function CartScreen() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
-              className="bg-white rounded-lg p-4 shadow-sm border border-gray-200"
+              className="bg-white rounded-lg shadow-sm border border-gray-200"
             >
-              <div className="flex space-x-3">
-                {/* Product Image */}
-                <div className="flex-shrink-0">
-                  <ProductImage
-                    src={item.image_url}
-                    alt={item.image_alt || item.product_name}
-                    productName={item.product_name}
-                    className="w-20 h-20 rounded-lg"
-                  />
-                </div>
-
-                {/* Product Details */}
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 text-sm">
-                    {item.product_name}
-                  </h3>
-                  {item.variant_title && (
-                    <p className="text-gray-500 text-xs mt-1">
-                      {item.variant_title}
-                    </p>
-                  )}
-                  <p className="text-blue-600 font-semibold text-sm mt-2">
-                    {formatPrice(item.price)}
-                  </p>
-                </div>
-
-                {/* Remove Button */}
-                <div className="flex flex-col items-end">
-                  <button
-                    onClick={() => handleRemoveItem(item.id)}
-                    className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                    aria-label={`Remove ${item.product_name} from cart`}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Quantity Controls */}
-              <div className="flex items-center justify-between mt-4">
-                <div className="flex items-center space-x-3">
-                  <button
-                    onClick={() => handleQuantityUpdate(item.id, item.quantity - 1)}
-                    className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
-                    aria-label="Decrease quantity"
-                  >
-                    <Minus className="h-4 w-4 text-gray-600" />
-                  </button>
-                  <span className="font-medium text-gray-900 min-w-[2rem] text-center">
-                    {item.quantity}
-                  </span>
-                  <button
-                    onClick={() => handleQuantityUpdate(item.id, item.quantity + 1)}
-                    className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
-                    aria-label="Increase quantity"
-                  >
-                    <Plus className="h-4 w-4 text-gray-600" />
-                  </button>
-                </div>
-                <span className="font-semibold text-gray-900">
-                  {formatPrice(item.total)}
-                </span>
-              </div>
+              <CartItem
+                item={item}
+                onQuantityUpdate={handleQuantityUpdate}
+                onRemove={handleRemoveItem}
+                size="lg"
+                className="border-none bg-transparent"
+              />
             </motion.div>
           ))}
         </div>
-      </div>
+      </DragScrollContainer>
 
       {/* Cart Summary */}
       {summary && (
@@ -271,13 +219,41 @@ export default function CartScreen() {
 
           <motion.button
             whileTap={{ scale: 0.98 }}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-            onClick={() => {
-              // TODO: Navigate to checkout
-              console.log('Navigate to checkout');
+            className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:from-green-700 hover:to-green-800 transition-all duration-200"
+            onClick={async () => {
+              try {
+                // Validate cart before proceeding to checkout
+                const checkoutPrep = await prepareForCheckout({
+                  userId,
+                  sessionId,
+                  autoResolveConflicts: true,
+                  removeUnavailable: true
+                });
+
+                const statusMessage = getCheckoutStatusMessage(checkoutPrep.validationResult);
+
+                if (checkoutPrep.canProceed) {
+                  console.log('✅ Cart validated successfully:', statusMessage.message);
+                  
+                  if (checkoutPrep.actions.length > 0) {
+                    console.log('🔧 Actions taken:', checkoutPrep.actions);
+                  }
+
+                  // TODO: Navigate to Phase 2 checkout page
+                  alert(`${statusMessage.title}\n\n${statusMessage.message}\n\nCheckout functionality will be implemented in Phase 2.`);
+                } else {
+                  console.error('❌ Cart validation failed:', checkoutPrep.validationResult.errors);
+                  
+                  const errorMessage = checkoutPrep.validationResult.errors.join('\n• ');
+                  alert(`${statusMessage.title}\n\n• ${errorMessage}\n\nPlease fix these issues and try again.`);
+                }
+              } catch (error) {
+                console.error('Checkout preparation failed:', error);
+                alert('Failed to prepare checkout. Please try again.');
+              }
             }}
           >
-            Proceed to Checkout
+            Complete Order • {formatPrice(summary.total)}
           </motion.button>
 
           {summary.shipping > 0 && (

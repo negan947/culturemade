@@ -22,7 +22,10 @@
       "Bash(curl:*)",
       "mcp__supabasecm__get_logs",
       "Bash(npx eslint:*)",
-      "Bash(npx next:*)"
+      "Bash(npx next:*)",
+      "Bash(node:*)",
+      "mcp__supabasecm__list_branches",
+      "mcp__supabasecm__get_anon_key"
     ],
     "deny": []
   }

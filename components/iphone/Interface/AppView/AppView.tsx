@@ -37,12 +37,12 @@ const AppView: FC<Props> = ({ appId }) => {
 
   return (
     <motion.div
-      className='absolute h-full w-full top-0 left-0 bg-white z-40'
+      className='absolute h-full w-full top-0 left-0 bg-white z-40 iphone-app-container'
       layoutId={appId}
       initial={{ borderRadius: 40, scale: 1 }}
       animate={animateExit}
     >
-      <div className="h-full pb-4">
+      <div className="h-full pb-4 iphone-app-container">
         {appContainer ? appContainer.element() : <p>app id not found</p>}
       </div>
       <HomeBar handleHomeBar={handleDrag} handleDragEnd={handleEndDrag} />

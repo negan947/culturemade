@@ -30,7 +30,7 @@ const createProductSchema = z.object({
   })).optional()
 });
 
-const updateProductSchema = createProductSchema.partial();
+// const updateProductSchema = createProductSchema.partial();
 
 const listProductsSchema = z.object({
   page: z.string().optional().transform((val) => val ? Math.max(1, parseInt(val)) : 1),
@@ -116,12 +116,20 @@ export async function GET(request: NextRequest) {
     }
     
     if (category) {
-      query = query.in('id', 
-        supabase
-          .from('product_categories')
-          .select('product_id')
-          .eq('category_id', category)
-      );
+      // Get product IDs for the category first
+      const { data: categoryProducts } = await supabase
+        .from('product_categories')
+        .select('product_id')
+        .eq('category_id', category);
+      
+      const productIds = categoryProducts?.map(cp => cp.product_id) || [];
+      
+      if (productIds.length > 0) {
+        query = query.in('id', productIds);
+      } else {
+        // No products in this category, return empty result
+        query = query.eq('id', 'no-match');
+      }
     }
 
     // Apply sorting

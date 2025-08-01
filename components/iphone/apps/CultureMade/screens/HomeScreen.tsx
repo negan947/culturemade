@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { ProductListItem } from '@/types/api';
 import { getCartSessionId } from '@/utils/cartSync';
 
+import { DragScrollContainer } from '../components';
 import ProductCard from '../components/ProductCard';
 import ProductDetailModal from '../components/ProductDetailModal';
 
@@ -19,6 +20,7 @@ export default function HomeScreen() {
   const [offset, setOffset] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState<ProductListItem | null>(null);
   const [showProductModal, setShowProductModal] = useState(false);
+
 
   // Fetch products from API
   useEffect(() => {
@@ -130,7 +132,11 @@ export default function HomeScreen() {
       </div>
 
       {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto overscroll-contain scrollable">
+      <DragScrollContainer 
+        className="flex-1 overflow-y-auto overscroll-contain culturemade-scrollable"
+        direction="vertical"
+        sensitivity={1}
+      >
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-8 text-white">
           <motion.div
@@ -268,7 +274,7 @@ export default function HomeScreen() {
             </div>
           )}
         </div>
-      </div>
+      </DragScrollContainer>
 
       {/* Product Detail Modal */}
       <ProductDetailModal

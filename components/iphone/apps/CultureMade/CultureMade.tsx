@@ -16,10 +16,10 @@ import { loadItemCount } from '@/store/cart-slice';
 import { store } from '@/store/store';
 import { RootState } from '@/store/store';
 import { getCartSessionId } from '@/utils/cartSync';
+import { prepareForCheckout, getCheckoutStatusMessage } from '@/utils/checkoutUtils';
 
-import { CartDrawer, CartIcon } from './components';
+import { CartDrawer, CartIcon, DragScrollContainer } from './components';
 // Import screen components
-import CartScreen from './screens/CartScreen';
 import CategoriesScreen from './screens/CategoriesScreen';
 import HomeScreen from './screens/HomeScreen';
 import ProfileScreen from './screens/ProfileScreen';
@@ -27,7 +27,7 @@ import SearchScreen from './screens/SearchScreen';
 
 // Icons for navigation
 
-type TabId = 'home' | 'categories' | 'search' | 'cart' | 'profile';
+type TabId = 'home' | 'categories' | 'search' | 'profile';
 
 interface Tab {
   id: TabId;
@@ -56,12 +56,6 @@ const tabs: Tab[] = [
     screen: SearchScreen,
   },
   {
-    id: 'cart',
-    name: 'Cart',
-    icon: ShoppingBag,
-    screen: CartScreen,
-  },
-  {
     id: 'profile',
     name: 'Profile',
     icon: User,
@@ -88,12 +82,45 @@ function CultureMadeInner() {
   const CurrentScreen = currentTab?.screen || HomeScreen;
 
   const handleCartIconClick = () => {
-    if (activeTab === 'cart') {
-      // If already on cart tab, don't open drawer (screen is visible)
-      return;
-    }
-    // Open cart drawer overlay
+    // Always open cart drawer when cart icon is clicked
     setCartDrawerOpen(true);
+  };
+
+  const handleCheckout = async () => {
+    try {
+      // Validate cart before proceeding to checkout
+      const checkoutPrep = await prepareForCheckout({
+        userId,
+        sessionId,
+        autoResolveConflicts: true,
+        removeUnavailable: true
+      });
+
+      const statusMessage = getCheckoutStatusMessage(checkoutPrep.validationResult);
+
+      if (checkoutPrep.canProceed) {
+        // Cart is ready for checkout
+        console.log('✅ Cart validated successfully:', statusMessage.message);
+        
+        // Show success message with actions taken
+        if (checkoutPrep.actions.length > 0) {
+          console.log('🔧 Actions taken:', checkoutPrep.actions);
+        }
+
+        // TODO: Navigate to Phase 2 checkout page
+        alert(`${statusMessage.title}\n\n${statusMessage.message}\n\nCheckout functionality will be implemented in Phase 2.`);
+        setCartDrawerOpen(false);
+      } else {
+        // Cart has validation errors
+        console.error('❌ Cart validation failed:', checkoutPrep.validationResult.errors);
+        
+        const errorMessage = checkoutPrep.validationResult.errors.join('\n• ');
+        alert(`${statusMessage.title}\n\n• ${errorMessage}\n\nPlease fix these issues and try again.`);
+      }
+    } catch (error) {
+      console.error('Checkout preparation failed:', error);
+      alert('Failed to prepare checkout. Please try again.');
+    }
   };
 
   return (
@@ -110,9 +137,15 @@ function CultureMadeInner() {
               duration: 0.3, 
               ease: [0.25, 0.46, 0.45, 0.94] // iOS-style easing
             }}
-            className="h-full overflow-y-auto scrollable"
+            className="h-full"
           >
-            <CurrentScreen />
+            <DragScrollContainer 
+              className="h-full overflow-y-auto culturemade-scrollable"
+              direction="vertical"
+              sensitivity={1}
+            >
+              <CurrentScreen />
+            </DragScrollContainer>
           </motion.div>
         </AnimatePresence>
       </div>
@@ -127,40 +160,20 @@ function CultureMadeInner() {
             return (
               <motion.button
                 key={tab.id}
-                onTap={() => {
-                  if (tab.id === 'cart') {
-                    handleCartIconClick();
-                  }
-                  setActiveTab(tab.id);
-                }}
+                onTap={() => setActiveTab(tab.id)}
                 className="flex flex-col items-center justify-center py-2 px-3 min-w-0 flex-1"
                 whileTap={{ scale: 0.95 }}
                 transition={{ duration: 0.1 }}
               >
                 <div className="relative">
-                  {tab.id === 'cart' ? (
-                    <CartIcon
-                      userId={userId}
-                      className=""
-                      iconClassName={`w-6 h-6 transition-colors duration-200 ${
-                        isActive 
-                          ? 'text-blue-500' 
-                          : 'text-gray-500'
-                      }`}
-                      badgeClassName="bg-red-500 text-white"
-                      size="md"
-                      showBadge={true}
-                    />
-                  ) : (
-                    <Icon 
-                      className={`w-6 h-6 transition-colors duration-200 ${
-                        isActive 
-                          ? 'text-blue-500' 
-                          : 'text-gray-500'
-                      }`}
-                      fill={isActive ? 'currentColor' : 'none'}
-                    />
-                  )}
+                  <Icon 
+                    className={`w-6 h-6 transition-colors duration-200 ${
+                      isActive 
+                        ? 'text-blue-500' 
+                        : 'text-gray-500'
+                    }`}
+                    fill={isActive ? 'currentColor' : 'none'}
+                  />
                 </div>
                 <span 
                   className={`text-xs mt-1 transition-colors duration-200 ${
@@ -174,6 +187,28 @@ function CultureMadeInner() {
               </motion.button>
             );
           })}
+          
+          {/* Dedicated Cart Icon - Always Visible */}
+          <motion.button
+            onTap={handleCartIconClick}
+            className="flex flex-col items-center justify-center py-2 px-3 min-w-0 flex-1"
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.1 }}
+          >
+            <div className="relative">
+              <CartIcon
+                userId={userId}
+                className=""
+                iconClassName="w-6 h-6 transition-colors duration-200 text-gray-500 hover:text-blue-500"
+                badgeClassName="bg-red-500 text-white"
+                size="md"
+                showBadge={true}
+              />
+            </div>
+            <span className="text-xs mt-1 transition-colors duration-200 text-gray-500">
+              Cart
+            </span>
+          </motion.button>
         </div>
       </div>
 
@@ -181,6 +216,7 @@ function CultureMadeInner() {
       <CartDrawer
         isOpen={cartDrawerOpen}
         onClose={() => setCartDrawerOpen(false)}
+        onCheckout={handleCheckout}
         userId={userId}
       />
     </div>

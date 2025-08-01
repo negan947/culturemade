@@ -59,26 +59,31 @@ export async function requireAdmin() {
 
 // Get user profile with caching
 export const getUserProfile = cache(async () => {
-  const supabase = await createClient();
-  const { user } = await getUser();
+  try {
+    const supabase = await createClient();
+    const { user, error: userError } = await getUser();
 
-  if (!user) return null;
+    if (userError || !user) return null;
 
-  const { data: profile, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
 
-  if (error) {
-    logSecurityEvent('PROFILE_FETCH_ERROR', {
-      userId: user.id,
-      error: error.message,
-    });
+    if (error) {
+      logSecurityEvent('PROFILE_FETCH_ERROR', {
+        userId: user.id,
+        error: error.message,
+      });
+      return null;
+    }
+
+    return { user, profile };
+  } catch (error) {
+    console.error('Error in getUserProfile:', error);
     return null;
   }
-
-  return { user, profile };
 });
 
 // Check if user is admin
@@ -175,26 +180,34 @@ export async function hasPermission(permission: string) {
 
 // Get user's full context (user + profile + permissions)
 export async function getUserContext() {
-  const userProfile = await getUserProfile();
+  try {
+    const userProfile = await getUserProfile();
 
-  if (!userProfile) return null;
+    if (!userProfile) return null;
 
-  const role = userProfile.profile?.role || 'customer';
-  const isAdminUser = role === 'admin';
+    const role = userProfile.profile?.role || 'customer';
+    const isAdminUser = role === 'admin';
 
-  return {
-    user: userProfile.user,
-    profile: userProfile.profile,
-    role,
-    isAdmin: isAdminUser,
-    permissions: {
-      canViewOrders: await hasPermission('view_orders'),
-      canCreateOrders: await hasPermission('create_orders'),
-      canUpdateProfile: await hasPermission('update_profile'),
-      canViewProfile: await hasPermission('view_profile'),
-      canAccessAdmin: isAdminUser,
-    },
-  };
+    // Calculate permissions without calling hasPermission to avoid potential issues
+    const customerPermissions = ['view_orders', 'create_orders', 'update_profile', 'view_profile'];
+    
+    return {
+      user: userProfile.user,
+      profile: userProfile.profile,
+      role,
+      isAdmin: isAdminUser,
+      permissions: {
+        canViewOrders: isAdminUser || customerPermissions.includes('view_orders'),
+        canCreateOrders: isAdminUser || customerPermissions.includes('create_orders'),
+        canUpdateProfile: isAdminUser || customerPermissions.includes('update_profile'),
+        canViewProfile: isAdminUser || customerPermissions.includes('view_profile'),
+        canAccessAdmin: isAdminUser,
+      },
+    };
+  } catch (error) {
+    console.error('Error in getUserContext:', error);
+    return null;
+  }
 }
 
 // Refresh user session

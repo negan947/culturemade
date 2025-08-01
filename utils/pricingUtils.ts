@@ -13,8 +13,8 @@ import { ProductListItem, ProductVariant } from '@/types/api';
 
 export interface PricingInfo {
   displayPrice: string;           // "$24.99" or "from $19.99"
-  originalPrice?: string;         // "$29.99" (if on sale)
-  discountPercentage?: number;    // 20 (for 20% off)
+  originalPrice?: string | undefined;         // "$29.99" (if on sale)
+  discountPercentage?: number | undefined;    // 20 (for 20% off)
   isOnSale: boolean;
   priceRange: { min: number; max: number };
   hasVariablePricing: boolean;    // true if variants have different prices
@@ -43,7 +43,6 @@ export function calculatePricingInfo(
   options: PriceDisplayOptions = {}
 ): PricingInfo {
   const {
-    showCurrency = true,
     showComparePricing = true,
     useFromPrefix = true,
     currencyCode = 'USD',

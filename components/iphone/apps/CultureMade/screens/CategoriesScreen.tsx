@@ -73,7 +73,7 @@ export default function CategoriesScreen() {
       </div>
 
       {/* Categories List */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto culturemade-scrollable">
         <div className="px-4 py-6 space-y-3">
           {categories.map((category, index) => (
             <motion.div

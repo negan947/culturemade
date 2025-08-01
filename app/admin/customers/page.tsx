@@ -1,26 +1,28 @@
+import { Metadata } from 'next';
+
+import { CustomerList } from '@/components/admin/customers/CustomerList';
 import { requireAdmin } from '@/lib/supabase/auth';
+
+export const metadata: Metadata = {
+  title: 'Customer Management - CultureMade Admin',
+  description: 'Manage customer accounts, view customer details, and handle customer support',
+};
 
 export default async function AdminCustomers() {
   await requireAdmin();
 
   return (
-    <div className='space-y-4 lg:space-y-6'>
-      <h1 className='text-xl lg:text-2xl font-bold text-admin-light-text-primary dark:text-admin-text-primary'>
-        Customers
-      </h1>
-
-      <div className='bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-4 lg:p-6'>
-        <p className='text-admin-light-text-secondary dark:text-admin-text-secondary'>
-          Customer management interface coming soon. This will include:
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight text-admin-light-text-primary dark:text-admin-text-primary">
+          Customer Management
+        </h1>
+        <p className="text-admin-light-text-secondary dark:text-admin-text-secondary">
+          Manage customer accounts, view order history, and handle customer support requests.
         </p>
-        <ul className='mt-4 space-y-2 text-admin-light-text-secondary dark:text-admin-text-secondary'>
-          <li>• Customer list with search</li>
-          <li>• Customer profiles and order history</li>
-          <li>• Account management tools</li>
-          <li>• Support ticket integration</li>
-          <li>• Customer analytics and insights</li>
-        </ul>
       </div>
+
+      <CustomerList />
     </div>
   );
 }

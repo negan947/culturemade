@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Suspense, useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import { createClient } from '@/lib/supabase/client';
 
@@ -343,7 +343,7 @@ export default function AdminProducts() {
             compare_at_price: product.compare_at_price,
             created_at: product.created_at,
             variant_count: product.product_variants?.length || 0,
-            category_name: product.product_categories?.[0]?.categories?.name || null,
+            category_name: (product.product_categories as any)?.[0]?.categories?.name || null,
             inventory_total: product.product_variants?.reduce((sum: number, variant: any) => 
               sum + (variant.quantity || 0), 0) || 0
           }));
@@ -536,7 +536,7 @@ export default function AdminProducts() {
                     {category.name}
                   </option>
                 ))}
-                <option value={null}>Uncategorized</option>
+                <option value={""}>Uncategorized</option>
               </select>
               <ChevronDown className='absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-admin-light-text-disabled dark:text-admin-text-disabled pointer-events-none' />
             </div>

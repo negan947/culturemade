@@ -1,4 +1,4 @@
-import { ProductVariant, checkVariantAvailability } from './productVariantUtils';
+import { checkVariantAvailability } from './productVariantUtils';
 import { validateQuantity } from './quantityUtils';
 
 // Note: This utility file demonstrates cart logic structure

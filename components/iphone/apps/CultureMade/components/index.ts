@@ -24,6 +24,10 @@ export { default as SearchFilters } from './SearchFilters';
 // Cart Components
 export { CartDrawer } from './CartDrawer';
 export { CartIcon, CartIconBadge, CartIconWithDropdown } from './CartIcon';
+export { default as CartItem, CartItemSkeleton } from './CartItem';
+
+// Utility Components
+export { default as DragScrollContainer } from './DragScrollContainer';
 
 // Component Types
 export type { ProductListItem, ProductImage, ProductCategory } from '@/types/api';

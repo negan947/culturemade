@@ -221,7 +221,7 @@ export default async function AdminDashboard() {
             </div>
           </Link>
 
-          <a
+          <Link
             href='/admin/orders'
             className='flex items-center p-3 lg:p-4 border border-admin-light-border dark:border-admin-border-soft rounded-lg hover:border-admin-success hover:bg-admin-light-bg-hover dark:hover:bg-admin-bg-hover hover:shadow-admin-soft transition-all duration-200'
           >
@@ -234,7 +234,7 @@ export default async function AdminDashboard() {
                 Manage customer orders
               </p>
             </div>
-          </a>
+          </Link>
 
           <a
             href='/admin/analytics'

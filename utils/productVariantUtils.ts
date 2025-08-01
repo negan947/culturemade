@@ -74,27 +74,13 @@ export async function getProductVariants(productId: string): Promise<ProductVari
       ORDER BY position ASC;
     `;
 
-    const result = await mcp__supabasecm__execute_sql({ query: query.replace('$1', `'${productId}'`) });
-    
-    if (!result || typeof result !== 'string') {
-      throw new Error('Invalid response from database');
-    }
-
-    // Parse the MCP response
-    const variants = JSON.parse(result.split('<untrusted-data-')[1].split('>')[1].split('</untrusted-data-')[0]);
-    
-    return variants.map((variant: any) => ({
-      ...variant,
-      price: parseFloat(variant.price)
-    }));
+    // Note: MCP functions are only available to Claude, not in application runtime
+    // const result = await mcp__supabasecm__execute_sql({ query: query.replace('$1', `'${productId}'`) });
+    // Application should use standard Supabase client
+    throw new Error('This utility requires application-level database implementation');
   } catch (error) {
     console.error('Error fetching product variants:', error);
-    throw new VariantError({
-      type: 'network',
-      message: 'Failed to fetch product variants',
-      retryable: true,
-      productId
-    });
+    throw new Error(`Failed to fetch variants for product ${productId}`);
   }
 }
 
@@ -113,7 +99,8 @@ export async function checkVariantAvailability(variantId: string): Promise<Varia
       WHERE id = '${variantId}';
     `;
 
-    const result = await mcp__supabasecm__execute_sql({ query });
+    // const result = await mcp__supabasecm__execute_sql({ query });
+    throw new Error('This utility requires application-level database implementation');
     
     if (!result || typeof result !== 'string') {
       throw new Error('Invalid response from database');
@@ -138,13 +125,13 @@ export async function checkVariantAvailability(variantId: string): Promise<Varia
     };
   } catch (error) {
     console.error('Error checking variant availability:', error);
-    throw new VariantError({
+    throw new Error('Variant error: ' + JSON.stringify({
       type: 'inventory',
       message: 'Failed to check variant availability',
       retryable: true,
       productId: 'unknown',
       variantId
-    });
+    }));
   }
 }
 
@@ -266,7 +253,8 @@ export async function getBulkProductVariants(productIds: string[]): Promise<Map<
       ORDER BY product_id, position ASC;
     `;
 
-    const result = await mcp__supabasecm__execute_sql({ query });
+    // const result = await mcp__supabasecm__execute_sql({ query });
+    throw new Error('This utility requires application-level database implementation');
     
     if (!result || typeof result !== 'string') {
       throw new Error('Invalid response from database');
@@ -290,12 +278,12 @@ export async function getBulkProductVariants(productIds: string[]): Promise<Map<
     return variantMap;
   } catch (error) {
     console.error('Error fetching bulk product variants:', error);
-    throw new VariantError({
+    throw new Error('Variant error: ' + JSON.stringify({
       type: 'network',
       message: 'Failed to fetch bulk product variants',
       retryable: true,
       productId: 'multiple'
-    });
+    }));
   }
 }
 

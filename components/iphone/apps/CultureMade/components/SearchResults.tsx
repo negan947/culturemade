@@ -364,7 +364,7 @@ export default function SearchResults({
       </AnimatePresence>
       
       {/* Search Results Content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto culturemade-scrollable">
         <AnimatePresence mode="wait">
           {loading && results.length === 0 ? (
             /* Loading State */

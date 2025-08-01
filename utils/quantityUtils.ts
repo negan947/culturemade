@@ -1,4 +1,4 @@
-import { ProductVariant, VariantAvailability, checkVariantAvailability } from './productVariantUtils';
+import { ProductVariant, checkVariantAvailability } from './productVariantUtils';
 
 export interface QuantityValidation {
   isValid: boolean;
@@ -261,11 +261,11 @@ export function getQuantityDisplayText(quantityState: QuantityState): string {
  */
 export function getQuantityWarningMessage(quantityState: QuantityState): string | null {
   if (quantityState.errors.length > 0) {
-    return quantityState.errors[0];
+    return quantityState.errors[0] || null;
   }
 
   if (quantityState.warnings.length > 0) {
-    return quantityState.warnings[0];
+    return quantityState.warnings[0] || null;
   }
 
   return null;

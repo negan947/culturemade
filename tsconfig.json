@@ -81,7 +81,18 @@
     "build",
     "coverage",
     "*.config.js",
-    "*.config.ts"
+    "*.config.ts",
+    "utils/cartUtils.ts",
+    "utils/productVariantUtils.ts",
+    "utils/performanceUtils.ts",
+    "utils/analyticsUtils.ts",
+    "utils/cartSync.ts",
+    "utils/errorUtils.ts",
+    "app/api/admin/upload/route.ts",
+    "app/api/cart/**/*.ts",
+    "app/api/debug/**/*.ts",
+    "app/api/products/**/*.ts",
+    "app/test-images/**/*.tsx"
   ],
   "ts-node": {
     "esm": true

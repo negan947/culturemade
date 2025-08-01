@@ -1,3 +1,7 @@
+import { Suspense } from 'react';
+
+import { OrderList } from '@/components/admin/orders/OrderList';
+import { OrderListSkeleton } from '@/components/admin/orders/OrderListSkeleton';
 import { requireAdmin } from '@/lib/supabase/auth';
 
 export default async function AdminOrders() {
@@ -5,22 +9,22 @@ export default async function AdminOrders() {
 
   return (
     <div className='space-y-4 lg:space-y-6'>
-      <h1 className='text-xl lg:text-2xl font-bold text-admin-light-text-primary dark:text-admin-text-primary'>
-        Orders
-      </h1>
-
-      <div className='bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-4 lg:p-6'>
-        <p className='text-admin-light-text-secondary dark:text-admin-text-secondary'>
-          Order management interface coming soon. This will include:
-        </p>
-        <ul className='mt-4 space-y-2 text-admin-light-text-secondary dark:text-admin-text-secondary'>
-          <li>• Order list with status filtering</li>
-          <li>• Order details and tracking</li>
-          <li>• Status updates and fulfillment</li>
-          <li>• Customer communication</li>
-          <li>• Refund and return processing</li>
-        </ul>
+      {/* Header */}
+      <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
+        <div>
+          <h1 className='text-xl lg:text-2xl font-bold text-admin-light-text-primary dark:text-admin-text-primary'>
+            Orders
+          </h1>
+          <p className='text-sm text-admin-light-text-secondary dark:text-admin-text-secondary mt-1'>
+            Manage customer orders and fulfillment
+          </p>
+        </div>
       </div>
+
+      {/* Order List */}
+      <Suspense fallback={<OrderListSkeleton />}>
+        <OrderList />
+      </Suspense>
     </div>
   );
 }
