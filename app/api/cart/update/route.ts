@@ -56,9 +56,22 @@ export async function PUT(request: NextRequest) {
         throw new Error(`Failed to remove cart item: ${error.message}`);
       }
 
+      // After successful removal, fetch and return the complete cart
+      const cartResponse = await fetch(`${request.nextUrl.origin}/api/cart?${new URLSearchParams({
+        ...(userId ? { userId } : {}),
+        ...(sessionId ? { sessionId } : {})
+      })}`);
+      
+      if (!cartResponse.ok) {
+        throw new Error('Failed to fetch updated cart');
+      }
+      
+      const cartData = await cartResponse.json();
+      
       return NextResponse.json({
         success: true,
         message: 'Cart item removed',
+        cart: cartData.cart,
         removed: true
       });
     }
@@ -68,9 +81,9 @@ export async function PUT(request: NextRequest) {
       .from('cart_items')
       .select(`
         id,
-        product_variant_id,
+        variant_id,
         quantity,
-        product_variants(
+        product_variants!variant_id(
           id,
           quantity,
           products(id, name)
