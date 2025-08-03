@@ -82,8 +82,11 @@ function CultureMadeInner() {
 
   // Load cart item count on app mount
   useEffect(() => {
-    dispatch(loadItemCount());
-  }, [dispatch]);
+    dispatch(loadItemCount({
+      ...(userId ? { userId } : {}),
+      ...(sessionId ? { sessionId } : {})
+    }));
+  }, [dispatch, userId, sessionId]);
 
   const currentTab = tabs.find(tab => tab.id === activeTab);
   const CurrentScreen = currentTab?.screen || HomeScreen;

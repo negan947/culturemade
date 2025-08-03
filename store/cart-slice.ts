@@ -149,13 +149,24 @@ export const loadCart = createAsyncThunk<
 
 export const loadItemCount = createAsyncThunk<
   number,
-  void,
+  { userId?: string; sessionId?: string } | void,
   { rejectValue: string }
 >(
   'cart/loadItemCount',
-  async (_, { rejectWithValue }) => {
+  async (params, { rejectWithValue }) => {
     try {
-      const response = await fetch('/api/cart/count');
+      // Get sessionId from cartSync if not provided
+      const { getCartSessionId } = await import('@/utils/cartSync');
+      const sessionId = params?.sessionId || (!params?.userId ? getCartSessionId() : undefined);
+      
+      const searchParams = new URLSearchParams();
+      if (params?.userId) {
+        searchParams.append('userId', params.userId);
+      } else if (sessionId) {
+        searchParams.append('sessionId', sessionId);
+      }
+      
+      const response = await fetch(`/api/cart/count?${searchParams}`);
       const data = await response.json();
       
       if (!response.ok) {
@@ -171,14 +182,23 @@ export const loadItemCount = createAsyncThunk<
 
 export const clearCartAsync = createAsyncThunk<
   any,
-  void,
+  { userId?: string; sessionId?: string } | void,
   { rejectValue: string }
 >(
   'cart/clearCart',
-  async (_, { rejectWithValue }) => {
+  async (params, { rejectWithValue }) => {
     try {
+      // Get sessionId from cartSync if not provided
+      const { getCartSessionId } = await import('@/utils/cartSync');
+      const sessionId = params?.sessionId || (!params?.userId ? getCartSessionId() : undefined);
+      
       const response = await fetch('/api/cart/clear', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...(params?.userId ? { userId: params.userId } : {}),
+          ...(sessionId ? { sessionId } : {})
+        })
       });
       
       const data = await response.json();

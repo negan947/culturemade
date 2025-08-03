@@ -26,7 +26,7 @@ const ProductImageGallery = ({
   const controls = useAnimation();
 
   // Placeholder image for missing or failed images
-  const placeholderImage = '/images/product-placeholder.jpg';
+  const placeholderImage = '/images/product-placeholder.svg';
   
   // Ensure we have at least one image (even if it's a placeholder)
   const displayImages = images.length > 0 ? images : [{

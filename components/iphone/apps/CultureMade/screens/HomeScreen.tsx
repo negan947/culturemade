@@ -82,7 +82,7 @@ export default function HomeScreen() {
       // Use the same session ID as the cart screen
       const sessionId = getCartSessionId();
       
-      const response = await fetch('/api/cart', {
+      const response = await fetch('/api/cart/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
