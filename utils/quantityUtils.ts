@@ -94,8 +94,8 @@ export async function validateQuantity(
       warnings
     };
 
-  } catch (error) {
-    console.error('Error validating quantity:', error);
+  } catch (_error) {
+
     return {
       isValid: false,
       maxQuantity: 0,
@@ -131,8 +131,8 @@ export async function getQuantityState(
       errors: validation.errors
     };
 
-  } catch (error) {
-    console.error('Error getting quantity state:', error);
+  } catch (_error) {
+
     
     return {
       quantity: constraints.defaultQuantity,

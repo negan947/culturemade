@@ -51,8 +51,8 @@ export function getCartSessionId(): string {
     localStorage.setItem(STORAGE_KEYS.SESSION_EXPIRES, newExpireTime.toString());
     
     return newSessionId;
-  } catch (error) {
-    console.warn('Failed to access localStorage for cart session:', error);
+  } catch (_error) {
+
     return uuidv4();
   }
 }
@@ -67,8 +67,8 @@ export function clearCartSession(): void {
     localStorage.removeItem(STORAGE_KEYS.SESSION_ID);
     localStorage.removeItem(STORAGE_KEYS.SESSION_EXPIRES);
     localStorage.removeItem(STORAGE_KEYS.LAST_SYNC);
-  } catch (error) {
-    console.warn('Failed to clear cart session:', error);
+  } catch (_error) {
+
   }
 }
 
@@ -81,8 +81,8 @@ export function extendCartSession(): void {
   try {
     const newExpireTime = Date.now() + (DEFAULT_OPTIONS.sessionTimeout! * 60 * 1000);
     localStorage.setItem(STORAGE_KEYS.SESSION_EXPIRES, newExpireTime.toString());
-  } catch (error) {
-    console.warn('Failed to extend cart session:', error);
+  } catch (_error) {
+
   }
 }
 
@@ -100,8 +100,8 @@ export function isCartSessionValid(): boolean {
     
     const expireTime = parseInt(expiresAt);
     return Date.now() < expireTime;
-  } catch (error) {
-    console.warn('Failed to check cart session validity:', error);
+  } catch (_error) {
+
     return false;
   }
 }
@@ -144,14 +144,14 @@ export async function mergeGuestCart(
     if (opts.enableLocalStorage) {
       try {
         localStorage.setItem(STORAGE_KEYS.LAST_SYNC, Date.now().toString());
-      } catch (error) {
-        console.warn('Failed to update last sync time:', error);
+      } catch (_error) {
+
       }
     }
 
     return { success: true };
-  } catch (error) {
-    console.error('Failed to merge guest cart:', error);
+  } catch (_error) {
+
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Unknown error' 
@@ -205,8 +205,8 @@ export function backupCartData(
     };
 
     localStorage.setItem('cart_backup', JSON.stringify(backup));
-  } catch (error) {
-    console.warn('Failed to backup cart data:', error);
+  } catch (_error) {
+
   }
 }
 
@@ -238,8 +238,8 @@ export function restoreCartData(): {
       summary: backup.summary || null,
       timestamp: backup.timestamp
     };
-  } catch (error) {
-    console.warn('Failed to restore cart data:', error);
+  } catch (_error) {
+
     return null;
   }
 }
@@ -252,8 +252,8 @@ export function clearCartBackup(): void {
 
   try {
     localStorage.removeItem('cart_backup');
-  } catch (error) {
-    console.warn('Failed to clear cart backup:', error);
+  } catch (_error) {
+
   }
 }
 
@@ -287,8 +287,8 @@ export async function handleCartMigration(
       return true;
     }
     return false;
-  } catch (error) {
-    console.error('Cart migration failed:', error);
+  } catch (_error) {
+
     return false;
   }
 }

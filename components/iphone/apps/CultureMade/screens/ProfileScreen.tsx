@@ -85,12 +85,12 @@ export default function ProfileScreen() {
   ];
 
   const handleMenuItemPress = (item: MenuItem) => {
-    console.log(`Navigate to ${item.id}`);
+
     // Will implement navigation later
   };
 
   const handleSignOut = () => {
-    console.log('Sign out');
+
     // Will implement real sign out later
   };
 

@@ -56,8 +56,8 @@ export class PerformanceMonitor {
         });
         navigationObserver.observe({ entryTypes: ['navigation'] });
         this.observers.push(navigationObserver);
-      } catch (e) {
-        console.warn('Navigation timing observer not supported');
+      } catch (_e) {
+
       }
 
       // Monitor largest contentful paint
@@ -69,8 +69,8 @@ export class PerformanceMonitor {
         });
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
         this.observers.push(lcpObserver);
-      } catch (e) {
-        console.warn('LCP observer not supported');
+      } catch (_e) {
+
       }
 
       // Monitor cumulative layout shift
@@ -84,8 +84,8 @@ export class PerformanceMonitor {
         });
         clsObserver.observe({ entryTypes: ['layout-shift'] });
         this.observers.push(clsObserver);
-      } catch (e) {
-        console.warn('CLS observer not supported');
+      } catch (_e) {
+
       }
     }
   }
@@ -125,8 +125,8 @@ export class PerformanceMonitor {
 
   private getMetrics(): PerformanceMetrics {
     const getAverage = (values: number[]) => values.reduce((a, b) => a + b, 0) / values.length;
-    const getMin = (values: number[]) => Math.min(...values);
-    const getMax = (values: number[]) => Math.max(...values);
+    const getMin = (values: number[]) => Math.min(..._values);
+    const getMax = (values: number[]) => Math.max(..._values);
 
     const fpsValues = this.metrics.get('fps') || [];
     const renderTimes = this.metrics.get('renderTime') || [0];
@@ -174,13 +174,13 @@ export function memoize<Args extends any[], Return>(
   const cache = new Map<string, Return>();
   
   return (...args: Args): Return => {
-    const key = getKey ? getKey(...args) : JSON.stringify(args);
+    const key = getKey ? getKey(..._args) : JSON.stringify(args);
     
     if (cache.has(key)) {
       return cache.get(key)!;
     }
     
-    const result = fn(...args);
+    const result = fn(..._args);
     cache.set(key, result);
     return result;
   };

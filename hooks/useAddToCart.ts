@@ -18,7 +18,6 @@ import {
 import { notificationActions } from '@/store/notification-slice';
 import { AppDispatch, RootState } from '@/store/store';
 import { AddToCartRequest, CartItem } from '@/utils/cartUtils';
-import { ProductVariant } from '@/utils/productVariantUtils';
 import { validateQuantity } from '@/utils/quantityUtils';
 
 export interface UseAddToCartResult {
@@ -113,7 +112,7 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
         isValid: quantityValidation.isValid,
         errors: quantityValidation.errors
       };
-    } catch (error) {
+    } catch {
       return {
         isValid: false,
         errors: ['Unable to validate product availability']
@@ -200,7 +199,7 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
         return false;
       }
 
-    } catch (error) {
+    } catch {
       // Rollback optimistic update
       if (enableOptimisticUpdates && cart.summary) {
         dispatch(rollbackOptimisticUpdate(cart.summary));
@@ -284,7 +283,7 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
         return false;
       }
 
-    } catch (error) {
+    } catch {
       // Rollback optimistic update
       if (enableOptimisticUpdates && cart.summary) {
         dispatch(rollbackOptimisticUpdate(cart.summary));
@@ -363,7 +362,7 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
         return false;
       }
 
-    } catch (error) {
+    } catch {
       // Rollback optimistic update
       if (enableOptimisticUpdates && cart.summary) {
         dispatch(rollbackOptimisticUpdate(cart.summary));
@@ -428,7 +427,7 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
         return false;
       }
 
-    } catch (error) {
+    } catch {
       const errorMessage = 'Failed to clear cart';
       
       if (showNotifications) {

@@ -141,18 +141,35 @@ export default function SearchFilters({
   };
 
   const handleCategoryChange = (categoryId: string) => {
-    onFiltersChange({ 
-      ...filters, 
-      category: filters.category === categoryId ? undefined : categoryId 
-    });
+    if (filters.category === categoryId) {
+      // Remove category entirely when deselecting
+      const { category, ...filtersWithoutCategory } = filters;
+      onFiltersChange(filtersWithoutCategory);
+    } else {
+      // Set new category
+      onFiltersChange({ 
+        ...filters, 
+        category: categoryId 
+      });
+    }
   };
 
   const handlePriceRangeChange = (range: PriceRange) => {
-    onFiltersChange({
-      ...filters,
-      minPrice: range.min,
-      maxPrice: range.max,
-    });
+    const newFilters = { ...filters };
+    
+    if (range.min !== undefined) {
+      newFilters.minPrice = range.min;
+    } else {
+      delete (newFilters as any).minPrice;
+    }
+    
+    if (range.max !== undefined) {
+      newFilters.maxPrice = range.max;
+    } else {
+      delete (newFilters as any).maxPrice;
+    }
+    
+    onFiltersChange(newFilters);
   };
 
   const handleCustomPriceChange = () => {
@@ -164,11 +181,21 @@ export default function SearchFilters({
       return; // Invalid range
     }
     
-    onFiltersChange({
-      ...filters,
-      minPrice: min,
-      maxPrice: max,
-    });
+    const newFilters = { ...filters };
+    
+    if (min !== undefined) {
+      newFilters.minPrice = min;
+    } else {
+      delete (newFilters as any).minPrice;
+    }
+    
+    if (max !== undefined) {
+      newFilters.maxPrice = max;
+    } else {
+      delete (newFilters as any).maxPrice;
+    }
+    
+    onFiltersChange(newFilters);
   };
 
   const handleAvailabilityChange = (key: keyof SearchFilters, value: boolean) => {

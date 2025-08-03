@@ -99,7 +99,7 @@ export async function addToCart(request: AddToCartRequest): Promise<AddToCartRes
     if (existingResult && typeof existingResult === 'string') {
       try {
         existingItems = JSON.parse(existingResult.split('<untrusted-data-')[1].split('>')[1].split('</untrusted-data-')[0]);
-      } catch (e) {
+      } catch (_e) {
         existingItems = [];
       }
     }
@@ -171,7 +171,11 @@ export async function addToCart(request: AddToCartRequest): Promise<AddToCartRes
     };
 
   } catch (error) {
-    console.error('Error adding to cart:', error);
+    // Error handling - log for debugging in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Add to cart error:', error);
+    }
+    
     return {
       success: false,
       errors: ['Failed to add item to cart. Please try again.']
@@ -241,8 +245,8 @@ export async function updateCartItemQuantity(
       warnings: quantityValidation.warnings
     };
 
-  } catch (error) {
-    console.error('Error updating cart item:', error);
+  } catch (_error) {
+
     return {
       success: false,
       errors: ['Failed to update cart item. Please try again.']
@@ -274,8 +278,8 @@ export async function removeCartItem(
       cart
     };
 
-  } catch (error) {
-    console.error('Error removing cart item:', error);
+  } catch (_error) {
+
     return {
       success: false,
       errors: ['Failed to remove cart item. Please try again.']
@@ -310,7 +314,7 @@ export async function getCartSummary(userId?: string, sessionId?: string): Promi
     if (result && typeof result === 'string') {
       try {
         items = JSON.parse(result.split('<untrusted-data-')[1].split('>')[1].split('</untrusted-data-')[0]);
-      } catch (e) {
+      } catch (_e) {
         items = [];
       }
     }
@@ -350,8 +354,8 @@ export async function getCartSummary(userId?: string, sessionId?: string): Promi
       hasOutOfStockItems
     };
 
-  } catch (error) {
-    console.error('Error getting cart summary:', error);
+  } catch (_error) {
+
     return {
       items: [],
       itemCount: 0,
@@ -378,8 +382,8 @@ export async function clearCart(userId?: string, sessionId?: string): Promise<bo
     await mcp__supabasecm__execute_sql({ query: deleteQuery });
     return true;
 
-  } catch (error) {
-    console.error('Error clearing cart:', error);
+  } catch (_error) {
+
     return false;
   }
 }
@@ -422,8 +426,8 @@ export async function validateCart(userId?: string, sessionId?: string): Promise
       warnings
     };
 
-  } catch (error) {
-    console.error('Error validating cart:', error);
+  } catch (_error) {
+
     return {
       isValid: false,
       invalidItems: [],
@@ -448,7 +452,7 @@ export async function mergeGuestCart(guestSessionId: string, userId: string): Pr
     if (guestResult && typeof guestResult === 'string') {
       try {
         guestItems = JSON.parse(guestResult.split('<untrusted-data-')[1].split('>')[1].split('</untrusted-data-')[0]);
-      } catch (e) {
+      } catch (_e) {
         guestItems = [];
       }
     }
@@ -470,8 +474,8 @@ export async function mergeGuestCart(guestSessionId: string, userId: string): Pr
 
     return true;
 
-  } catch (error) {
-    console.error('Error merging guest cart:', error);
+  } catch (_error) {
+
     return false;
   }
 }
@@ -496,8 +500,8 @@ export async function getCartItemCount(userId?: string, sessionId?: string): Pro
 
     return 0;
 
-  } catch (error) {
-    console.error('Error getting cart item count:', error);
+  } catch (_error) {
+
     return 0;
   }
 }

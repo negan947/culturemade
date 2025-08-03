@@ -264,8 +264,8 @@ export function useBulkInventoryStatus(
       try {
         const inventory = calculateInventoryStatus(product, options);
         inventoryMap.set(product.id, inventory);
-      } catch (error) {
-        console.warn(`Failed to calculate inventory for product ${product.id}:`, error);
+      } catch (_error) {
+
         
         // Fallback inventory status
         inventoryMap.set(product.id, {

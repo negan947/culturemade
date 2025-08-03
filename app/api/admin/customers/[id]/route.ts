@@ -99,7 +99,6 @@ export async function GET(
     });
 
     if (customerError) {
-      console.error('Customer query error:', customerError);
       return NextResponse.json({ error: 'Failed to fetch customer' }, { status: 500 });
     }
 
@@ -117,7 +116,7 @@ export async function GET(
       .order('is_default', { ascending: false });
 
     if (addressError) {
-      console.error('Address query error:', addressError);
+      // Address query failed, continue without addresses
     }
 
     // Get recent orders
@@ -136,7 +135,6 @@ export async function GET(
       .limit(10);
 
     if (ordersError) {
-      console.error('Orders query error:', ordersError);
     }
 
     // Transform data
@@ -191,101 +189,15 @@ export async function GET(
 
     return NextResponse.json(customerDetail);
 
-  } catch (error) {
-    console.error('Admin customer detail API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const supabase = await createClient();
+  } catch (error: any) {
     
-    // Verify admin access
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (error.message === 'Unauthorized') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    // Check admin role
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (!profile || profile.role !== 'admin') {
+    if (error.message === 'Forbidden - Admin access required') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
-
-    const customerId = params.id;
-    const body = await request.json();
-
-    // Validate input
-    const allowedFields = ['full_name', 'phone', 'role'];
-    const updateData: any = {};
-
-    for (const field of allowedFields) {
-      if (body[field] !== undefined) {
-        updateData[field] = body[field];
-      }
-    }
-
-    if (Object.keys(updateData).length === 0) {
-      return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
-    }
-
-    // Validate role if being updated
-    if (updateData.role) {
-      const validRoles = ['customer', 'admin', 'inactive', 'blocked'];
-      if (!validRoles.includes(updateData.role)) {
-        return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
-      }
-    }
-
-    // Update customer profile
-    const { data: updatedProfile, error: updateError } = await supabase
-      .from('profiles')
-      .update({
-        ...updateData,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', customerId)
-      .select()
-      .single();
-
-    if (updateError) {
-      console.error('Profile update error:', updateError);
-      return NextResponse.json({ error: 'Failed to update customer' }, { status: 500 });
-    }
-
-    // Log admin action
-    await supabase.from('admin_logs').insert({
-      admin_id: user.id,
-      action: 'customer_updated',
-      resource_type: 'customers',
-      resource_id: customerId,
-      metadata: {
-        updated_fields: Object.keys(updateData),
-        old_values: body.old_values || {},
-        new_values: updateData
-      }
-    });
-
-    return NextResponse.json({
-      success: true,
-      customer: updatedProfile,
-      message: 'Customer updated successfully'
-    });
-
-  } catch (error) {
-    console.error('Admin customer update API error:', error);
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

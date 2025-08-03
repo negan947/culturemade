@@ -49,8 +49,8 @@ const ProductDetailModalExample = ({
   };
 
   // Handle add to cart (placeholder for Backend Agent implementation)
-  const handleAddToCart = (productId: string, variantId?: string, quantity?: number) => {
-    console.log('Add to cart:', { productId, variantId, quantity });
+  const handleAddToCart = async (productId: string, variantId?: string, quantity?: number) => {
+
     // TODO: Backend Agent will implement actual cart functionality
     // This would typically:
     // 1. Validate product/variant availability
@@ -68,7 +68,7 @@ const ProductDetailModalExample = ({
         loading={loading}
         error={error}
         onProductClick={handleProductClick}
-        onRetry={onRetry}
+        {...(onRetry && { onRetry })}
       />
 
       {/* Product Detail Modal */}

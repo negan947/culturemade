@@ -45,11 +45,12 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({ count });
 
-  } catch (error) {
-    console.error('Cart count API error:', error);
+  } catch (error: any) {
+    
     return NextResponse.json(
       { error: 'Failed to get cart count' },
       { status: 500 }
     );
   }
 }
+

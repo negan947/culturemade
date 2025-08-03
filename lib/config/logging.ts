@@ -212,7 +212,7 @@ export async function cleanupOldLogs(config?: LogRetentionConfig) {
       // Remove old log files
       if (file.endsWith('.log') && ageInDays > retentionConfig.retentionDays) {
         await fs.unlink(filePath);
-        console.log(`Cleaned up old log file: ${file}`);
+
       }
 
       // Remove old archive files
@@ -221,71 +221,10 @@ export async function cleanupOldLogs(config?: LogRetentionConfig) {
         ageInDays > retentionConfig.archiveRetentionDays
       ) {
         await fs.unlink(filePath);
-        console.log(`Cleaned up old archive file: ${file}`);
+
       }
     }
   } catch (error) {
-    console.error('Error cleaning up old logs:', error);
+    // Silent fail for cleanup
   }
 }
-
-/**
- * Initialize log directory
- */
-export async function initializeLogDirectory() {
-  if (process.env.NODE_ENV === 'development') {
-    return; // Skip in development
-  }
-
-  try {
-    const fs = await import('fs/promises');
-    const logDir = process.env['LOG_DIRECTORY'] || './logs';
-
-    // Create log directory if it doesn't exist
-    await fs.mkdir(logDir, { recursive: true });
-
-    // Create .gitignore in log directory
-    const gitignorePath = `${logDir}/.gitignore`;
-    const gitignoreContent = `# Ignore all log files
-*.log
-*.gz
-*.json
-!.gitignore
-`;
-
-    try {
-      await fs.access(gitignorePath);
-    } catch {
-      // File doesn't exist, create it
-      await fs.writeFile(gitignorePath, gitignoreContent);
-    }
-  } catch (error) {
-    console.error('Error initializing log directory:', error);
-  }
-}
-
-/**
- * Log rotation schedule configuration
- */
-export const logRotationSchedule = {
-  // Daily rotation at 2 AM
-  daily: '0 2 * * *',
-  // Weekly rotation on Sunday at 2 AM
-  weekly: '0 2 * * 0',
-  // Monthly rotation on the 1st at 2 AM
-  monthly: '0 2 1 * *',
-};
-
-/**
- * Export all configurations
- */
-export const logConfig = {
-  rotation: defaultLogRotationConfig,
-  retention: defaultLogRetentionConfig,
-  getEnvironmentConfig: getLogConfigForEnvironment,
-  getLogLevel: getLogLevelForEnvironment,
-  getTransport: getTransportConfig,
-  cleanup: cleanupOldLogs,
-  initialize: initializeLogDirectory,
-  schedule: logRotationSchedule,
-};

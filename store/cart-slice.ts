@@ -54,52 +54,51 @@ export const addToCart = createAsyncThunk<
       
       return { success: true, ...data };
     } catch (error) {
-      console.error('Add to cart error:', error);
-      return rejectWithValue('Failed to add item to cart');
+      return rejectWithValue(error instanceof Error ? error.message : 'Failed to add item to cart');
     }
   }
 );
 
+// Additional async thunks for complete cart functionality
 export const updateQuantity = createAsyncThunk<
-  AddToCartResponse,
-  { cartItemId: string; quantity: number; userId?: string; sessionId?: string },
+  any,
+  { cartItemId: string; quantity: number },
   { rejectValue: string }
 >(
   'cart/updateQuantity',
-  async ({ cartItemId, quantity, userId, sessionId }, { rejectWithValue }) => {
+  async ({ cartItemId, quantity }, { rejectWithValue }) => {
     try {
       const response = await fetch('/api/cart/update', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cartItemId, quantity, userId, sessionId })
+        body: JSON.stringify({ cartItemId, quantity })
       });
       
       const data = await response.json();
       
       if (!response.ok) {
-        return rejectWithValue(data.error || 'Failed to update quantity');
+        return rejectWithValue(data.error || 'Failed to update cart');
       }
       
-      return { success: true, ...data };
+      return data;
     } catch (error) {
-      console.error('Update quantity error:', error);
-      return rejectWithValue('Failed to update quantity');
+      return rejectWithValue(error instanceof Error ? error.message : 'Failed to update cart');
     }
   }
 );
 
 export const removeItem = createAsyncThunk<
-  AddToCartResponse,
-  { cartItemId: string; userId?: string; sessionId?: string },
+  any,
+  { cartItemId: string },
   { rejectValue: string }
 >(
   'cart/removeItem',
-  async ({ cartItemId, userId, sessionId }, { rejectWithValue }) => {
+  async ({ cartItemId }, { rejectWithValue }) => {
     try {
       const response = await fetch('/api/cart/remove', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cartItemId, userId, sessionId })
+        body: JSON.stringify({ cartItemId })
       });
       
       const data = await response.json();
@@ -108,101 +107,88 @@ export const removeItem = createAsyncThunk<
         return rejectWithValue(data.error || 'Failed to remove item');
       }
       
-      return { success: true, ...data };
+      return data;
     } catch (error) {
-      console.error('Remove item error:', error);
-      return rejectWithValue('Failed to remove item');
+      return rejectWithValue(error instanceof Error ? error.message : 'Failed to remove item');
     }
   }
 );
 
 export const loadCart = createAsyncThunk<
-  CartSummary,
-  { userId?: string; sessionId?: string },
+  any,
+  void,
   { rejectValue: string }
 >(
   'cart/loadCart',
-  async ({ userId, sessionId }, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const params = new URLSearchParams();
-      if (userId) params.append('userId', userId);
-      if (sessionId) params.append('sessionId', sessionId);
-      
-      const response = await fetch(`/api/cart?${params}`);
+      const response = await fetch('/api/cart');
+      const data = await response.json();
       
       if (!response.ok) {
-        const error = await response.json();
-        return rejectWithValue(error.error || 'Failed to load cart');
+        return rejectWithValue(data.error || 'Failed to load cart');
       }
       
-      return await response.json();
+      return data;
     } catch (error) {
-      console.error('Load cart error:', error);
-      return rejectWithValue('Failed to load cart');
-    }
-  }
-);
-
-export const clearCartAsync = createAsyncThunk<
-  boolean,
-  { userId?: string; sessionId?: string },
-  { rejectValue: string }
->(
-  'cart/clearCart',
-  async ({ userId, sessionId }, { rejectWithValue }) => {
-    try {
-      const response = await fetch('/api/cart/clear', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, sessionId })
-      });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        return rejectWithValue(error.error || 'Failed to clear cart');
-      }
-      
-      return true;
-    } catch (error) {
-      console.error('Clear cart error:', error);
-      return rejectWithValue('Failed to clear cart');
+      return rejectWithValue(error instanceof Error ? error.message : 'Failed to load cart');
     }
   }
 );
 
 export const loadItemCount = createAsyncThunk<
   number,
-  { userId?: string; sessionId?: string },
+  void,
   { rejectValue: string }
 >(
   'cart/loadItemCount',
-  async ({ userId, sessionId }, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const params = new URLSearchParams();
-      if (userId) params.append('userId', userId);
-      if (sessionId) params.append('sessionId', sessionId);
-      
-      const response = await fetch(`/api/cart/count?${params}`);
+      const response = await fetch('/api/cart/count');
+      const data = await response.json();
       
       if (!response.ok) {
-        const error = await response.json();
-        return rejectWithValue(error.error || 'Failed to load item count');
+        return rejectWithValue(data.error || 'Failed to load cart count');
       }
       
-      const data = await response.json();
       return data.count || 0;
     } catch (error) {
-      console.error('Load item count error:', error);
-      return rejectWithValue('Failed to load item count');
+      return rejectWithValue(error instanceof Error ? error.message : 'Failed to load cart count');
     }
   }
 );
 
-// Slice
+export const clearCartAsync = createAsyncThunk<
+  any,
+  void,
+  { rejectValue: string }
+>(
+  'cart/clearCart',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch('/api/cart/clear', {
+        method: 'POST',
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        return rejectWithValue(data.error || 'Failed to clear cart');
+      }
+      
+      return data;
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : 'Failed to clear cart');
+    }
+  }
+);
+
+// Create the cart slice
 const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
+    // Synchronous actions
     setCartId: (state, action: PayloadAction<{ userId?: string; sessionId?: string }>) => {
       state.userId = action.payload.userId;
       state.sessionId = action.payload.sessionId;
@@ -213,36 +199,31 @@ const cartSlice = createSlice({
     clearLastAddedItem: (state) => {
       state.lastAddedItem = null;
     },
-    // Optimistic updates
+    // Optimistic update actions
     optimisticAddItem: (state, action: PayloadAction<CartItem>) => {
-      const existingIndex = state.items.findIndex(
-        item => item.variant_id === action.payload.variant_id
-      );
-      
-      if (existingIndex >= 0) {
-        state.items[existingIndex].quantity += action.payload.quantity;
-      } else {
-        state.items.push(action.payload);
-      }
-      
-      state.itemCount = state.items.reduce((sum, item) => sum + item.quantity, 0);
+      state.items.push(action.payload);
+      state.itemCount += action.payload.quantity;
+      state.lastAddedItem = action.payload;
     },
     optimisticUpdateQuantity: (state, action: PayloadAction<{ cartItemId: string; quantity: number }>) => {
       const item = state.items.find(item => item.id === action.payload.cartItemId);
       if (item) {
+        const oldQuantity = item.quantity;
         item.quantity = action.payload.quantity;
-        state.itemCount = state.items.reduce((sum, item) => sum + item.quantity, 0);
+        state.itemCount = state.itemCount - oldQuantity + action.payload.quantity;
       }
     },
-    optimisticRemoveItem: (state, action: PayloadAction<string>) => {
-      state.items = state.items.filter(item => item.id !== action.payload);
-      state.itemCount = state.items.reduce((sum, item) => sum + item.quantity, 0);
+    optimisticRemoveItem: (state, action: PayloadAction<{ cartItemId: string }>) => {
+      const itemIndex = state.items.findIndex(item => item.id === action.payload.cartItemId);
+      if (itemIndex !== -1) {
+        const item = state.items[itemIndex];
+        state.itemCount -= item.quantity;
+        state.items.splice(itemIndex, 1);
+      }
     },
-    // Rollback optimistic updates on failure
-    rollbackOptimisticUpdate: (state, action: PayloadAction<CartSummary>) => {
-      state.items = action.payload.items;
-      state.itemCount = action.payload.itemCount;
-      state.summary = action.payload;
+    rollbackOptimisticUpdate: (state, action: PayloadAction<{ originalState: CartState }>) => {
+      // Restore previous state on failure
+      return action.payload.originalState;
     }
   },
   extraReducers: (builder) => {
@@ -254,13 +235,11 @@ const cartSlice = createSlice({
       })
       .addCase(addToCart.fulfilled, (state, action) => {
         state.isLoading = false;
-        
-        if (action.payload.cartItem) {
-          state.lastAddedItem = action.payload.cartItem;
+        if (action.payload.cart) {
+          state.items = action.payload.cart.items || [];
+          state.summary = action.payload.cart.summary || null;
+          state.itemCount = action.payload.cart.items?.reduce((total, item) => total + item.quantity, 0) || 0;
         }
-        
-        // After adding item, we need to refresh cart to get updated totals
-        // This will be handled by the component calling loadCart after addToCart
       })
       .addCase(addToCart.rejected, (state, action) => {
         state.isLoading = false;
@@ -275,13 +254,15 @@ const cartSlice = createSlice({
       })
       .addCase(updateQuantity.fulfilled, (state, action) => {
         state.isLoading = false;
-        
-        // After updating quantity, we need to refresh cart to get updated totals
-        // This will be handled by the component calling loadCart after updateQuantity
+        if (action.payload.cart) {
+          state.items = action.payload.cart.items || [];
+          state.summary = action.payload.cart.summary || null;
+          state.itemCount = action.payload.cart.items?.reduce((total, item) => total + item.quantity, 0) || 0;
+        }
       })
       .addCase(updateQuantity.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || 'Failed to update quantity';
+        state.error = action.payload || 'Failed to update cart';
       });
 
     // Remove item
@@ -292,9 +273,11 @@ const cartSlice = createSlice({
       })
       .addCase(removeItem.fulfilled, (state, action) => {
         state.isLoading = false;
-        
-        // After removing item, we need to refresh cart to get updated totals
-        // This will be handled by the component calling loadCart after removeItem
+        if (action.payload.cart) {
+          state.items = action.payload.cart.items || [];
+          state.summary = action.payload.cart.summary || null;
+          state.itemCount = action.payload.cart.items?.reduce((total, item) => total + item.quantity, 0) || 0;
+        }
       })
       .addCase(removeItem.rejected, (state, action) => {
         state.isLoading = false;
@@ -309,13 +292,27 @@ const cartSlice = createSlice({
       })
       .addCase(loadCart.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.items = action.payload.items;
-        state.summary = action.payload;
-        state.itemCount = action.payload.itemCount;
+        if (action.payload.cart) {
+          state.items = action.payload.cart.items || [];
+          state.summary = action.payload.cart.summary || null;
+          state.itemCount = action.payload.cart.items?.reduce((total, item) => total + item.quantity, 0) || 0;
+        }
       })
       .addCase(loadCart.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || 'Failed to load cart';
+      });
+
+    // Load item count
+    builder
+      .addCase(loadItemCount.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(loadItemCount.fulfilled, (state, action) => {
+        state.itemCount = action.payload;
+      })
+      .addCase(loadItemCount.rejected, (state, action) => {
+        state.error = action.payload || 'Failed to load cart count';
       });
 
     // Clear cart
@@ -335,15 +332,10 @@ const cartSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload || 'Failed to clear cart';
       });
-
-    // Load item count
-    builder
-      .addCase(loadItemCount.fulfilled, (state, action) => {
-        state.itemCount = action.payload;
-      });
   }
 });
 
+// Export actions
 export const {
   setCartId,
   clearError,

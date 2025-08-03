@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
           .eq('id', existingUserItem.id);
 
         if (updateError) {
-          console.error('Failed to update user cart item:', updateError);
+
           continue;
         }
 
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
           });
 
         if (insertError) {
-          console.error('Failed to add item to user cart:', insertError);
+
           continue;
         }
 
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
         .eq('session_id', guestSessionId);
 
       if (clearError) {
-        console.error('Failed to clear guest cart:', clearError);
+
         // Don't fail the request, just log the error
       }
     }
@@ -159,11 +159,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response);
 
-  } catch (error) {
-    console.error('Cart merge error:', error);
+  } catch (error: any) {
+    
     return NextResponse.json(
-      { error: 'Failed to merge cart' },
+      { error: 'Failed to merge carts' },
       { status: 500 }
     );
   }
 }
+

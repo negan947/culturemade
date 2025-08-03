@@ -98,7 +98,7 @@ export function useProductPricing(
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         }).format(amount);
-      } catch (error) {
+      } catch (_error) {
         return `$${amount.toFixed(2)}`;
       }
     };
@@ -234,8 +234,8 @@ export function useBulkProductPricing(
       try {
         const pricing = calculatePricingInfo(product, options);
         pricingMap.set(product.id, pricing);
-      } catch (error) {
-        console.warn(`Failed to calculate pricing for product ${product.id}:`, error);
+      } catch (_error) {
+
         
         // Fallback pricing
         pricingMap.set(product.id, {
@@ -282,8 +282,8 @@ export function usePriceComparison(
     }
 
     const prices = products.map(p => parseFloat(p.min_price));
-    const minPrice = Math.min(...prices);
-    const maxPrice = Math.max(...prices);
+    const minPrice = Math.min(..._prices);
+    const maxPrice = Math.max(..._prices);
     const averagePrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
 
     const cheapest = products.find(p => parseFloat(p.min_price) === minPrice) || null;
@@ -321,7 +321,7 @@ export function useCurrencyFormatter(
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         }).format(amount);
-      } catch (error) {
+      } catch (_error) {
         return `$${amount.toFixed(2)}`;
       }
     };

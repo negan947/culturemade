@@ -119,7 +119,7 @@ export function useProductVariants(options: UseProductVariantsOptions): UseProdu
       }
 
     } catch (err) {
-      console.error('Error loading variants:', err);
+
       setError(err instanceof Error ? err.message : 'Failed to load product variants');
     } finally {
       setIsLoading(false);

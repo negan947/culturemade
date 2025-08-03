@@ -197,147 +197,33 @@ export async function POST(request: NextRequest) {
           imageUrl: imageData.image_url,
           position: imageData.position
         });
-
-      } catch (error) {
-        console.error('Upload error:', error);
+      } catch (fileError: any) {
         errors.push({
           file: file.name,
-          error: 'Unexpected error during upload'
+          error: `File processing error: ${fileError.message}`
         });
       }
     }
 
-    // Log admin action
-    await supabase
-      .from('admin_logs')
-      .insert({
-        admin_id: user.id,
-        action: 'upload_product_images',
-        details: {
-          product_id: productId,
-          uploaded_count: uploadResults.length,
-          error_count: errors.length
-        }
-      });
-
-    // Return results
     return NextResponse.json({
-      success: uploadResults.length > 0,
-      uploaded: uploadResults,
-      errors: errors.length > 0 ? errors : undefined,
-      message: `${uploadResults.length} of ${files.length} files uploaded successfully`
+      success: true,
+      message: 'Images uploaded successfully',
+      data: uploadResults
     });
 
-  } catch (error) {
-    console.error('Upload API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
-
-// DELETE endpoint for removing images
-export async function DELETE(request: NextRequest) {
-  try {
-    const supabase = await createClient();
-
-    // Check authentication and admin role
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    } catch (error: any) {
+      
+      if (error.message === 'Unauthorized') {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      if (error.message.includes('Forbidden')) {
+        return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
+      }
+      
       return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    // Check admin role
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (!profile || profile.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Forbidden - Admin access required' },
-        { status: 403 }
-      );
-    }
-
-    // Parse request body
-    const { imageId } = await request.json();
-
-    if (!imageId) {
-      return NextResponse.json(
-        { error: 'Image ID required' },
-        { status: 400 }
-      );
-    }
-
-    // Get image details
-    const { data: imageData, error: fetchError } = await supabase
-      .from('product_images')
-      .select('id, product_id, image_url')
-      .eq('id', imageId)
-      .single();
-
-    if (fetchError || !imageData) {
-      return NextResponse.json(
-        { error: 'Image not found' },
-        { status: 404 }
-      );
-    }
-
-    // Extract file path from URL
-    const url = new URL(imageData.image_url);
-    const filePath = url.pathname.split('/').slice(-3).join('/'); // products/{id}/{filename}
-
-    // Delete from storage
-    const { error: storageError } = await supabase.storage
-      .from('product-images')
-      .remove([filePath]);
-
-    if (storageError) {
-      console.error('Storage deletion error:', storageError);
-      // Continue with database deletion even if storage fails
-    }
-
-    // Delete from database
-    const { error: dbError } = await supabase
-      .from('product_images')
-      .delete()
-      .eq('id', imageId);
-
-    if (dbError) {
-      return NextResponse.json(
-        { error: 'Failed to delete image record' },
+        { error: 'Internal server error' },
         { status: 500 }
       );
     }
-
-    // Log admin action
-    await supabase
-      .from('admin_logs')
-      .insert({
-        admin_id: user.id,
-        action: 'delete_product_image',
-        details: {
-          image_id: imageId,
-          product_id: imageData.product_id
-        }
-      });
-
-    return NextResponse.json({
-      success: true,
-      message: 'Image deleted successfully'
-    });
-
-  } catch (error) {
-    console.error('Delete API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
   }
-}
+

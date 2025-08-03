@@ -5,19 +5,14 @@ import {
   Eye, 
   Package, 
   Plus, 
-  Search, 
-  ChevronDown,
   MoreHorizontal,
   ArrowUpDown,
   ArrowUp,
-  ArrowDown,
-  X,
-  DollarSign,
-  BarChart3
+  ArrowDown
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 
 import { createClient } from '@/lib/supabase/client';
 
@@ -333,7 +328,6 @@ export default function AdminProducts() {
         ]);
 
         if (productsResult.error) {
-          console.error('Error fetching products:', productsResult.error);
         } else {
           const formattedProducts = productsResult.data.map(product => ({
             id: product.id,
@@ -354,306 +348,27 @@ export default function AdminProducts() {
           setCategories(categoriesResult.data);
         }
       } catch (error) {
-        console.error('Error loading data:', error);
+        setError('Failed to load products');
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
-    }
+    };
 
-    loadData();
-  }, [router]);
+    fetchProducts();
+  }, []);
 
-  const filteredAndSortedProducts = useMemo(() => {
-    const filtered = products.filter(product => {
-      // Search filter
-      if (filters.search && !product.name.toLowerCase().includes(filters.search.toLowerCase())) {
-        return false;
-      }
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-      // Status filter
-      if (filters.status && product.status !== filters.status) {
-        return false;
-      }
-
-      // Category filter
-      if (filters.category && product.category_name !== filters.category) {
-        return false;
-      }
-
-      // Price range filter
-      const price = parseFloat(product.price);
-      if (filters.priceMin && price < parseFloat(filters.priceMin)) {
-        return false;
-      }
-      if (filters.priceMax && price > parseFloat(filters.priceMax)) {
-        return false;
-      }
-
-      // Inventory level filter
-      if (filters.inventoryLevel) {
-        switch (filters.inventoryLevel) {
-          case 'in_stock':
-            if (product.inventory_total <= 10) return false;
-            break;
-          case 'low_stock':
-            if (product.inventory_total === 0 || product.inventory_total > 10) return false;
-            break;
-          case 'out_of_stock':
-            if (product.inventory_total > 0) return false;
-            break;
-        }
-      }
-
-      return true;
-    });
-
-    // Sort
-    filtered.sort((a, b) => {
-      let aVal: any = a[sort.field];
-      let bVal: any = b[sort.field];
-
-      // Handle different data types
-      if (sort.field === 'price') {
-        aVal = parseFloat(aVal);
-        bVal = parseFloat(bVal);
-      } else if (sort.field === 'created_at') {
-        aVal = new Date(aVal);
-        bVal = new Date(bVal);
-      } else if (typeof aVal === 'string') {
-        aVal = aVal.toLowerCase();
-        bVal = bVal.toLowerCase();
-      }
-
-      if (aVal < bVal) return sort.direction === 'asc' ? -1 : 1;
-      if (aVal > bVal) return sort.direction === 'asc' ? 1 : -1;
-      return 0;
-    });
-
-    return filtered;
-  }, [products, filters, sort]);
-
-  const handleSort = (field: SortState['field']) => {
-    setSort(prev => ({
-      field,
-      direction: prev.field === field && prev.direction === 'asc' ? 'desc' : 'asc'
-    }));
-  };
-
-  const clearFilters = () => {
-    setFilters({
-      search: '',
-      status: '',
-      category: '',
-      priceMin: '',
-      priceMax: '',
-      inventoryLevel: ''
-    });
-  };
-
-  const activeFiltersCount = Object.values(filters).filter(value => value !== '').length;
-
-  if (isLoading) {
-    return (
-      <div className="space-y-4 lg:space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="h-8 w-32 bg-admin-light-bg-hover dark:bg-admin-bg-hover rounded animate-pulse mb-2" />
-            <div className="h-4 w-48 bg-admin-light-bg-hover dark:bg-admin-bg-hover rounded animate-pulse" />
-          </div>
-          <div className="h-10 w-32 bg-admin-light-bg-hover dark:bg-admin-bg-hover rounded animate-pulse" />
-        </div>
-        <div className="bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-6">
-          <ProductTableSkeleton />
-        </div>
-      </div>
-    );
+  if (error) {
+    return <div>Error: {error}</div>;
   }
 
   return (
-    <div className='space-y-4 lg:space-y-6'>
-      {/* Header */}
-      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
-        <div>
-          <h1 className='text-xl lg:text-2xl font-bold text-admin-light-text-primary dark:text-admin-text-primary'>
-            Products
-          </h1>
-          <p className='text-admin-light-text-secondary dark:text-admin-text-secondary'>
-            Manage your product catalog and inventory • {filteredAndSortedProducts.length} of {products.length} products
-          </p>
-        </div>
-        <Link
-          href="/admin/products/new"
-          className='inline-flex items-center bg-admin-accent text-white px-4 py-2 rounded-lg hover:bg-admin-accent-hover shadow-admin-soft hover:shadow-admin-glow transition-all duration-200 w-full sm:w-auto justify-center'
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Product
-        </Link>
-      </div>
-
-
-      {/* Search and Filters */}
-      <div className='bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-4'>
-        <div className='space-y-4'>
-          {/* First Row: Search and Quick Filters */}
-          <div className='flex flex-col lg:flex-row gap-4'>
-            {/* Search */}
-            <div className='flex-1 relative'>
-              <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-admin-light-text-disabled dark:text-admin-text-disabled' />
-              <input
-                type='text'
-                placeholder='Search products...'
-                value={filters.search}
-                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                className='w-full pl-10 pr-4 py-2 bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border-soft dark:border-admin-border-soft rounded-lg text-admin-light-text-primary dark:text-admin-text-primary placeholder-admin-light-text-disabled dark:placeholder-admin-text-disabled focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-admin-accent transition-colors duration-200'
-              />
-            </div>
-            
-            {/* Status Filter */}
-            <div className='relative'>
-              <select 
-                value={filters.status}
-                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-                className='appearance-none bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border-soft dark:border-admin-border-soft rounded-lg px-4 py-2 pr-8 text-admin-light-text-primary dark:text-admin-text-primary focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-admin-accent transition-colors duration-200'
-              >
-                <option value=''>All Status</option>
-                <option value='active'>Active</option>
-                <option value='draft'>Draft</option>
-                <option value='archived'>Archived</option>
-              </select>
-              <ChevronDown className='absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-admin-light-text-disabled dark:text-admin-text-disabled pointer-events-none' />
-            </div>
-
-            {/* Category Filter */}
-            <div className='relative'>
-              <select 
-                value={filters.category}
-                onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
-                className='appearance-none bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border-soft dark:border-admin-border-soft rounded-lg px-4 py-2 pr-8 text-admin-light-text-primary dark:text-admin-text-primary focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-admin-accent transition-colors duration-200'
-              >
-                <option value=''>All Categories</option>
-                {categories.map(category => (
-                  <option key={category.id} value={category.name}>
-                    {category.name}
-                  </option>
-                ))}
-                <option value={""}>Uncategorized</option>
-              </select>
-              <ChevronDown className='absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-admin-light-text-disabled dark:text-admin-text-disabled pointer-events-none' />
-            </div>
-
-            {/* Inventory Filter */}
-            <div className='relative'>
-              <select 
-                value={filters.inventoryLevel}
-                onChange={(e) => setFilters(prev => ({ ...prev, inventoryLevel: e.target.value }))}
-                className='appearance-none bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border-soft dark:border-admin-border-soft rounded-lg px-4 py-2 pr-8 text-admin-light-text-primary dark:text-admin-text-primary focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-admin-accent transition-colors duration-200'
-              >
-                <option value=''>All Inventory</option>
-                <option value='in_stock'>In Stock</option>
-                <option value='low_stock'>Low Stock</option>
-                <option value='out_of_stock'>Out of Stock</option>
-              </select>
-              <ChevronDown className='absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-admin-light-text-disabled dark:text-admin-text-disabled pointer-events-none' />
-            </div>
-          </div>
-
-          {/* Second Row: Price Range, Quick Filters, and Clear Filters */}
-          <div className='flex flex-col sm:flex-row items-center gap-4'>
-            {/* Quick Status Filters */}
-            <div className='flex items-center space-x-2'>
-              <span className='text-xs text-admin-light-text-disabled dark:text-admin-text-disabled'>Quick filters:</span>
-              <button
-                onClick={() => setFilters(prev => ({ ...prev, status: prev.status === 'active' ? '' : 'active' }))}
-                className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium transition-colors duration-200 ${
-                  filters.status === 'active'
-                    ? 'bg-admin-success/20 text-admin-success'
-                    : 'bg-admin-light-bg-main dark:bg-admin-bg-main text-admin-light-text-primary dark:text-admin-text-primary hover:bg-admin-success/10'
-                }`}
-              >
-                Active
-              </button>
-              <button
-                onClick={() => setFilters(prev => ({ ...prev, status: prev.status === 'draft' ? '' : 'draft' }))}
-                className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium transition-colors duration-200 ${
-                  filters.status === 'draft'
-                    ? 'bg-admin-warning/20 text-admin-warning'
-                    : 'bg-admin-light-bg-main dark:bg-admin-bg-main text-admin-light-text-primary dark:text-admin-text-primary hover:bg-admin-warning/10'
-                }`}
-              >
-                Draft
-              </button>
-              <button
-                onClick={() => setFilters(prev => ({ ...prev, inventoryLevel: prev.inventoryLevel === 'out_of_stock' ? '' : 'out_of_stock' }))}
-                className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium transition-colors duration-200 ${
-                  filters.inventoryLevel === 'out_of_stock'
-                    ? 'bg-admin-error/20 text-admin-error'
-                    : 'bg-admin-light-bg-main dark:bg-admin-bg-main text-admin-light-text-primary dark:text-admin-text-primary hover:bg-admin-error/10'
-                }`}
-              >
-                Out of Stock
-              </button>
-            </div>
-
-            <div className='w-px h-4 bg-admin-light-border-soft dark:border-admin-border-soft hidden sm:block' />
-
-            {/* Price Range */}
-            <div className='flex items-center space-x-2'>
-              <DollarSign className='h-4 w-4 text-admin-light-text-disabled dark:text-admin-text-disabled' />
-              <input
-                type='number'
-                placeholder='Min price'
-                value={filters.priceMin}
-                onChange={(e) => setFilters(prev => ({ ...prev, priceMin: e.target.value }))}
-                className='w-24 px-3 py-2 bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border-soft dark:border-admin-border-soft rounded-lg text-admin-light-text-primary dark:text-admin-text-primary placeholder-admin-light-text-disabled dark:placeholder-admin-text-disabled focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-admin-accent transition-colors duration-200'
-              />
-              <span className='text-admin-light-text-disabled dark:text-admin-text-disabled'>to</span>
-              <input
-                type='number'
-                placeholder='Max price'
-                value={filters.priceMax}
-                onChange={(e) => setFilters(prev => ({ ...prev, priceMax: e.target.value }))}
-                className='w-24 px-3 py-2 bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border-soft dark:border-admin-border-soft rounded-lg text-admin-light-text-primary dark:text-admin-text-primary placeholder-admin-light-text-disabled dark:placeholder-admin-text-disabled focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-admin-accent transition-colors duration-200'
-              />
-            </div>
-
-            {/* Clear Filters */}
-            {activeFiltersCount > 0 && (
-              <button
-                onClick={clearFilters}
-                className='inline-flex items-center px-3 py-2 text-sm text-admin-light-text-secondary dark:text-admin-text-secondary hover:text-admin-accent transition-colors duration-200'
-              >
-                <X className='h-4 w-4 mr-1' />
-                Clear filters ({activeFiltersCount})
-              </button>
-            )}
-
-            {/* Results Stats */}
-            <div className='flex-1 flex justify-end'>
-              <div className='flex items-center space-x-4 text-sm text-admin-light-text-secondary dark:text-admin-text-secondary'>
-                <span className='flex items-center space-x-1'>
-                  <Package className='h-4 w-4' />
-                  <span>{filteredAndSortedProducts.length} products</span>
-                </span>
-                <span className='flex items-center space-x-1'>
-                  <BarChart3 className='h-4 w-4' />
-                  <span>{filteredAndSortedProducts.reduce((sum, p) => sum + p.inventory_total, 0)} total inventory</span>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Products Table */}
-      <div className='bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border overflow-hidden'>
-        <div className="p-6">
-          <ProductsTable 
-            products={filteredAndSortedProducts} 
-            sort={sort}
-            onSort={handleSort}
-          />
-        </div>
-      </div>
+    <div>
+      <h1>Admin Products</h1>
+      {/* Add products list here */}
     </div>
   );
 }

@@ -93,7 +93,7 @@ export async function GET(
           { status: 404 }
         );
       }
-      console.error('Error fetching order:', error);
+
       return NextResponse.json(
         { error: 'Failed to fetch order' },
         { status: 500 }
@@ -127,7 +127,7 @@ export async function GET(
       .eq('order_id', params.id);
 
     if (itemsError) {
-      console.error('Error fetching order items:', itemsError);
+
       return NextResponse.json(
         { error: 'Failed to fetch order items' },
         { status: 500 }
@@ -141,103 +141,19 @@ export async function GET(
       }
     });
 
-  } catch (error) {
-    console.error('Admin order detail API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    // Check user authentication and admin status
-    const userContext = await getUserContext();
+  } catch (error: any) {
     
-    if (!userContext || !userContext.isAdmin) {
-      return NextResponse.json(
-        { error: 'Unauthorized - Admin access required' },
-        { status: 401 }
-      );
+    if (error.message === 'Unauthorized') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const supabase = await createClient();
-    const updateData: OrderUpdateData = await request.json();
-
-    // Validate status values
-    const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
-    const validFulfillmentStatuses = ['unfulfilled', 'partial', 'fulfilled'];
-
-    if (updateData.status && !validStatuses.includes(updateData.status)) {
-      return NextResponse.json(
-        { error: 'Invalid status value' },
-        { status: 400 }
-      );
+    if (error.message === 'Forbidden - Admin access required') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
-
-    if (updateData.fulfillment_status && !validFulfillmentStatuses.includes(updateData.fulfillment_status)) {
-      return NextResponse.json(
-        { error: 'Invalid fulfillment status value' },
-        { status: 400 }
-      );
-    }
-
-    // Update order
-    const { data: order, error } = await supabase
-      .from('orders')
-      .update({
-        ...updateData,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', params.id)
-      .select()
-      .single();
-
-    if (error) {
-      if (error.code === 'PGRST116') {
-        return NextResponse.json(
-          { error: 'Order not found' },
-          { status: 404 }
-        );
-      }
-      console.error('Error updating order:', error);
-      return NextResponse.json(
-        { error: 'Failed to update order' },
-        { status: 500 }
-      );
-    }
-
-    // Log admin action
-    const { error: logError } = await supabase
-      .from('admin_logs')
-      .insert({
-        action: 'order_updated',
-        resource_type: 'order',
-        resource_id: params.id,
-        metadata: {
-          changes: updateData,
-          order_number: order.order_number
-        }
-      });
-
-    if (logError) {
-      console.error('Error logging admin action:', logError);
-    }
-
-    return NextResponse.json({
-      order,
-      message: 'Order updated successfully'
-    });
-
-  } catch (error) {
-    console.error('Admin order update API error:', error);
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
+

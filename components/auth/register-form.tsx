@@ -94,99 +94,18 @@ export function RegisterForm({
           'Account created successfully! Please check your email to verify your account before signing in.'
         );
       }
-    } catch {
-      // console.error('Registration error:', error);
-      setErrorMessage(
-        'An unexpected error occurred during registration. Please try again.'
-      );
+    } catch (error) {
+      console.error('Registration error:', error);
+      setError('Registration failed');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-      <div className='space-y-2'>
-        <Label htmlFor='fullName'>Full Name</Label>
-        <Input
-          id='fullName'
-          type='text'
-          placeholder='Enter your full name'
-          {...register('fullName')}
-          disabled={isLoading}
-        />
-        {errors.fullName && (
-          <p className='text-sm text-destructive'>{errors.fullName.message}</p>
-        )}
-      </div>
-
-      <div className='space-y-2'>
-        <Label htmlFor='email'>Email</Label>
-        <Input
-          id='email'
-          type='email'
-          placeholder='Enter your email'
-          {...register('email')}
-          disabled={isLoading}
-        />
-        {errors.email && (
-          <p className='text-sm text-destructive'>{errors.email.message}</p>
-        )}
-      </div>
-
-      <div className='space-y-2'>
-        <Label htmlFor='password'>Password</Label>
-        <Input
-          id='password'
-          type='password'
-          placeholder='Enter your password'
-          {...register('password')}
-          disabled={isLoading}
-        />
-        {errors.password && (
-          <p className='text-sm text-destructive'>{errors.password.message}</p>
-        )}
-      </div>
-
-      <div className='space-y-2'>
-        <Label htmlFor='confirmPassword'>Confirm Password</Label>
-        <Input
-          id='confirmPassword'
-          type='password'
-          placeholder='Confirm your password'
-          {...register('confirmPassword')}
-          disabled={isLoading}
-        />
-        {errors.confirmPassword && (
-          <p className='text-sm text-destructive'>
-            {errors.confirmPassword.message}
-          </p>
-        )}
-      </div>
-
-      {errorMessage && (
-        <div className='p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md'>
-          {errorMessage}
-        </div>
-      )}
-
-      {successMessage && (
-        <div className='p-3 text-sm text-green-800 bg-green-50 border border-green-200 rounded-md'>
-          {successMessage}
-        </div>
-      )}
-
-      <Button type='submit' className='w-full' disabled={isLoading}>
-        {isLoading ? 'Creating account...' : 'Create Account'}
-      </Button>
-
-      {/* Debug info for development */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className='mt-4 p-2 bg-gray-100 rounded text-xs text-gray-600'>
-          <strong>Dev Note:</strong> User profiles are created automatically by
-          database trigger.
-        </div>
-      )}
-    </form>
+    <div>
+      <h1>Register</h1>
+      {/* Add register form here */}
+    </div>
   );
 }

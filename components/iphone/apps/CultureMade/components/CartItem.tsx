@@ -129,7 +129,7 @@ export default function CartItem({
       {showImage && (
         <div className="flex-shrink-0">
           <ProductImage
-            src={item.image_url}
+            src={item.image_url || null}
             alt={item.image_alt || item.product_name}
             productName={item.product_name}
             className={`${currentSize.image} rounded-lg`}
@@ -199,7 +199,7 @@ export default function CartItem({
           
           <button
             onClick={() => handleQuantityChange(item.quantity + 1)}
-            disabled={isDisabled || (item.inventory_quantity && item.quantity >= item.inventory_quantity)}
+            disabled={isDisabled || Boolean(item.inventory_quantity && item.quantity >= item.inventory_quantity)}
             className={`
               ${currentSize.button}
               text-gray-500 hover:text-gray-700 hover:bg-white 

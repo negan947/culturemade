@@ -45,7 +45,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error details
-    // console.error('ErrorBoundary caught an error:', error, errorInfo);
+
 
     // Update state with error info
     this.setState({
@@ -69,7 +69,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   handleReportFeedback = () => {
     // Simple feedback - just log or could integrate with other services
-    // console.log('User reported feedback for error:', this.state.error);
+
   };
 
   override render() {

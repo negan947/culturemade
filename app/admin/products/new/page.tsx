@@ -25,7 +25,6 @@ async function getCategories(): Promise<Category[]> {
     .order('name');
 
   if (error) {
-    console.error('Error fetching categories:', error);
     return [];
   }
 

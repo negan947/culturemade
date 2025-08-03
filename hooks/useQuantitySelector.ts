@@ -131,8 +131,8 @@ export function useQuantitySelector(options: UseQuantitySelectorOptions): UseQua
         onQuantityChange?.(adjustedQuantity, state.errors.length === 0);
       }
       
-    } catch (error) {
-      console.error('Error loading quantity state:', error);
+    } catch (_error) {
+
       setQuantityState({
         quantity: constraints.defaultQuantity,
         maxAllowed: 0,
@@ -166,8 +166,8 @@ export function useQuantitySelector(options: UseQuantitySelectorOptions): UseQua
       setValidation(validationResult);
       onValidationChange?.(validationResult);
       return validationResult;
-    } catch (error) {
-      console.error('Error validating quantity:', error);
+    } catch (_error) {
+
       const errorValidation: QuantityValidation = {
         isValid: false,
         maxQuantity: 0,

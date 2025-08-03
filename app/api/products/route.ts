@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
       .eq('status', 'active');
 
     if (countError) {
-      console.warn('Failed to get total count:', countError.message);
+
     }
 
     const total = totalCount || 0;
@@ -123,14 +123,12 @@ export async function GET(request: NextRequest) {
       }
     });
 
-  } catch (error) {
-    console.error('Products API error:', error);
+  } catch (error: any) {
+    
     return NextResponse.json(
-      { 
-        error: 'Failed to fetch products',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: 'Failed to get products' },
       { status: 500 }
     );
   }
 }
+

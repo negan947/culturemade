@@ -31,7 +31,10 @@ export function CartDrawer({ isOpen, onClose, userId, onCheckout }: CartDrawerPr
     removeItem,
     clearCart,
     refreshCart
-  } = useCart({ userId, sessionId });
+  } = useCart({ 
+    ...(userId && { userId }),
+    ...(sessionId && { sessionId })
+  });
 
   const [removingItem, setRemovingItem] = useState<string | null>(null);
 
@@ -168,16 +171,30 @@ export function CartDrawer({ isOpen, onClose, userId, onCheckout }: CartDrawerPr
                 <>
                   {/* Cart Items - Using CartItem Component */}
                   <div className="flex-1 overflow-y-auto culturemade-scrollable p-4 space-y-3">
-                    {items.map((item) => (
-                      <CartItem
-                        key={item.id}
-                        item={item}
-                        onQuantityUpdate={handleQuantityUpdate}
-                        onRemove={handleRemoveItem}
-                        isRemoving={removingItem === item.id}
-                        size="md"
-                      />
-                    ))}
+                    {items.map((item) => {
+                      // Transform CartItem to CartItemData format
+                      const transformedItem = {
+                        id: item.id,
+                        product_name: item.product_name || 'Unknown Product',
+                        ...(item.variant_name && { variant_title: item.variant_name }),
+                        price: parseFloat(item.variant_price?.toString() || '0'),
+                        quantity: item.quantity,
+                        total: parseFloat(item.variant_price?.toString() || '0') * item.quantity,
+                        ...(item.product_image && { image_url: item.product_image }),
+                        is_available: true
+                      };
+                      
+                      return (
+                        <CartItem
+                          key={item.id}
+                          item={transformedItem}
+                          onQuantityUpdate={handleQuantityUpdate}
+                          onRemove={handleRemoveItem}
+                          isRemoving={removingItem === item.id}
+                          size="md"
+                        />
+                      );
+                    })}
                   </div>
 
                   {/* Cart Summary & Checkout */}

@@ -30,7 +30,7 @@ export { default as CartItem, CartItemSkeleton } from './CartItem';
 export { default as DragScrollContainer } from './DragScrollContainer';
 
 // Component Types
-export type { ProductListItem, ProductImage, ProductCategory } from '@/types/api';
+export type { ProductListItem, ProductImage as ProductImageType, ProductCategory } from '@/types/api';
 
 // Re-export common product-related types for convenience
 export type {

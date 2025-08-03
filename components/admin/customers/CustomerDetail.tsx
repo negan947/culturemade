@@ -52,7 +52,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
         role: data.role || 'customer'
       });
     } catch (err) {
-      console.error('Error fetching customer:', err);
+
       setError(err instanceof Error ? err.message : 'Failed to fetch customer');
     } finally {
       setLoading(false);
@@ -91,7 +91,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
       await fetchCustomer();
       setEditing(false);
     } catch (err) {
-      console.error('Error updating customer:', err);
+
       setError(err instanceof Error ? err.message : 'Failed to update customer');
     } finally {
       setSaving(false);

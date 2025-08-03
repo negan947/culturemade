@@ -75,8 +75,8 @@ export function getCurrentSession(): UserSession {
         return session;
       }
     }
-  } catch (error) {
-    console.warn('Failed to retrieve analytics session:', error);
+  } catch (_error) {
+
   }
   
   // Create new session
@@ -90,8 +90,8 @@ export function getCurrentSession(): UserSession {
   
   try {
     localStorage.setItem(SESSION_KEY, JSON.stringify(newSession));
-  } catch (error) {
-    console.warn('Failed to store analytics session:', error);
+  } catch (_error) {
+
   }
   
   return newSession;
@@ -121,8 +121,8 @@ export function updateSessionUserId(userId: string): void {
   
   try {
     localStorage.setItem('culturemade_analytics_session', JSON.stringify(session));
-  } catch (error) {
-    console.warn('Failed to update session user ID:', error);
+  } catch (_error) {
+
   }
 }
 
@@ -288,7 +288,7 @@ export function queueAnalyticsEvent(event: ProductInteractionEvent): void {
   if (!config.enableTracking) return;
   
   if (config.enableDebugLogging) {
-    console.log('Analytics Event:', event);
+
   }
   
   eventQueue.push(event);
@@ -339,14 +339,14 @@ export async function flushAnalyticsEvents(): Promise<void> {
     
     const config = getAnalyticsConfig();
     if (config.enableDebugLogging) {
-      console.log(`Flushed ${eventsToSend.length} analytics events`);
+
     }
-  } catch (error) {
-    console.warn('Failed to flush analytics events:', error);
+  } catch (_error) {
+
     
     // Re-queue events for retry (with limit to prevent infinite growth)
     if (eventQueue.length < 100) {
-      eventQueue.unshift(...eventsToSend);
+      eventQueue.unshift(..._eventsToSend);
     }
   }
 }
@@ -361,8 +361,8 @@ export function getAnalyticsConfig(): AnalyticsConfig {
     if (stored) {
       return { ...defaultConfig, ...JSON.parse(stored) };
     }
-  } catch (error) {
-    console.warn('Failed to load analytics config:', error);
+  } catch (_error) {
+
   }
   
   return defaultConfig;
@@ -378,8 +378,8 @@ export function updateAnalyticsConfig(newConfig: Partial<AnalyticsConfig>): void
   
   try {
     localStorage.setItem('culturemade_analytics_config', JSON.stringify(updatedConfig));
-  } catch (error) {
-    console.warn('Failed to save analytics config:', error);
+  } catch (_error) {
+
   }
 }
 
@@ -466,7 +466,7 @@ export function debounce<T extends (...args: any[]) => void>(
   
   return (...args: Parameters<T>) => {
     clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func(...args), delay);
+    timeoutId = setTimeout(() => func(..._args), delay);
   };
 }
 
@@ -484,7 +484,7 @@ export function throttle<T extends (...args: any[]) => void>(
     const now = Date.now();
     if (now - lastCall >= delay) {
       lastCall = now;
-      func(...args);
+      func(..._args);
     }
   };
 }
@@ -541,7 +541,7 @@ export function initializeAnalytics(config?: Partial<AnalyticsConfig>): void {
         if (now - session.lastActivity > SESSION_DURATION) {
           localStorage.removeItem('culturemade_analytics_session');
         }
-      } catch (error) {
+      } catch (_error) {
         // Ignore cleanup errors
       }
     }, 5 * 60 * 1000); // Every 5 minutes

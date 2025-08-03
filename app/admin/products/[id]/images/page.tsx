@@ -1,4 +1,5 @@
 import { Upload, Image as ImageIcon, Trash2, Plus } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -123,9 +124,11 @@ function ProductImageManager({ product }: { product: Product }) {
               >
                 {/* Image */}
                 <div className="aspect-square bg-admin-light-bg-main dark:bg-admin-bg-main flex items-center justify-center">
-                  <img
+                  <Image
                     src={image.image_url}
                     alt={image.alt_text || `Product image ${index + 1}`}
+                    width={200}
+                    height={200}
                     className="w-full h-full object-cover"
                   />
                 </div>

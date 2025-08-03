@@ -121,11 +121,12 @@ export async function PUT(request: NextRequest) {
       }
     });
 
-  } catch (error) {
-    console.error('Cart update API error:', error);
+  } catch (error: any) {
+    
     return NextResponse.json(
       { error: 'Failed to update cart item' },
       { status: 500 }
     );
   }
 }
+

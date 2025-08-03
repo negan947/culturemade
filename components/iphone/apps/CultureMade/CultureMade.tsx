@@ -100,7 +100,7 @@ function CultureMadeInner() {
 
       if (checkoutPrep.canProceed) {
         // Cart is ready for checkout
-        console.log('✅ Cart validated successfully:', statusMessage.message);
+
         
         // Show success message with actions taken
         if (checkoutPrep.actions.length > 0) {
@@ -112,103 +112,67 @@ function CultureMadeInner() {
         setCartDrawerOpen(false);
       } else {
         // Cart has validation errors
-        console.error('❌ Cart validation failed:', checkoutPrep.validationResult.errors);
+
         
         const errorMessage = checkoutPrep.validationResult.errors.join('\n• ');
         alert(`${statusMessage.title}\n\n• ${errorMessage}\n\nPlease fix these issues and try again.`);
       }
     } catch (error) {
-      console.error('Checkout preparation failed:', error);
-      alert('Failed to prepare checkout. Please try again.');
+      console.error('Checkout validation failed:', error);
+      alert('Failed to validate cart. Please try again.');
     }
   };
 
   return (
-    <div className="h-full w-full bg-white flex flex-col">
-      {/* Main Content Area - Fixed for scrolling */}
-      <div className="flex-1 overflow-hidden pt-12">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ 
-              duration: 0.3, 
-              ease: [0.25, 0.46, 0.45, 0.94] // iOS-style easing
-            }}
-            className="h-full"
-          >
-            <DragScrollContainer 
-              className="h-full overflow-y-auto culturemade-scrollable"
-              direction="vertical"
-              sensitivity={1}
-            >
-              <CurrentScreen />
-            </DragScrollContainer>
-          </motion.div>
-        </AnimatePresence>
-      </div>
+    <div className="relative bg-gray-100 rounded-3xl overflow-hidden h-full w-full">
+      {/* Main Content */}
+      <div className="flex flex-col h-full">
+        {/* Screen Content */}
+        <div className="flex-1 overflow-hidden">
+          <CurrentScreen />
+        </div>
 
-      {/* Bottom Tab Navigation */}
-      <div className="bg-white border-t border-gray-200">
-        <div className="flex justify-around items-center px-2 py-1">
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            const Icon = tab.icon;
-            
-            return (
-              <motion.button
-                key={tab.id}
-                onTap={() => setActiveTab(tab.id)}
-                className="flex flex-col items-center justify-center py-2 px-3 min-w-0 flex-1"
-                whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.1 }}
-              >
-                <div className="relative">
-                  <Icon 
-                    className={`w-6 h-6 transition-colors duration-200 ${
-                      isActive 
-                        ? 'text-blue-500' 
-                        : 'text-gray-500'
-                    }`}
-                    fill={isActive ? 'currentColor' : 'none'}
-                  />
-                </div>
-                <span 
-                  className={`text-xs mt-1 transition-colors duration-200 ${
-                    isActive 
-                      ? 'text-blue-500 font-medium' 
-                      : 'text-gray-500'
-                  }`}
+        {/* Bottom Navigation */}
+        <div className="bg-white border-t border-gray-200 px-4 py-2 safe-area-bottom">
+          <div className="flex items-center justify-around">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`
+                    flex flex-col items-center justify-center py-2 px-3 rounded-lg
+                    transition-colors duration-200
+                    ${isActive 
+                      ? 'text-blue-600 bg-blue-50' 
+                      : 'text-gray-600 hover:text-gray-900'
+                    }
+                  `}
                 >
-                  {tab.name}
-                </span>
-              </motion.button>
-            );
-          })}
-          
-          {/* Dedicated Cart Icon - Always Visible */}
-          <motion.button
-            onTap={handleCartIconClick}
-            className="flex flex-col items-center justify-center py-2 px-3 min-w-0 flex-1"
-            whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.1 }}
-          >
-            <div className="relative">
-              <CartIcon
+                  <Icon className="h-5 w-5 mb-1" fill={isActive ? 'currentColor' : 'none'} />
+                  <span className="text-xs font-medium">{tab.name}</span>
+                </button>
+              );
+            })}
+            
+            {/* Cart Icon */}
+            <button
+              onClick={handleCartIconClick}
+              className="flex flex-col items-center justify-center py-2 px-3 rounded-lg text-gray-600 hover:text-gray-900 transition-colors duration-200 relative"
+            >
+              <CartIcon 
                 userId={userId}
-                className=""
-                iconClassName="w-6 h-6 transition-colors duration-200 text-gray-500 hover:text-blue-500"
-                badgeClassName="bg-red-500 text-white"
                 size="md"
-                showBadge={true}
+                className="mb-1"
+                iconClassName="h-5 w-5"
+                badgeClassName="bg-red-500 text-white"
               />
-            </div>
-            <span className="text-xs mt-1 transition-colors duration-200 text-gray-500">
-              Cart
-            </span>
-          </motion.button>
+              <span className="text-xs font-medium">Cart</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -216,8 +180,8 @@ function CultureMadeInner() {
       <CartDrawer
         isOpen={cartDrawerOpen}
         onClose={() => setCartDrawerOpen(false)}
-        onCheckout={handleCheckout}
         userId={userId}
+        onCheckout={handleCheckout}
       />
     </div>
   );

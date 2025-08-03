@@ -54,16 +54,18 @@ export function CustomerList({
       });
 
       const response = await fetch(`/api/admin/customers?${params}`);
-      const data: CustomerListResponse = await response.json();
-
+      
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch customers');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || errorData.message || 'Failed to fetch customers');
       }
+
+      const data: CustomerListResponse = await response.json();
 
       setCustomers(data.customers);
       setPagination(data.pagination);
     } catch (err) {
-      console.error('Error fetching customers:', err);
+
       setError(err instanceof Error ? err.message : 'Failed to fetch customers');
     } finally {
       setLoading(false);

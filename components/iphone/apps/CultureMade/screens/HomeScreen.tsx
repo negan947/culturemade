@@ -55,7 +55,7 @@ export default function HomeScreen() {
         setHasMore(data.pagination?.hasMore || false);
         setOffset(prev => resetProducts ? 20 : prev + 20);
       } catch (err) {
-        console.error('Error fetching products:', err);
+
         setError('Failed to load products');
       } finally {
         setLoading(false);
@@ -108,169 +108,184 @@ export default function HomeScreen() {
       }
 
       const result = await response.json();
-      console.log('Item added to cart:', result);
+
       
       // Dispatch custom event to refresh cart components
       window.dispatchEvent(new CustomEvent('cartUpdated', { 
         detail: { type: 'add', productId, quantity, result } 
       }));
       
+      console.log('✅ Item added to cart successfully');
     } catch (error) {
-      console.error('Error adding to cart:', error);
-      // TODO: Show error message to user
+      console.error('❌ Failed to add item to cart:', error);
+      throw error; // Re-throw to let calling component handle the error
     }
   };
 
+  const handleRetry = () => {
+    setError(null);
+    setProducts([]);
+    setOffset(0);
+    // Re-fetch products
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        
+        const params = new URLSearchParams({
+          limit: '20',
+          offset: '0',
+          featured: 'true'
+        });
+        
+        const response = await fetch(`/api/products?${params}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+        
+        const data = await response.json();
+        
+        setProducts(data.products || []);
+        setHasMore(data.pagination?.hasMore || false);
+        setOffset(20);
+      } catch (err) {
+        setError('Failed to load products');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  };
+
+  if (loading && products.length === 0) {
+    return (
+      <div className="h-full bg-gray-50">
+        <div className="bg-white px-4 py-3 border-b border-gray-200">
+          <h1 className="text-2xl font-bold text-gray-900">Home</h1>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-full bg-gray-50">
+        <div className="bg-white px-4 py-3 border-b border-gray-200">
+          <h1 className="text-2xl font-bold text-gray-900">Home</h1>
+        </div>
+        <div className="flex-1 flex items-center justify-center px-4">
+          <div className="text-center">
+            <div className="text-red-600 mb-4">
+              <p className="font-medium">Failed to load products</p>
+            </div>
+            <button
+              onClick={handleRetry}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-full bg-gray-50 flex flex-col">
+    <div className="h-full bg-gray-50">
       {/* Header */}
-      <div className="bg-white px-4 py-3 border-b border-gray-200 flex-shrink-0">
+      <div className="bg-white px-4 py-3 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">CultureMade</h1>
-          <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+          <h1 className="text-2xl font-bold text-gray-900">Discover</h1>
+          <div className="flex items-center space-x-2">
+            <Sparkles className="h-6 w-6 text-yellow-500" />
+          </div>
+        </div>
+        <p className="text-gray-600 text-sm mt-1">Featured and trending products</p>
+      </div>
+
+      {/* Featured Categories */}
+      <div className="bg-white px-4 py-4 border-b border-gray-200">
+        <div className="flex space-x-3 overflow-x-auto">
+          {[
+            { name: 'Trending', icon: Flame, color: 'bg-red-100 text-red-600' },
+            { name: 'New', icon: Sparkles, color: 'bg-blue-100 text-blue-600' },
+            { name: 'Sale', icon: Tag, color: 'bg-green-100 text-green-600' }
+          ].map((category, index) => (
+            <motion.button
+              key={category.name}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+              className={`flex-shrink-0 flex items-center space-x-2 px-4 py-2 rounded-full ${category.color} font-medium text-sm`}
+            >
+              <category.icon className="h-4 w-4" />
+              <span>{category.name}</span>
+            </motion.button>
+          ))}
         </div>
       </div>
 
-      {/* Scrollable Content */}
-      <DragScrollContainer 
-        className="flex-1 overflow-y-auto overscroll-contain culturemade-scrollable"
-        direction="vertical"
-        sensitivity={1}
-      >
-        {/* Hero Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-8 text-white">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-xl font-bold mb-2">Welcome to CultureMade</h2>
-            <p className="text-blue-100 text-sm">
-              Discover the latest fashion trends and express your unique style
-            </p>
-          </motion.div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="px-4 py-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Shop by Category</h3>
+      {/* Products Grid */}
+      <DragScrollContainer className="flex-1 overflow-y-auto culturemade-scrollable">
+        <div className="p-4">
           <div className="grid grid-cols-2 gap-3">
-            {[
-              { icon: Sparkles, label: "New Arrivals", color: "bg-pink-100 text-pink-600" },
-              { icon: Flame, label: "Trending", color: "bg-orange-100 text-orange-600" },
-              { icon: Tag, label: "Sale", color: "bg-red-100 text-red-600" },
-              { icon: Sparkles, label: "Featured", color: "bg-purple-100 text-purple-600" },
-            ].map((item, index) => (
+            {products.map((product, index) => (
               <motion.div
-                key={item.label}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="bg-white rounded-lg p-4 shadow-sm border border-gray-200"
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
               >
-                <div className={`w-10 h-10 rounded-lg ${item.color} flex items-center justify-center mb-3`}>
-                  <item.icon className="w-5 h-5" />
-                </div>
-                <h4 className="font-medium text-gray-900 text-sm">{item.label}</h4>
+                <ProductCard
+                  product={product}
+                  onProductClick={handleProductClick}
+                  onAddToCart={handleAddToCart}
+                />
               </motion.div>
             ))}
           </div>
-        </div>
-
-        {/* Featured Products Section */}
-        <div className="px-4 pb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Featured Products</h3>
-            <button className="text-blue-600 text-sm font-medium">See All</button>
-          </div>
-          
-          {/* Loading State */}
-          {loading && (
-            <div className="grid grid-cols-2 gap-3">
-              {[1, 2, 3, 4].map((item) => (
-                <div key={item} className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 animate-pulse">
-                  <div className="aspect-square bg-gray-200"></div>
-                  <div className="p-3">
-                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Error State */}
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-800 text-sm font-medium">Error Loading Products</p>
-              <p className="text-red-700 text-xs mt-1">{error}</p>
-              <button 
-                onClick={() => window.location.reload()} 
-                className="text-red-600 text-xs mt-2 underline"
-              >
-                Try Again
-              </button>
-            </div>
-          )}
-
-          {/* Real Product Grid */}
-          {!loading && !error && products.length > 0 && (
-            <div className="grid grid-cols-2 gap-3">
-              {products.map((product, index) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: (index % 20) * 0.05 }}
-                >
-                  <ProductCard
-                    product={product}
-                    onProductClick={handleProductClick}
-                    loading={loading}
-                  />
-                </motion.div>
-              ))}
-            </div>
-          )}
 
           {/* Load More Button */}
-          {!loading && !error && products.length > 0 && hasMore && (
-            <div className="mt-6">
-              <button
+          {hasMore && (
+            <div className="text-center mt-6">
+              <motion.button
+                whileTap={{ scale: 0.95 }}
                 onClick={() => {
-                  // TODO: Implement load more functionality
-                  console.log('Load more products');
+                  // Load more products
+                  const fetchMoreProducts = async () => {
+                    try {
+                      const params = new URLSearchParams({
+                        limit: '20',
+                        offset: offset.toString(),
+                        featured: 'true'
+                      });
+                      
+                      const response = await fetch(`/api/products?${params}`);
+                      
+                      if (!response.ok) {
+                        throw new Error('Failed to fetch products');
+                      }
+                      
+                      const data = await response.json();
+                      
+                      setProducts(prev => [...prev, ...(data.products || [])]);
+                      setHasMore(data.pagination?.hasMore || false);
+                      setOffset(prev => prev + 20);
+                    } catch (err) {
+                      console.error('Failed to load more products:', err);
+                    }
+                  };
+
+                  fetchMoreProducts();
                 }}
-                className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
               >
                 Load More Products
-              </button>
-            </div>
-          )}
-
-          {/* Empty State */}
-          {!loading && !error && products.length === 0 && (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-              <p className="text-gray-500 text-sm">No products available</p>
-              <p className="text-gray-400 text-xs mt-1">Check back later for new arrivals</p>
-            </div>
-          )}
-
-          {/* Debug: Add extra content to test scrolling */}
-          {!loading && !error && products.length > 0 && (
-            <div className="mt-8 space-y-4">
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="text-sm text-blue-800">End of products - scroll test</p>
-              </div>
-              <div className="bg-green-50 p-4 rounded-lg">
-                <p className="text-sm text-green-800">More content here</p>
-              </div>
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <p className="text-sm text-purple-800">Even more content</p>
-              </div>
-              <div className="bg-orange-50 p-4 rounded-lg">
-                <p className="text-sm text-orange-800">Final test content</p>
-              </div>
+              </motion.button>
             </div>
           )}
         </div>

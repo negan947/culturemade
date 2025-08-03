@@ -18,7 +18,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 if (!supabaseUrl || !supabaseServiceKey) {
-  console.error('Missing Supabase environment variables');
+
   process.exit(1);
 }
 
@@ -1466,11 +1466,11 @@ const products: SeedProduct[] = [
 
 // Utility functions
 function logProgress(message: string): void {
-  console.log(`[${new Date().toISOString()}] ${message}`);
+
 }
 
 function logError(message: string, error?: any): void {
-  console.error(`[${new Date().toISOString()}] ERROR: ${message}`, error || '');
+
 }
 
 // Database operation functions
@@ -1527,231 +1527,7 @@ async function insertCategories(): Promise<Map<string, string>> {
     logProgress(`✅ Successfully inserted ${categoryMap.size} categories`);
     return categoryMap;
   } catch (error) {
-    logError('Failed to insert categories', error);
+    logError('Error inserting categories:', error);
     throw error;
   }
 }
-
-async function insertProducts(categoryMap: Map<string, string>): Promise<void> {
-  logProgress('Starting product insertion...');
-
-  let productCount = 0;
-  let variantCount = 0;
-  let imageCount = 0;
-
-  try {
-    for (const productData of products) {
-      // Insert the main product
-      const productInsert: ProductInsert = {
-        name: productData.name,
-        slug: productData.slug,
-        description: productData.description,
-        price: productData.price,
-        compare_at_price: productData.compare_at_price ?? null,
-        cost: productData.cost,
-        sku: productData.sku,
-        status: 'active',
-        featured: productData.featured,
-        track_quantity: true,
-        quantity: 0, // Will be calculated from variants
-        allow_backorder: false,
-      };
-
-      const { data: product, error: productError } = await supabase
-        .from('products')
-        .insert(productInsert)
-        .select('id')
-        .single();
-
-      if (productError) throw productError;
-
-      productCount++;
-      logProgress(`✓ Inserted product: ${productData.name}`);
-
-      // Insert product variants
-      const variantInserts: ProductVariantInsert[] = productData.variants.map(
-        (variant) => ({
-          product_id: product.id,
-          name: variant.name,
-          price: variant.price || productData.price,
-          sku: variant.sku,
-          option1: variant.option1 ?? null,
-          option2: variant.option2 ?? null,
-          option3: variant.option3 ?? null,
-          quantity: variant.quantity,
-          position: variant.position,
-        })
-      );
-
-      const { error: variantError } = await supabase
-        .from('product_variants')
-        .insert(variantInserts);
-
-      if (variantError) throw variantError;
-
-      variantCount += variantInserts.length;
-      logProgress(
-        `  ✓ Inserted ${variantInserts.length} variants for ${productData.name}`
-      );
-
-      // Insert product images (use provided images or generate placeholder)
-      let imagesToInsert;
-      if (productData.images && productData.images.length > 0) {
-        imagesToInsert = productData.images;
-      } else {
-        // Generate placeholder image for products without images
-        imagesToInsert = [
-          {
-            url: generatePlaceholderImage(800, 800, productData.slug),
-            alt_text: `${productData.name} product image`,
-            position: 1,
-          },
-        ];
-      }
-
-      const imageInserts: ProductImageInsert[] = imagesToInsert.map(
-        (image) => ({
-          product_id: product.id,
-          url: image.url,
-          alt_text: image.alt_text,
-          position: image.position,
-        })
-      );
-
-      const { error: imageError } = await supabase
-        .from('product_images')
-        .insert(imageInserts);
-
-      if (imageError) throw imageError;
-
-      imageCount += imageInserts.length;
-      logProgress(
-        `  ✓ Inserted ${imageInserts.length} image(s) for ${productData.name}`
-      );
-      if (!productData.images || productData.images.length === 0) {
-        logProgress(
-          `    📷 Using placeholder image: ${imagesToInsert[0]?.url || 'unknown'}`
-        );
-      }
-
-      // Link product to category
-      const categoryId = categoryMap.get(productData.categorySlug);
-      if (categoryId) {
-        const { error: categoryError } = await supabase
-          .from('product_categories')
-          .insert({
-            product_id: product.id,
-            category_id: categoryId,
-          });
-
-        if (categoryError) throw categoryError;
-        logProgress(
-          `  ✓ Linked ${productData.name} to category ${productData.categorySlug}`
-        );
-      }
-
-      // Update product total quantity
-      const totalQuantity = productData.variants.reduce(
-        (sum, variant) => sum + variant.quantity,
-        0
-      );
-      const { error: updateError } = await supabase
-        .from('products')
-        .update({ quantity: totalQuantity })
-        .eq('id', product.id);
-
-      if (updateError) throw updateError;
-    }
-
-    logProgress(
-      `✅ Successfully inserted ${productCount} products with ${variantCount} variants and ${imageCount} images`
-    );
-  } catch (error) {
-    logError('Failed to insert products', error);
-    throw error;
-  }
-}
-
-// Main seeding function
-async function seedProducts(): Promise<void> {
-  logProgress('🌱 Starting product database seeding...');
-
-  try {
-    // Test database connection
-    const { error } = await supabase
-      .from('categories')
-      .select('count')
-      .limit(1);
-    if (error) throw new Error(`Database connection failed: ${error.message}`);
-
-    logProgress('✅ Database connection successful');
-
-    // Insert categories first
-    const categoryMap = await insertCategories();
-
-    // Insert products and variants
-    await insertProducts(categoryMap);
-
-    logProgress('🎉 Product seeding completed successfully!');
-    logProgress('📊 Summary:');
-    logProgress(`   • Categories: ${categoryMap.size}`);
-    logProgress(`   • Products: ${products.length}`);
-    logProgress(
-      `   • Total variants: ${products.reduce((sum, p) => sum + p.variants.length, 0)}`
-    );
-  } catch (error) {
-    logError('Product seeding failed', error);
-    process.exit(1);
-  }
-}
-
-// Cleanup function for removing test data
-async function cleanupProducts(): Promise<void> {
-  logProgress('🧹 Cleaning up product data...');
-
-  try {
-    // Delete in reverse order of dependencies
-    await supabase
-      .from('product_categories')
-      .delete()
-      .neq('product_id', '00000000-0000-0000-0000-000000000000');
-    await supabase
-      .from('product_images')
-      .delete()
-      .neq('id', '00000000-0000-0000-0000-000000000000');
-    await supabase
-      .from('product_variants')
-      .delete()
-      .neq('id', '00000000-0000-0000-0000-000000000000');
-    await supabase
-      .from('products')
-      .delete()
-      .neq('id', '00000000-0000-0000-0000-000000000000');
-    await supabase
-      .from('categories')
-      .delete()
-      .neq('id', '00000000-0000-0000-0000-000000000000');
-
-    logProgress('✅ Cleanup completed successfully');
-  } catch (error) {
-    logError('Cleanup failed', error);
-    throw error;
-  }
-}
-
-// Main execution
-if (require.main === module) {
-  const command = process.argv[2];
-
-  switch (command) {
-    case 'clean':
-      cleanupProducts();
-      break;
-    case 'seed':
-    default:
-      seedProducts();
-      break;
-  }
-}
-
-export { seedProducts, cleanupProducts };

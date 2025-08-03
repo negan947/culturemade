@@ -2,7 +2,6 @@
 
 import { 
   Search, 
-  Filter, 
   ChevronDown, 
   ExternalLink,
   Eye,
@@ -144,11 +143,6 @@ export function OrderList() {
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('API Error:', {
-          status: response.status,
-          statusText: response.statusText,
-          error: errorData
-        });
         throw new Error(`Failed to fetch orders: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
       }
 
@@ -157,7 +151,7 @@ export function OrderList() {
       setPagination(data.pagination);
 
     } catch (err) {
-      console.error('Error fetching orders:', err);
+
       setError(err instanceof Error ? err.message : 'Failed to fetch orders');
     } finally {
       setLoading(false);

@@ -70,8 +70,8 @@ export async function DELETE(request: NextRequest) {
       }
     });
 
-  } catch (error) {
-    console.error('Cart remove API error:', error);
+  } catch (error: any) {
+    
     return NextResponse.json(
       { error: 'Failed to remove cart item' },
       { status: 500 }
@@ -79,9 +79,3 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-/**
- * POST /api/cart/remove - Alternative POST method for remove (for easier frontend integration)
- */
-export async function POST(request: NextRequest) {
-  return await DELETE(request);
-}

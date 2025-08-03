@@ -130,8 +130,8 @@ export async function validateCartForCheckout(
       lowStockItems
     };
 
-  } catch (error) {
-    console.error('Cart validation failed:', error);
+  } catch (_error) {
+
     return {
       isValid: false,
       errors: ['Failed to validate cart'],
@@ -184,8 +184,8 @@ export async function resolveInventoryConflicts(
       errors
     };
 
-  } catch (error) {
-    console.error('Failed to resolve inventory conflicts:', error);
+  } catch (_error) {
+
     return {
       success: false,
       errors: ['Failed to resolve inventory conflicts']
@@ -232,8 +232,8 @@ export async function removeUnavailableItems(
       errors
     };
 
-  } catch (error) {
-    console.error('Failed to remove unavailable items:', error);
+  } catch (_error) {
+
     return {
       success: false,
       errors: ['Failed to remove unavailable items']

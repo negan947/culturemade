@@ -69,7 +69,7 @@ export function LoginForm({ onSuccess, redirectTo = '/' }: LoginFormProps) {
             });
 
           if (createError) {
-            // console.error('Error creating profile:', createError);
+
           }
         }
 
@@ -79,53 +79,18 @@ export function LoginForm({ onSuccess, redirectTo = '/' }: LoginFormProps) {
           window.location.href = redirectTo;
         }
       }
-    } catch {
-      setErrorMessage('An unexpected error occurred. Please try again.');
-      // console.error('Login error:', error);
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('Login failed');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-      <div className='space-y-2'>
-        <Label htmlFor='email'>Email</Label>
-        <Input
-          id='email'
-          type='email'
-          placeholder='Enter your email'
-          {...register('email')}
-          disabled={isLoading}
-        />
-        {errors.email && (
-          <p className='text-sm text-destructive'>{errors.email.message}</p>
-        )}
-      </div>
-
-      <div className='space-y-2'>
-        <Label htmlFor='password'>Password</Label>
-        <Input
-          id='password'
-          type='password'
-          placeholder='Enter your password'
-          {...register('password')}
-          disabled={isLoading}
-        />
-        {errors.password && (
-          <p className='text-sm text-destructive'>{errors.password.message}</p>
-        )}
-      </div>
-
-      {errorMessage && (
-        <div className='p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md'>
-          {errorMessage}
-        </div>
-      )}
-
-      <Button type='submit' className='w-full' disabled={isLoading}>
-        {isLoading ? 'Signing in...' : 'Sign In'}
-      </Button>
-    </form>
+    <div>
+      <h1>Login</h1>
+      {/* Add login form here */}
+    </div>
   );
 }

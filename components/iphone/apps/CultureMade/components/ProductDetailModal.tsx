@@ -30,10 +30,12 @@ const ProductDetailModal = ({
   // Track product detail view when modal opens
   useEffect(() => {
     if (isOpen && product) {
-      trackProductDetailView(product.id, {
-        source: 'product_card',
-        category: product.categories[0]?.name || 'unknown',
-        price: parseFloat(product.price)
+      trackProductDetailView(product.id, 'product_card', {
+        categoryId: product.categories[0]?.id || 'unknown',
+        additionalData: {
+          category: product.categories[0]?.name || 'unknown',
+          price: parseFloat(product.price)
+        }
       });
     }
   }, [isOpen, product]);
@@ -56,6 +58,11 @@ const ProductDetailModal = ({
         document.body.style.overflow = 'unset';
       };
     }
+    
+    return () => {
+      // Cleanup function for when isOpen is false
+      document.body.style.overflow = 'unset';
+    };
   }, [isOpen, handleKeyDown]);
 
   // Handle backdrop click
@@ -85,141 +92,125 @@ const ProductDetailModal = ({
         setAddToCartSuccess(false);
       }, 2000);
     } catch (error) {
-      console.error('Failed to add to cart:', error);
+      console.error('Failed to add item to cart:', error);
     } finally {
       setIsAddingToCart(false);
     }
   };
 
+  if (!product) return null;
+
   return (
     <AnimatePresence>
-      {isOpen && product && (
+      {isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="absolute inset-0 z-50 backdrop-blur-md flex items-start justify-center pt-20 pb-16 px-4 overflow-hidden"
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
           onClick={handleBackdropClick}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="product-modal-title"
-          aria-describedby="product-modal-description"
         >
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+
+          {/* Modal Content */}
           <motion.div
-            initial={{ scale: 0.95, opacity: 0, y: 50 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.95, opacity: 0, y: 50 }}
+            initial={{ y: '100%', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '100%', opacity: 0 }}
             transition={{ 
               type: 'spring', 
               damping: 25, 
-              stiffness: 300,
-              duration: 0.3
+              stiffness: 400,
+              duration: 0.4 
             }}
-            className="w-full max-w-sm max-h-full bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            className="relative w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white/95 backdrop-blur-sm sticky top-0 z-10">
-              <h2 
-                id="product-modal-title"
-                className="text-lg font-semibold text-gray-900 truncate flex-1 mr-4"
-              >
-                {product.name}
-              </h2>
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={onClose}
-                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center active:bg-gray-200 transition-colors"
-                aria-label="Close product details"
-                style={{ minWidth: '44px', minHeight: '44px' }} // iOS touch target
-              >
-                <X className="w-5 h-5 text-gray-600" />
-              </motion.button>
+            {/* Header */}
+            <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-100 p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <h2 className="text-lg font-semibold text-gray-900 truncate">
+                    {product.name}
+                  </h2>
+                  {product.categories && product.categories.length > 0 && (
+                    <p className="text-sm text-gray-600">
+                      {product.categories[0].name}
+                    </p>
+                  )}
+                </div>
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={onClose}
+                  className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+                  aria-label="Close modal"
+                >
+                  <X className="h-6 w-6" />
+                </motion.button>
+              </div>
             </div>
 
-            {/* Modal Content - Scrollable */}
-            <div 
-              className="flex-1 overflow-y-auto culturemade-scrollable"
-              id="product-modal-description"
-            >
-              {/* Image Gallery Section */}
-              <div className="relative">
+            {/* Content */}
+            <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
+              {/* Product Image Gallery */}
+              <div className="w-full">
                 <ProductImageGallery
-                  images={product.primary_image ? [product.primary_image] : []}
+                  images={product.images || []}
                   productName={product.name}
+                  className="w-full"
                 />
               </div>
 
-              {/* Product Information Section */}
-              <div className="px-4 pb-6">
+              {/* Product Info */}
+              <div className="p-4">
                 <ProductInfoSection
                   product={product}
                   pricingInfo={pricingInfo}
                   inventoryStatus={inventoryStatus}
+                  className="mb-6"
                 />
-              </div>
 
-              {/* Add to Cart Section */}
-              <div className="px-4 pb-4 border-t border-gray-100 mt-auto">
-                <div className="py-4">
-                  {/* Price Display */}
-                  {pricingInfo && (
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="text-2xl font-bold text-gray-900">
-                        {pricingInfo.displayPrice}
-                      </div>
-                      {pricingInfo.originalPrice && pricingInfo.originalPrice !== pricingInfo.displayPrice && (
-                        <div className="text-lg text-gray-500 line-through">
-                          {pricingInfo.originalPrice}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  
-                  {/* Stock Status */}
-                  {inventoryStatus && (
-                    <div className="mb-4">
-                      <div className={`text-sm font-medium ${
-                        inventoryStatus.status === 'in_stock' 
-                          ? 'text-green-600' 
-                          : inventoryStatus.status === 'low_stock'
-                          ? 'text-orange-600'
-                          : 'text-red-600'
-                      }`}>
-                        {getStockLevelText(inventoryStatus)}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Add to Cart Button */}
-                  <button
+                {/* Add to Cart Button */}
+                <div className="sticky bottom-0 bg-white pt-4 border-t border-gray-100">
+                  <motion.button
+                    whileTap={{ scale: 0.98 }}
                     onClick={handleAddToCartClick}
-                    disabled={inventoryStatus?.status === 'out_of_stock' || isAddingToCart}
-                    className={`w-full py-3 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-                      inventoryStatus?.status === 'out_of_stock' || isAddingToCart
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : addToCartSuccess
-                        ? 'bg-green-600 text-white'
-                        : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
-                    }`}
+                    disabled={isAddingToCart || !inventoryStatus?.inStock}
+                    className={`
+                      w-full py-4 px-6 rounded-xl font-bold text-lg shadow-lg
+                      transition-all duration-200 flex items-center justify-center gap-2
+                      ${addToCartSuccess
+                        ? 'bg-green-500 text-white'
+                        : inventoryStatus?.inStock
+                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }
+                    `}
                   >
                     {isAddingToCart ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         Adding...
-                      </>
+                      </div>
                     ) : addToCartSuccess ? (
-                      <>
-                        <Check className="w-4 h-4" />
+                      <div className="flex items-center gap-2">
+                        <Check className="h-5 w-5" />
                         Added to Cart!
-                      </>
-                    ) : inventoryStatus?.status === 'out_of_stock' ? (
+                      </div>
+                    ) : !inventoryStatus?.inStock ? (
                       'Out of Stock'
                     ) : (
-                      'Add to Cart'
+                      `Add to Cart • ${pricingInfo?.displayPrice || 'Price not available'}`
                     )}
-                  </button>
+                  </motion.button>
+
+                  {inventoryStatus?.stockLevel && (
+                    <p className="text-center text-sm text-gray-600 mt-2">
+                      {getStockLevelText(inventoryStatus.stockLevel, inventoryStatus.quantity)}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

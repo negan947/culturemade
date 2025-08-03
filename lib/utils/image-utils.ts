@@ -223,3 +223,23 @@ export function generateImageFileName(
 
   return `${sanitizedName}-${timestamp}.${extension}`;
 }
+
+/**
+ * Generate placeholder image URL using Lorem Picsum service
+ * Used for development and testing purposes
+ */
+export function generatePlaceholderImage(
+  width: number,
+  height: number,
+  seed?: string
+): string {
+  const baseUrl = 'https://picsum.photos';
+  
+  // Use seed for consistent images
+  if (seed) {
+    const seedValue = seed.toLowerCase().replace(/[^a-z0-9]/g, '');
+    return `${baseUrl}/seed/${seedValue}/${width}/${height}`;
+  }
+  
+  return `${baseUrl}/${width}/${height}`;
+}

@@ -17,6 +17,7 @@ interface CartIconProps {
   badgeClassName?: string;
   size?: 'sm' | 'md' | 'lg';
   showBadge?: boolean;
+  onClick?: () => void;
 }
 
 export function CartIcon({
@@ -25,7 +26,8 @@ export function CartIcon({
   iconClassName = '',
   badgeClassName = '',
   size = 'md',
-  showBadge = true
+  showBadge = true,
+  onClick
 }: CartIconProps) {
   const sessionId = !userId ? getCartSessionId() : undefined;
   const { itemCount, isLoading, refreshCount } = useCartCount(userId, sessionId);
@@ -72,7 +74,8 @@ export function CartIcon({
 
   return (
     <div 
-      className={`relative inline-flex items-center justify-center ${className}`}
+      className={`relative inline-flex items-center justify-center ${className} ${onClick ? 'cursor-pointer' : ''}`}
+      onClick={onClick}
       aria-label={`Shopping cart with ${itemCount} items`}
     >
       {/* Cart Icon */}
@@ -220,7 +223,7 @@ export function CartIconWithDropdown({
     <div className="relative">
       <CartIcon
         {...cartIconProps}
-        onClick={onDropdownToggle}
+        {...(onDropdownToggle && { onClick: onDropdownToggle })}
       />
       
       <AnimatePresence>

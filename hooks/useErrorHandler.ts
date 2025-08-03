@@ -254,13 +254,13 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}): UseErrorH
     context?: Record<string, any>
   ) => {
     return async (...args: T): Promise<R> => {
-      lastFailedOperationRef.current = () => fn(...args);
+      lastFailedOperationRef.current = () => fn(..._args);
       
       try {
         clearError();
-        const result = await fn(...args);
+        const result = await fn(..._args);
         return result;
-      } catch (error) {
+      } catch (_error) {
         handleError(error as Error, context);
         throw error;
       }

@@ -98,7 +98,6 @@ export async function GET(request: NextRequest) {
       .select('*', { count: 'exact', head: true });
 
     if (countError) {
-      console.error('Count query error:', countError);
       return NextResponse.json({ error: 'Failed to get customer count' }, { status: 500 });
     }
 
@@ -108,7 +107,6 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1);
 
     if (profilesError) {
-      console.error('Profiles query error:', profilesError);
       return NextResponse.json({ error: 'Failed to fetch customers' }, { status: 500 });
     }
 
@@ -122,7 +120,7 @@ export async function GET(request: NextRequest) {
       const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
       
       if (authError) {
-        console.error('Auth users query error:', authError);
+        // Auth users query failed, continue without auth details
         // Fallback: create dummy customers with profile data only
         customers = profiles.map(profile => ({
           id: profile.id,
@@ -145,7 +143,7 @@ export async function GET(request: NextRequest) {
           .in('user_id', profileIds);
 
         if (orderError) {
-          console.error('Orders query error:', orderError);
+          // Orders query failed, set defaults
           // Continue without order data
         }
 
@@ -211,16 +209,13 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
 
-  } catch (error) {
-    console.error('Admin customers API error:', error);
+  } catch (error: any) {
     
-    if (error instanceof Error) {
-      if (error.message === 'Unauthorized') {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
-      if (error.message === 'Forbidden - Admin access required') {
-        return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-      }
+    if (error.message === 'Unauthorized') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error.message === 'Forbidden - Admin access required') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
     
     return NextResponse.json(

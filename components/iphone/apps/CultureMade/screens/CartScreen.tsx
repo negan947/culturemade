@@ -233,7 +233,7 @@ export default function CartScreen() {
                 const statusMessage = getCheckoutStatusMessage(checkoutPrep.validationResult);
 
                 if (checkoutPrep.canProceed) {
-                  console.log('✅ Cart validated successfully:', statusMessage.message);
+
                   
                   if (checkoutPrep.actions.length > 0) {
                     console.log('🔧 Actions taken:', checkoutPrep.actions);
@@ -242,25 +242,19 @@ export default function CartScreen() {
                   // TODO: Navigate to Phase 2 checkout page
                   alert(`${statusMessage.title}\n\n${statusMessage.message}\n\nCheckout functionality will be implemented in Phase 2.`);
                 } else {
-                  console.error('❌ Cart validation failed:', checkoutPrep.validationResult.errors);
+
                   
                   const errorMessage = checkoutPrep.validationResult.errors.join('\n• ');
                   alert(`${statusMessage.title}\n\n• ${errorMessage}\n\nPlease fix these issues and try again.`);
                 }
               } catch (error) {
-                console.error('Checkout preparation failed:', error);
-                alert('Failed to prepare checkout. Please try again.');
+                console.error('Checkout validation failed:', error);
+                alert('Failed to validate cart. Please try again.');
               }
             }}
           >
-            Complete Order • {formatPrice(summary.total)}
+            Proceed to Checkout • {formatPrice(summary.total)}
           </motion.button>
-
-          {summary.shipping > 0 && (
-            <p className="text-center text-xs text-gray-500 mt-2">
-              Free shipping on orders over $75
-            </p>
-          )}
         </div>
       )}
     </div>

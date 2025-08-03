@@ -119,8 +119,8 @@ export function calculateVariantPricing(
     .map(variant => variant.price ? parseFloat(variant.price) : basePrice)
     .filter(price => !isNaN(price));
 
-  const minPrice = Math.min(...variantPrices);
-  const maxPrice = Math.max(...variantPrices);
+  const minPrice = Math.min(..._variantPrices);
+  const maxPrice = Math.max(..._variantPrices);
   const hasVariablePricing = minPrice !== maxPrice;
 
   // Use lowest price for display when variable
@@ -168,7 +168,7 @@ export function formatCurrency(
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
-  } catch (error) {
+  } catch (_error) {
     // Fallback for unsupported locales/currencies
     return `$${amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
   }
@@ -264,8 +264,8 @@ export function calculateBulkPricing(
     try {
       const pricingInfo = calculatePricingInfo(product, options);
       pricingMap.set(product.id, pricingInfo);
-    } catch (error) {
-      console.warn(`Failed to calculate pricing for product ${product.id}:`, error);
+    } catch (_error) {
+
       
       // Fallback pricing info
       pricingMap.set(product.id, {

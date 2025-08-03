@@ -137,40 +137,26 @@ async function handleAuthCallback(request: NextRequest) {
 
         // Session exchange error tracking disabled
       }
-    } catch (error) {
-      // Log unexpected errors
-      const err = error as Error;
-      errorLogger.error('Unexpected error in auth callback', {
-        error: err.message,
-        stack: err.stack,
+    } catch (sessionError: any) {
+      
+      errorLogger.error('Session exchange error', {
+        error: sessionError.message,
         hasCode: !!code,
       });
-
-      logAuthEvent('auth_callback_error', undefined, false, {
-        error: err.message,
-      });
     }
-  } else {
-    // Log missing auth code
-    authLogger.warn('Auth callback called without code parameter', {
-      url: requestUrl.toString(),
-      searchParams: Object.fromEntries(requestUrl.searchParams.entries()),
-    });
-
-    logAuthEvent('auth_callback_missing_code', undefined, false);
   }
 
-  // Return the user to an error page with instructions
-  authLogger.warn('Auth callback failed - redirecting to error page', {
-    hasCode: !!code,
-    redirectTo: '/login?error=auth_callback_error',
-  });
-
-  // Auth callback error tracking disabled
-
-  return NextResponse.redirect(
-    new URL('/login?error=auth_callback_error', requestUrl.origin)
-  );
+  // Final fallback redirect on success or failure
+  return NextResponse.redirect(new URL('/', requestUrl.origin));
 }
 
-export const GET = handleAuthCallback;
+export async function GET(request: NextRequest) {
+  try {
+    return await handleAuthCallback(request);
+  } catch (error: any) {
+    
+    return NextResponse.redirect(
+      new URL('/?error=callback_error', new URL(request.url).origin)
+    );
+  }
+}

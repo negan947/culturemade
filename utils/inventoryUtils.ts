@@ -366,8 +366,8 @@ export function calculateBulkInventoryStatus(
     try {
       const inventoryStatus = calculateInventoryStatus(product, thresholds);
       inventoryMap.set(product.id, inventoryStatus);
-    } catch (error) {
-      console.warn(`Failed to calculate inventory for product ${product.id}:`, error);
+    } catch (_error) {
+
       
       // Fallback inventory status
       inventoryMap.set(product.id, {
@@ -425,7 +425,7 @@ export function validateInventoryData(product: ProductListItem): {
     if (createdAt > now) {
       warnings.push('Product created_at is in the future');
     }
-  } catch (error) {
+  } catch (_error) {
     errors.push('Failed to parse created_at date');
   }
   

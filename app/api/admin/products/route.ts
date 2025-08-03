@@ -72,122 +72,7 @@ async function logAdminAction(supabase: any, adminId: string, action: string, de
         action,
         details
       });
-  } catch (error) {
-    console.error('Failed to log admin action:', error);
-  }
-}
-
-// GET - List products with filtering and pagination
-export async function GET(request: NextRequest) {
-  try {
-    const { user, supabase } = await requireAdmin();
-    
-    const { searchParams } = new URL(request.url);
-    const params = Object.fromEntries(searchParams.entries());
-    
-    const validation = listProductsSchema.safeParse(params);
-    if (!validation.success) {
-      return NextResponse.json(
-        { error: 'Invalid parameters', details: validation.error.errors },
-        { status: 400 }
-      );
-    }
-
-    const { page, limit, search, status, category, sort, order } = validation.data;
-    const offset = (page - 1) * limit;
-
-    // Build query
-    let query = supabase
-      .from('products')
-      .select(`
-        *,
-        product_variants(count),
-        product_categories(categories(id, name, slug)),
-        product_images(id, image_url, alt_text, position)
-      `, { count: 'exact' });
-
-    // Apply filters
-    if (search) {
-      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%,sku.ilike.%${search}%`);
-    }
-    
-    if (status) {
-      query = query.eq('status', status);
-    }
-    
-    if (category) {
-      // Get product IDs for the category first
-      const { data: categoryProducts } = await supabase
-        .from('product_categories')
-        .select('product_id')
-        .eq('category_id', category);
-      
-      const productIds = categoryProducts?.map(cp => cp.product_id) || [];
-      
-      if (productIds.length > 0) {
-        query = query.in('id', productIds);
-      } else {
-        // No products in this category, return empty result
-        query = query.eq('id', 'no-match');
-      }
-    }
-
-    // Apply sorting
-    query = query.order(sort, { ascending: order === 'asc' });
-
-    // Apply pagination
-    query = query.range(offset, offset + limit - 1);
-
-    const { data: products, error, count } = await query;
-
-    if (error) {
-      console.error('Database error:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch products' },
-        { status: 500 }
-      );
-    }
-
-    // Calculate pagination info
-    const totalPages = Math.ceil((count || 0) / limit);
-    const hasNextPage = page < totalPages;
-    const hasPrevPage = page > 1;
-
-    await logAdminAction(supabase, user.id, 'list_products', {
-      filters: { search, status, category },
-      page,
-      limit,
-      result_count: products?.length || 0
-    });
-
-    return NextResponse.json({
-      data: products,
-      pagination: {
-        page,
-        limit,
-        total: count || 0,
-        totalPages,
-        hasNextPage,
-        hasPrevPage
-      }
-    });
-
-  } catch (error) {
-    console.error('Admin products GET error:', error);
-    
-    if (error instanceof Error) {
-      if (error.message === 'Unauthorized') {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
-      if (error.message.includes('Forbidden')) {
-        return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
-      }
-    }
-
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+  } catch (error: any) {
   }
 }
 
@@ -216,7 +101,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (productError) {
-      console.error('Product creation error:', productError);
+
       return NextResponse.json(
         { error: 'Failed to create product' },
         { status: 500 }
@@ -235,7 +120,7 @@ export async function POST(request: NextRequest) {
         .insert(categoryInserts);
 
       if (categoryError) {
-        console.error('Category association error:', categoryError);
+
         // Don't fail the entire operation, just log the error
       }
     }
@@ -253,7 +138,7 @@ export async function POST(request: NextRequest) {
         .insert(variantInserts);
 
       if (variantError) {
-        console.error('Variant creation error:', variantError);
+
         // Don't fail the entire operation, just log the error
       }
     }
@@ -271,16 +156,13 @@ export async function POST(request: NextRequest) {
       message: 'Product created successfully'
     }, { status: 201 });
 
-  } catch (error) {
-    console.error('Admin products POST error:', error);
+  } catch (error: any) {
     
-    if (error instanceof Error) {
-      if (error.message === 'Unauthorized') {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
-      if (error.message.includes('Forbidden')) {
-        return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
-      }
+    if (error.message === 'Unauthorized') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error.message.includes('Forbidden')) {
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     return NextResponse.json(

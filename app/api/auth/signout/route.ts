@@ -30,14 +30,9 @@ export async function POST(request: NextRequest) {
 
     // Redirect to login page
     return NextResponse.redirect(new URL('/login', request.url));
-  } catch (error) {
-    logSecurityEvent('SIGN_OUT_UNEXPECTED_ERROR', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
 
-    return NextResponse.json(
-      { error: 'An unexpected error occurred' },
-      { status: 500 }
-    );
+  } catch (error: any) {
+    
+    return NextResponse.redirect(new URL('/login?error=signout_error', request.url));
   }
 }

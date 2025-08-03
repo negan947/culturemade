@@ -106,19 +106,7 @@ export default async function TestConnection() {
       </div>
     );
   } catch (error) {
-    return (
-      <div className='container mx-auto p-8'>
-        <h1 className='text-3xl font-bold mb-6'>Database Connection Test</h1>
-        <div className='p-4 bg-red-100 border border-red-300 rounded-lg'>
-          <h2 className='text-xl font-semibold text-red-800 mb-2'>
-            ❌ Connection Failed
-          </h2>
-          <p className='text-red-700'>
-            Error:{' '}
-            {error instanceof Error ? error.message : 'Unknown error occurred'}
-          </p>
-        </div>
-      </div>
-    );
+    console.error('Test connection error:', error);
+    return <div>Error loading test connection page</div>;
   }
 }

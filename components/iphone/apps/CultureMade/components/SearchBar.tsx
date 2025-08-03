@@ -50,11 +50,9 @@ export default function SearchBar({
   const {
     suggestions,
     isLoading,
-    error,
     getSuggestions,
     clearSuggestions,
     addToRecentSearches,
-    getRecentSearches,
   } = useSearchSuggestions({
     debounceMs,
     maxSuggestions,

@@ -14,7 +14,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 if (!supabaseUrl || !supabaseServiceKey) {
-  console.error('❌ Missing required environment variables');
+
   console.error(
     'Required: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY'
   );
@@ -122,33 +122,17 @@ async function updateProductImages() {
           continue;
         }
 
-        console.log(`✅ Updated image for: ${product.name}`);
+
         updatedCount++;
-      } catch (error) {
-        console.error(`❌ Error processing ${product.name}:`, error);
+      } catch (productError) {
+        console.error(`❌ Failed to process product ${product.slug}:`, productError);
         errorCount++;
       }
     }
-
-    console.log('\n📊 Update Summary:');
-    console.log(`✅ Successfully updated: ${updatedCount} products`);
-    console.log(`❌ Errors: ${errorCount} products`);
-
-    if (updatedCount > 0) {
-      console.log('\n🎉 Product images updated successfully!');
-      console.log('\n🔗 Test image URLs:');
-      console.log(
-        `Original: ${supabaseUrl}/storage/v1/object/public/product-images/shirts/classic-white-tshirt.jpg`
-      );
-      console.log(
-        `Thumbnail: ${supabaseUrl}/storage/v1/render/image/public/product-images/shirts/classic-white-tshirt.jpg?width=200&height=200&quality=80&format=webp&resize=cover`
-      );
-    }
+    
+    console.log(`✅ Updated ${updatedCount} products with new image URLs`);
   } catch (error) {
-    console.error('❌ Failed to update product images:', error);
-    process.exit(1);
+    console.error('Error updating product images:', error);
+    throw error;
   }
 }
-
-// Run the update
-updateProductImages();

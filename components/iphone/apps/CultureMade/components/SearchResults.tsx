@@ -3,9 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search as SearchIcon,
-  Filter,
   SlidersHorizontal,
-  ArrowUpDown,
   Grid3X3,
   List,
   AlertCircle,
@@ -38,6 +36,7 @@ interface SearchFilters {
 interface SearchResponse {
   success: boolean;
   data: ProductListItem[];
+  error?: string;
   pagination: {
     page: number;
     limit: number;
@@ -135,7 +134,7 @@ export default function SearchResults({
       setSearchInfo(data.search_info);
       
     } catch (err) {
-      console.error('Search error:', err);
+
       setError(err instanceof Error ? err.message : 'Search failed');
       setResults([]);
     } finally {
@@ -166,7 +165,7 @@ export default function SearchResults({
     if (onProductClick) {
       onProductClick(productId);
     } else {
-      console.log('Product clicked:', productId);
+
     }
   };
   
@@ -304,18 +303,20 @@ export default function SearchResults({
                       type="number"
                       placeholder="Min"
                       value={filters.minPrice || ''}
-                      onChange={(e) => handleFilterChange({ 
-                        minPrice: e.target.value ? parseFloat(e.target.value) : undefined 
-                      })}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        handleFilterChange(value ? { minPrice: parseFloat(value) } : { minPrice: undefined });
+                      }}
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <input
                       type="number"
                       placeholder="Max"
                       value={filters.maxPrice || ''}
-                      onChange={(e) => handleFilterChange({ 
-                        maxPrice: e.target.value ? parseFloat(e.target.value) : undefined 
-                      })}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        handleFilterChange(value ? { maxPrice: parseFloat(value) } : { maxPrice: undefined });
+                      }}
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>

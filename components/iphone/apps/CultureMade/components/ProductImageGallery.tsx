@@ -98,7 +98,7 @@ const ProductImageGallery = ({
   }, [currentIndex, displayImages.length, goToImage]);
 
   // Handle swipe gestures with momentum
-  const handleDragEnd = useCallback((event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+  const handleDragEnd = useCallback((_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const threshold = 50; // Minimum swipe distance
     const velocity = Math.abs(info.velocity.x);
     const offset = Math.abs(info.offset.x);
@@ -138,8 +138,19 @@ const ProductImageGallery = ({
 
   // Get current image
   const currentImage = displayImages[currentIndex];
-  const isCurrentImageLoading = imageLoading.has(currentImage.id);
-  const hasCurrentImageError = imageErrors.has(currentImage.id);
+  const isCurrentImageLoading = currentImage ? imageLoading.has(currentImage.id) : false;
+  const hasCurrentImageError = currentImage ? imageErrors.has(currentImage.id) : false;
+
+  // Guard clause for no images
+  if (!currentImage) {
+    return (
+      <div className={`relative bg-gray-50 ${className}`}>
+        <div className="w-full aspect-square flex items-center justify-center">
+          <div className="text-gray-400">No image available</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`relative bg-gray-50 ${className}`}>

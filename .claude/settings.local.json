@@ -25,7 +25,11 @@
       "Bash(npx next:*)",
       "Bash(node:*)",
       "mcp__supabasecm__list_branches",
-      "mcp__supabasecm__get_anon_key"
+      "mcp__supabasecm__get_anon_key",
+      "Bash(sed:*)",
+      "Bash(for:*)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(done)"
     ],
     "deny": []
   }

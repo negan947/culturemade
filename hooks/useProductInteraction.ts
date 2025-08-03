@@ -126,7 +126,7 @@ export function useProductInteraction(
           document.body.style.transition = '';
         }, 50);
       }, 50);
-    } catch (error) {
+    } catch (_error) {
       // Ignore haptic feedback errors
     }
   }, [enableHapticFeedback]);
@@ -177,8 +177,8 @@ export function useProductInteraction(
         timestamp: new Date().toISOString()
       });
 
-    } catch (error) {
-      console.warn('Error handling product click:', error);
+    } catch (_error) {
+
     } finally {
       // Reset processing state after a short delay
       setTimeout(() => {
@@ -394,8 +394,8 @@ export function useSimpleProductClick(
 
     try {
       onProductClick(productId);
-    } catch (error) {
-      console.warn('Error in product click handler:', error);
+    } catch (_error) {
+
     } finally {
       setTimeout(() => {
         setIsProcessing(false);

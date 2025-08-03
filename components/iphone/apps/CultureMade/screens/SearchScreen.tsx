@@ -66,7 +66,7 @@ export default function SearchScreen() {
   };
 
   const handleSuggestionSelect = (suggestion: SearchSuggestion) => {
-    console.log('Selected suggestion:', suggestion);
+
     search(suggestion.text);
   };
 
@@ -122,196 +122,155 @@ export default function SearchScreen() {
       }
 
       const result = await response.json();
-      console.log('Item added to cart:', result);
+
       
       // Dispatch custom event to refresh cart components
       window.dispatchEvent(new CustomEvent('cartUpdated', { 
         detail: { type: 'add', productId, quantity, result } 
       }));
       
+      console.log('✅ Item added to cart successfully');
     } catch (error) {
-      console.error('Error adding to cart:', error);
-      // TODO: Show error message to user
+      console.error('❌ Failed to add item to cart:', error);
+      throw error; // Re-throw to let calling component handle the error
     }
   };
 
   return (
-    <>
-      <div className="h-full bg-gray-50 relative">
+    <div className="h-full bg-gray-50 flex flex-col">
       {/* Search Header */}
-      <div className="bg-white px-4 py-3 border-b border-gray-200 relative z-20">
-        <div className="flex items-center gap-3">
-          <div className="flex-1">
-            <SearchBar
-              placeholder="Search products..."
-              onSearch={handleSearch}
-              onSuggestionSelect={handleSuggestionSelect}
-              showSuggestions={!hasSearched}
-              maxSuggestions={6}
-              autoFocus={false}
-            />
-          </div>
-          
+      <div className="bg-white px-4 py-3 border-b border-gray-200">
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="text-2xl font-bold text-gray-900">Search</h1>
           {hasSearched && (
-            <div className="flex items-center gap-2">
+            <button
+              onClick={handleClearAll}
+              className="text-sm text-gray-600 hover:text-gray-800 font-medium"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+
+        {/* Search Bar */}
+        <SearchBar
+          placeholder="Search products..."
+          onSearch={handleSearch}
+          onSuggestionSelect={handleSuggestionSelect}
+          autoFocus={false}
+          showSuggestions={true}
+          maxSuggestions={6}
+          className="mb-3"
+        />
+
+        {/* Filter Button */}
+        {hasSearched && (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`p-2 rounded-lg transition-colors ${
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   showFilters 
-                    ? 'bg-blue-100 text-blue-600' 
+                    ? 'bg-blue-100 text-blue-700' 
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
-                <SlidersHorizontal className="w-5 h-5" />
+                <SlidersHorizontal className="w-4 h-4" />
+                <span>Filters</span>
               </button>
               
-              <button
-                onClick={handleClearAll}
-                className="p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              {Object.keys(filters).length > 2 && ( // More than just sort and direction
+                <span className="text-xs text-gray-500">
+                  {Object.keys(filters).length - 2} applied
+                </span>
+              )}
             </div>
-          )}
-        </div>
+
+            {searchInfo && (
+              <span className="text-xs text-gray-500">
+                {searchInfo.search_time_ms}ms
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
-      <div className="flex-1 overflow-hidden relative">
-        <AnimatePresence mode="wait">
-          {hasSearched ? (
-            /* Search Results */
-            <motion.div
-              key="search-results"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="h-full"
-            >
-              <SearchResults
-                query={query}
-                onRetry={retry}
-                onProductClick={handleProductClick}
-              />
-            </motion.div>
-          ) : (
-            /* Default State - Browse & Discover */
-            <motion.div
-              key="default"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="h-full overflow-y-auto culturemade-scrollable px-4 py-6"
-            >
+      {/* Filters Panel */}
+      <AnimatePresence>
+        {showFilters && (
+          <SearchFilters
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            onClose={() => setShowFilters(false)}
+            categories={categories}
+            className="border-b border-gray-200"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Content Area */}
+      <div className="flex-1 overflow-hidden">
+        {!hasSearched ? (
+          /* Search Home - Show trending searches and suggestions */
+          <div className="h-full overflow-y-auto culturemade-scrollable">
+            <div className="p-4 space-y-6">
               {/* Trending Searches */}
-              <div className="mb-8">
-                <div className="flex items-center mb-4">
-                  <Flame className="h-5 w-5 text-orange-500 mr-2" />
-                  <h3 className="text-lg font-semibold text-gray-900">Trending Now</h3>
-                </div>
-                <div className="space-y-2">
-                  {trendingSearches.map((search, index) => (
-                    <motion.button
-                      key={search}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.1 }}
-                      onClick={() => handleSearch(search)}
-                      className="flex items-center w-full px-4 py-3 bg-white rounded-lg border border-gray-200 text-left hover:bg-gray-50 active:bg-gray-100 transition-colors"
-                    >
-                      <Flame className="h-4 w-4 text-orange-500 mr-3 flex-shrink-0" />
-                      <span className="text-gray-700 font-medium">{search}</span>
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Categories */}
-              <div className="mb-8">
-                <div className="flex items-center mb-4">
-                  <SearchIcon className="h-5 w-5 text-gray-400 mr-2" />
-                  <h3 className="text-lg font-semibold text-gray-900">Browse Categories</h3>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {categories.map((category, index) => (
-                    <motion.button
-                      key={category.id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
-                      onClick={() => search('', { category: category.id })}
-                      className="p-4 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-colors"
-                    >
-                      <div className="text-left">
-                        <div className="font-medium text-gray-900">{category.name}</div>
-                        <div className="text-sm text-gray-500">
-                          {category.product_count} items
-                        </div>
-                      </div>
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Quick Filters */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Filters</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                  <Flame className="w-5 h-5 text-orange-500 mr-2" />
+                  Trending Searches
+                </h3>
                 <div className="flex flex-wrap gap-2">
-                  {[
-                    { label: 'New Arrivals', filters: { sort: 'created_at' as const } },
-                    { label: 'On Sale', filters: { onSale: true } },
-                    { label: 'Under $50', filters: { maxPrice: 50 } },
-                    { label: 'Featured', filters: { featured: true } },
-                    { label: 'In Stock', filters: { inStock: true } },
-                  ].map((item, index) => (
+                  {trendingSearches.map((searchTerm, index) => (
                     <motion.button
-                      key={item.label}
+                      key={searchTerm}
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.3, delay: 1 + index * 0.1 }}
-                      onClick={() => search('', item.filters)}
-                      className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium hover:bg-blue-200 active:bg-blue-300 transition-colors"
+                      transition={{ duration: 0.2, delay: index * 0.05 }}
+                      onClick={() => handleSearch(searchTerm)}
+                      className="px-4 py-2 bg-white rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50 active:scale-95 transition-all duration-200"
                     >
-                      {item.label}
+                      {searchTerm}
                     </motion.button>
                   ))}
                 </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
-        {/* Filters Modal */}
-        <AnimatePresence>
-          {showFilters && (
-            <>
-              {/* Backdrop */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setShowFilters(false)}
-                className="absolute inset-0 bg-black bg-opacity-25 z-30"
-              />
-              
-              {/* Filters Panel */}
-              <motion.div
-                initial={{ y: '100%' }}
-                animate={{ y: 0 }}
-                exit={{ y: '100%' }}
-                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                className="absolute bottom-0 left-0 right-0 z-40"
-              >
-                <SearchFilters
-                  filters={filters}
-                  onFiltersChange={handleFiltersChange}
-                  onClose={() => setShowFilters(false)}
-                  categories={categories}
-                />
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
-      </div>
+              {/* Recent Searches */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                  <Clock className="w-5 h-5 text-gray-500 mr-2" />
+                  Recent Searches
+                </h3>
+                <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
+                  {/* Placeholder for recent searches - will be implemented with localStorage */}
+                  <div className="p-4 text-center text-gray-500">
+                    <SearchIcon className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                    <p className="text-sm">Your recent searches will appear here</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Search Tips */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-medium text-blue-900 mb-2">Search Tips</h4>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• Try specific product names or categories</li>
+                  <li>• Use filters to narrow down results</li>
+                  <li>• Search by color, style, or brand</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Search Results */
+          <SearchResults
+            query={query}
+            onRetry={retry}
+            onProductClick={handleProductClick}
+            className="h-full"
+          />
+        )}
       </div>
 
       {/* Product Detail Modal */}
@@ -321,6 +280,6 @@ export default function SearchScreen() {
         onClose={handleCloseProductModal}
         onAddToCart={handleAddToCart}
       />
-    </>
+    </div>
   );
 }

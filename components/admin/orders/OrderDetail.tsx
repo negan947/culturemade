@@ -13,9 +13,7 @@ import {
   AlertCircle,
   Truck,
   XCircle,
-  Save,
-  Edit3,
-  ExternalLink
+  Edit3
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -181,7 +179,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
       setNotes(data.order.notes || '');
 
     } catch (err) {
-      console.error('Error fetching order:', err);
+
       setError(err instanceof Error ? err.message : 'Failed to fetch order');
     } finally {
       setLoading(false);
@@ -209,7 +207,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
       setEditingNotes(false);
 
     } catch (err) {
-      console.error('Error updating order:', err);
+
       setError(err instanceof Error ? err.message : 'Failed to update order');
     } finally {
       setUpdating(false);
@@ -438,7 +436,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
             Billing Address
           </h3>
           <div className="text-sm text-admin-light-text-secondary dark:text-admin-text-secondary whitespace-pre-line">
-            {formatAddress(order.addresses)}
+            {formatAddress(order.addresses || null)}
           </div>
         </div>
 
@@ -449,7 +447,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
             Shipping Address
           </h3>
           <div className="text-sm text-admin-light-text-secondary dark:text-admin-text-secondary whitespace-pre-line">
-            {formatAddress(order.shipping_address || order.addresses)}
+            {formatAddress(order.shipping_address || order.addresses || null)}
           </div>
         </div>
       </div>

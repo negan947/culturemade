@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { userId, sessionId } = body;
 
-    console.log('Clear cart request:', { userId, sessionId });
+
 
     if (!userId && !sessionId) {
       return NextResponse.json(
@@ -37,18 +37,19 @@ export async function POST(request: NextRequest) {
     const { error, data } = await query;
 
     if (error) {
-      console.error('Supabase delete error:', error);
+
       throw new Error(`Failed to clear cart: ${error.message}`);
     }
     
-    console.log('Clear cart success:', data);
+
     return NextResponse.json({ success: true });
 
-  } catch (error) {
-    console.error('Cart clear API error:', error);
+  } catch (error: any) {
+    
     return NextResponse.json(
       { error: 'Failed to clear cart' },
       { status: 500 }
     );
   }
 }
+

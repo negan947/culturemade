@@ -78,8 +78,8 @@ export async function getProductVariants(productId: string): Promise<ProductVari
     // const result = await mcp__supabasecm__execute_sql({ query: query.replace('$1', `'${productId}'`) });
     // Application should use standard Supabase client
     throw new Error('This utility requires application-level database implementation');
-  } catch (error) {
-    console.error('Error fetching product variants:', error);
+  } catch (_error) {
+
     throw new Error(`Failed to fetch variants for product ${productId}`);
   }
 }
@@ -123,8 +123,8 @@ export async function checkVariantAvailability(variantId: string): Promise<Varia
       is_available: available_quantity > 0,
       is_low_stock: available_quantity <= 5 && available_quantity > 0
     };
-  } catch (error) {
-    console.error('Error checking variant availability:', error);
+  } catch (_error) {
+
     throw new Error('Variant error: ' + JSON.stringify({
       type: 'inventory',
       message: 'Failed to check variant availability',
@@ -215,8 +215,8 @@ export function getVariantPricing(variants: ProductVariant[]) {
   }
 
   const prices = variants.map(v => v.price);
-  const minPrice = Math.min(...prices);
-  const maxPrice = Math.max(...prices);
+  const minPrice = Math.min(..._prices);
+  const maxPrice = Math.max(..._prices);
 
   return {
     minPrice,
@@ -276,8 +276,8 @@ export async function getBulkProductVariants(productIds: string[]): Promise<Map<
     });
 
     return variantMap;
-  } catch (error) {
-    console.error('Error fetching bulk product variants:', error);
+  } catch (_error) {
+
     throw new Error('Variant error: ' + JSON.stringify({
       type: 'network',
       message: 'Failed to fetch bulk product variants',

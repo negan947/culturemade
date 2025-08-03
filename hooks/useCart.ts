@@ -93,6 +93,7 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
     if (autoRefresh && (userId || sessionId)) {
       refreshCart();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, sessionId, autoRefresh]);
 
   // Computed values
@@ -111,8 +112,8 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
     
     try {
       await dispatch(loadCart({ userId, sessionId })).unwrap();
-    } catch (error) {
-      console.error('Failed to refresh cart:', error);
+    } catch {
+      // Error handled by slice
     }
   }, [dispatch, userId, sessionId]);
 
@@ -122,15 +123,15 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
     
     try {
       await dispatch(loadItemCount({ userId, sessionId })).unwrap();
-    } catch (error) {
-      console.error('Failed to refresh item count:', error);
+    } catch {
+      // Error handled by slice
     }
   }, [dispatch, userId, sessionId]);
 
   // Add item to cart
   const addToCart = useCallback(async (request: Omit<AddToCartRequest, 'userId' | 'sessionId'>): Promise<boolean> => {
     if (!userId && !sessionId) {
-      console.error('Cannot add to cart without userId or sessionId');
+
       return false;
     }
 
@@ -170,9 +171,7 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
       await refreshCart();
       
       return true;
-    } catch (error) {
-      console.error('Add to cart failed:', error);
-      
+    } catch {
       // Rollback optimistic update
       if (enableOptimisticUpdates && previousState) {
         dispatch(rollbackOptimisticUpdate(previousState));
@@ -185,7 +184,7 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
   // Update item quantity
   const updateQuantity = useCallback(async (cartItemId: string, quantity: number): Promise<boolean> => {
     if (!userId && !sessionId) {
-      console.error('Cannot update cart without userId or sessionId');
+
       return false;
     }
 
@@ -209,9 +208,7 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
       await refreshCart();
       
       return true;
-    } catch (error) {
-      console.error('Update quantity failed:', error);
-      
+    } catch {
       // Rollback optimistic update
       if (enableOptimisticUpdates && previousState) {
         dispatch(rollbackOptimisticUpdate(previousState));
@@ -224,7 +221,7 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
   // Remove item from cart
   const removeItem = useCallback(async (cartItemId: string): Promise<boolean> => {
     if (!userId && !sessionId) {
-      console.error('Cannot remove from cart without userId or sessionId');
+
       return false;
     }
 
@@ -244,9 +241,7 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
       await refreshCart();
       
       return true;
-    } catch (error) {
-      console.error('Remove item failed:', error);
-      
+    } catch {
       // Rollback optimistic update
       if (enableOptimisticUpdates && previousState) {
         dispatch(rollbackOptimisticUpdate(previousState));
@@ -259,15 +254,14 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
   // Clear entire cart
   const clearCart = useCallback(async (): Promise<boolean> => {
     if (!userId && !sessionId) {
-      console.error('Cannot clear cart without userId or sessionId');
+
       return false;
     }
 
     try {
       await dispatch(clearCartAsync({ userId, sessionId })).unwrap();
       return true;
-    } catch (error) {
-      console.error('Clear cart failed:', error);
+    } catch {
       return false;
     }
   }, [dispatch, userId, sessionId]);
@@ -361,8 +355,8 @@ export function useCartCount(userId?: string, sessionId?: string) {
     
     try {
       await dispatch(loadItemCount({ userId, sessionId })).unwrap();
-    } catch (error) {
-      console.error('Failed to refresh cart count:', error);
+    } catch {
+      // Error handled by slice
     }
   }, [dispatch, userId, sessionId]);
 

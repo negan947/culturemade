@@ -235,28 +235,15 @@ export function validateEnv<T extends z.ZodSchema>(
   } catch (error) {
     if (error instanceof z.ZodError) {
       const formattedError = formatEnvErrors(error);
-
       if (envConfig.logErrors) {
         console.error(formattedError);
       }
-
-      if (envConfig.throwOnError && !envConfig.skipValidation) {
-        throw new EnvValidationError(
-          `Environment validation failed for ${context}`,
-          error,
-          context
-        );
-      }
-
-      // Return a partial object with defaults for non-critical errors
-      // Note: This is a fallback for non-critical environments
-      if (context === 'client') {
-        return clientEnvSchema.partial().parse(env) as z.infer<T>;
-      } else {
-        return serverEnvSchema.partial().parse(env) as z.infer<T>;
-      }
+      throw new EnvValidationError(
+        `Environment validation failed for ${context}`,
+        error,
+        context
+      );
     }
-
     throw error;
   }
 }
@@ -265,16 +252,15 @@ export function validateEnv<T extends z.ZodSchema>(
  * Validate client-side environment variables
  */
 export function validateClientEnv(): ClientEnv {
-  const clientEnv = {
+  const env = {
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:
-      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
   };
 
-  return validateEnv(clientEnvSchema, clientEnv, 'client');
+  return validateEnv(clientEnvSchema, env, 'client');
 }
 
 /**
@@ -282,63 +268,4 @@ export function validateClientEnv(): ClientEnv {
  */
 export function validateServerEnv(): ServerEnv {
   return validateEnv(serverEnvSchema, process.env, 'server');
-}
-
-/**
- * Get validated environment variables for the current context
- */
-export function getEnv(): ServerEnv {
-  return validateServerEnv();
-}
-
-/**
- * Get validated client environment variables
- */
-export function getClientEnv(): ClientEnv {
-  return validateClientEnv();
-}
-
-/**
- * Type guard to check if running on server
- */
-export function isServer(): boolean {
-  return typeof window === 'undefined';
-}
-
-/**
- * Type guard to check if running on client
- */
-export function isClient(): boolean {
-  return typeof window !== 'undefined';
-}
-
-/**
- * Get environment variables for the current context (client or server)
- */
-export function getContextualEnv(): ClientEnv | ServerEnv {
-  return isServer() ? getEnv() : getClientEnv();
-}
-
-/**
- * Environment variable validation result
- */
-export interface EnvValidationResult {
-  success: boolean;
-  data?: ServerEnv | ClientEnv;
-  error?: EnvValidationError;
-}
-
-/**
- * Validate environment variables and return result without throwing
- */
-export function tryValidateEnv(): EnvValidationResult {
-  try {
-    const data = getContextualEnv();
-    return { success: true, data };
-  } catch (error) {
-    if (error instanceof EnvValidationError) {
-      return { success: false, error };
-    }
-    throw error;
-  }
 }

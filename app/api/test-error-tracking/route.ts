@@ -33,21 +33,13 @@ async function testErrorTracking(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Test execution error:', error);
-
-    return NextResponse.json(
-      {
-        success: false,
-        message: 'Error tracking tests failed',
-        error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString(),
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      success: false,
+      message: 'Error tracking test failed',
+    }, { status: 500 });
   }
 }
 
-// Error tracking disabled
-export const GET = testErrorTracking;
-
-export const POST = GET; // Allow both GET and POST for testing
+export async function GET(request: NextRequest) {
+  return testErrorTracking(request);
+}

@@ -272,7 +272,7 @@ export async function retryWithBackoff<T>(
   for (let attempt = 1; attempt <= config.maxAttempts; attempt++) {
     try {
       return await operation();
-    } catch (error) {
+    } catch (_error) {
       lastError = classifyError(error);
 
       // Don't retry if error is not retryable or this is the last attempt
@@ -335,7 +335,7 @@ export class CircuitBreaker {
       const result = await operation();
       this.onSuccess();
       return result;
-    } catch (error) {
+    } catch (_error) {
       this.onFailure();
       throw error;
     }
@@ -433,7 +433,7 @@ export async function batchWithErrorHandling<T>(
     try {
       const result = await operation();
       results.push(result);
-    } catch (error) {
+    } catch (_error) {
       const errorInfo = classifyError(error);
       errors.push(errorInfo);
       

@@ -130,11 +130,12 @@ export async function POST(request: NextRequest) {
       }
     });
 
-  } catch (error) {
-    console.error('Cart add API error:', error);
+  } catch (error: any) {
+    
     return NextResponse.json(
       { error: 'Failed to add item to cart' },
       { status: 500 }
     );
   }
 }
+

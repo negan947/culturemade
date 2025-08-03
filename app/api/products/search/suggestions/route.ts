@@ -150,15 +150,12 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
 
-  } catch (error) {
-    console.error('Suggestions API error:', error);
+  } catch (error: any) {
     
     return NextResponse.json(
-      {
-        success: false,
-        error: 'Internal server error'
-      },
+      { error: 'Failed to get search suggestions' },
       { status: 500 }
     );
   }
 }
+

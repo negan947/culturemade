@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       .limit(2);
 
     if (error) {
-      console.error('Database error:', error);
+
       return NextResponse.json(
         { 
           success: false,
@@ -38,16 +38,12 @@ export async function GET(request: NextRequest) {
       count: products?.length || 0
     });
 
-  } catch (error) {
-    console.error('API error:', error);
+  } catch (error: any) {
     
     return NextResponse.json(
-      { 
-        success: false,
-        error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: 'Failed to test products connection' },
       { status: 500 }
     );
   }
 }
+

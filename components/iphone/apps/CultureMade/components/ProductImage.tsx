@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Package, RotateCcw } from 'lucide-react';
+import { Package } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -52,16 +52,12 @@ export default function ProductImage({
   };
 
   const handleImageError = () => {
-    console.warn('Image failed to load:', imageUrl);
+
     setImageError(true);
     setIsLoading(false);
     onError?.();
   };
 
-  const handleRetry = () => {
-    setImageError(false);
-    setIsLoading(true);
-  };
 
   return (
     <div className={`relative aspect-square bg-gray-100 overflow-hidden ${className}`}>
