@@ -116,13 +116,24 @@ export const removeItem = createAsyncThunk<
 
 export const loadCart = createAsyncThunk<
   any,
-  void,
+  { userId?: string; sessionId?: string } | void,
   { rejectValue: string }
 >(
   'cart/loadCart',
-  async (_, { rejectWithValue }) => {
+  async (params, { rejectWithValue }) => {
     try {
-      const response = await fetch('/api/cart');
+      // Get sessionId from cartSync if not provided
+      const { getCartSessionId } = await import('@/utils/cartSync');
+      const sessionId = params?.sessionId || (!params?.userId ? getCartSessionId() : undefined);
+      
+      const searchParams = new URLSearchParams();
+      if (params?.userId) {
+        searchParams.append('userId', params.userId);
+      } else if (sessionId) {
+        searchParams.append('sessionId', sessionId);
+      }
+      
+      const response = await fetch(`/api/cart?${searchParams}`);
       const data = await response.json();
       
       if (!response.ok) {

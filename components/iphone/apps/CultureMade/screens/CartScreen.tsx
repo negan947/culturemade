@@ -8,7 +8,7 @@ import { useCart } from '@/hooks/useCart';
 import { getCartSessionId } from '@/utils/cartSync';
 import { prepareForCheckout, getCheckoutStatusMessage } from '@/utils/checkoutUtils';
 
-import { DragScrollContainer, CartItem } from '../components';
+import { CartItem } from '../components';
 
 export default function CartScreen() {
   // TODO: Get userId from auth context when available
@@ -156,8 +156,42 @@ export default function CartScreen() {
         </div>
       </div>
 
-      {/* Cart Items */}
-      <DragScrollContainer className="flex-1 overflow-y-auto culturemade-scrollable">
+      {/* Cart Items - Hybrid: Native mobile + Drag desktop */}
+      <div 
+        className="flex-1 overflow-y-auto overscroll-contain scrollable drag-scroll-container"
+        onMouseDown={(e) => {
+          // Only enable drag scrolling on desktop (non-touch devices)
+          if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
+          
+          const container = e.currentTarget;
+          let isScrolling = false;
+          let startY = e.pageY;
+          let startScrollTop = container.scrollTop;
+
+          const handleMouseMove = (e: MouseEvent) => {
+            if (!isScrolling) return;
+            e.preventDefault();
+            const deltaY = e.pageY - startY;
+            container.scrollTop = startScrollTop - deltaY;
+          };
+
+          const handleMouseUp = () => {
+            isScrolling = false;
+            container.style.cursor = '';
+            container.style.userSelect = '';
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+          };
+
+          // Start drag scrolling
+          isScrolling = true;
+          container.style.cursor = 'grabbing';
+          container.style.userSelect = 'none';
+          document.addEventListener('mousemove', handleMouseMove);
+          document.addEventListener('mouseup', handleMouseUp);
+        }}
+        style={{ cursor: 'grab' }}
+      >
         <div className="px-4 py-4 space-y-4">
           {items.map((item, index) => {
             // Transform cart item to match CartItemData interface
@@ -194,7 +228,7 @@ export default function CartScreen() {
             );
           })}
         </div>
-      </DragScrollContainer>
+      </div>
 
       {/* Cart Summary */}
       {summary && (

@@ -17,10 +17,10 @@ import { loadItemCount } from '@/store/cart-slice';
 import { store } from '@/store/store';
 import { RootState } from '@/store/store';
 import { getCartSessionId } from '@/utils/cartSync';
-import { prepareForCheckout, getCheckoutStatusMessage } from '@/utils/checkoutUtils';
 
-import { CartDrawer, CartIcon, DragScrollContainer } from './components';
+import { CartDrawer, CartIcon } from './components';
 // Import screen components
+import CartScreen from './screens/CartScreen';
 import CategoriesScreen from './screens/CategoriesScreen';
 import HomeScreen from './screens/HomeScreen';
 import ProfileScreen from './screens/ProfileScreen';
@@ -28,7 +28,7 @@ import SearchScreen from './screens/SearchScreen';
 
 // Icons for navigation
 
-type TabId = 'home' | 'categories' | 'search' | 'profile';
+type TabId = 'home' | 'categories' | 'search' | 'cart' | 'profile';
 
 interface Tab {
   id: TabId;
@@ -57,6 +57,12 @@ const tabs: Tab[] = [
     screen: SearchScreen,
   },
   {
+    id: 'cart',
+    name: 'Cart',
+    icon: ShoppingBag,
+    screen: CartScreen,
+  },
+  {
     id: 'profile',
     name: 'Profile',
     icon: User,
@@ -77,108 +83,133 @@ function CultureMadeInner() {
   // Load cart item count on app mount
   useEffect(() => {
     dispatch(loadItemCount());
-  }, [dispatch, userId, sessionId]);
+  }, [dispatch]);
 
   const currentTab = tabs.find(tab => tab.id === activeTab);
   const CurrentScreen = currentTab?.screen || HomeScreen;
 
   const handleCartIconClick = () => {
-    // Always open cart drawer when cart icon is clicked
+    if (activeTab === 'cart') {
+      // If already on cart tab, don't open drawer (screen is visible)
+      return;
+    }
+    // Open cart drawer overlay
     setCartDrawerOpen(true);
   };
 
-  const handleCheckout = async () => {
-    try {
-      // Validate cart before proceeding to checkout
-      const checkoutOptions: any = {
-        autoResolveConflicts: true,
-        removeUnavailable: true
-      };
-      if (userId) {
-        checkoutOptions.userId = userId;
-      }
-      if (sessionId) {
-        checkoutOptions.sessionId = sessionId;
-      }
-      const checkoutPrep = await prepareForCheckout(checkoutOptions);
-
-      const statusMessage = getCheckoutStatusMessage(checkoutPrep.validationResult);
-
-      if (checkoutPrep.canProceed) {
-        // Cart is ready for checkout
-
-        
-        // Show success message with actions taken
-        if (checkoutPrep.actions.length > 0) {
-          console.log('🔧 Actions taken:', checkoutPrep.actions);
-        }
-
-        // TODO: Navigate to Phase 2 checkout page
-        alert(`${statusMessage.title}\n\n${statusMessage.message}\n\nCheckout functionality will be implemented in Phase 2.`);
-        setCartDrawerOpen(false);
-      } else {
-        // Cart has validation errors
-
-        
-        const errorMessage = checkoutPrep.validationResult.errors.join('\n• ');
-        alert(`${statusMessage.title}\n\n• ${errorMessage}\n\nPlease fix these issues and try again.`);
-      }
-    } catch (error) {
-      console.error('Checkout validation failed:', error);
-      alert('Failed to validate cart. Please try again.');
-    }
-  };
-
   return (
-    <div className="relative bg-gray-100 rounded-3xl overflow-hidden h-full w-full">
-      {/* Main Content */}
-      <div className="flex flex-col h-full">
-        {/* Screen Content */}
-        <div className="flex-1 overflow-hidden">
-          <CurrentScreen />
-        </div>
-
-        {/* Bottom Navigation */}
-        <div className="bg-white border-t border-gray-200 px-4 py-2 safe-area-bottom">
-          <div className="flex items-center justify-around">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
+    <div className="h-full w-full bg-white flex flex-col">
+      {/* Main Content Area - Fixed for scrolling */}
+      <div className="flex-1 overflow-hidden pt-12">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ 
+              duration: 0.3, 
+              ease: [0.25, 0.46, 0.45, 0.94] // iOS-style easing
+            }}
+            className="h-full overflow-y-auto scrollable drag-scroll-container"
+            onMouseDown={(e) => {
+              // Only enable drag scrolling on desktop (non-touch devices)
+              if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
               
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`
-                    flex flex-col items-center justify-center py-2 px-3 rounded-lg
-                    transition-colors duration-200
-                    ${isActive 
-                      ? 'text-blue-600 bg-blue-50' 
-                      : 'text-gray-600 hover:text-gray-900'
-                    }
-                  `}
-                >
-                  <Icon className="h-5 w-5 mb-1" fill={isActive ? 'currentColor' : 'none'} />
-                  <span className="text-xs font-medium">{tab.name}</span>
-                </button>
-              );
-            })}
+              const container = e.currentTarget;
+              let isScrolling = false;
+              let startY = e.pageY;
+              let startScrollTop = container.scrollTop;
+
+              const handleMouseMove = (e: MouseEvent) => {
+                if (!isScrolling) return;
+                e.preventDefault();
+                const deltaY = e.pageY - startY;
+                container.scrollTop = startScrollTop - deltaY;
+              };
+
+              const handleMouseUp = () => {
+                isScrolling = false;
+                container.style.cursor = '';
+                container.style.userSelect = '';
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+              };
+
+              // Start drag scrolling
+              isScrolling = true;
+              container.style.cursor = 'grabbing';
+              container.style.userSelect = 'none';
+              document.addEventListener('mousemove', handleMouseMove);
+              document.addEventListener('mouseup', handleMouseUp);
+            }}
+            style={{ cursor: 'grab' }}
+          >
+            <CurrentScreen />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Bottom Tab Navigation */}
+      <div className="bg-white border-t border-gray-200">
+        <div className="flex justify-around items-center px-2 py-1">
+          {tabs.map((tab) => {
+            // Cart tab is never "active" since it only opens drawer
+            const isActive = tab.id === 'cart' ? false : activeTab === tab.id;
+            const Icon = tab.icon;
             
-            {/* Cart Icon */}
-            <button
-              onClick={handleCartIconClick}
-              className="flex flex-col items-center justify-center py-2 px-3 rounded-lg text-gray-600 hover:text-gray-900 transition-colors duration-200 relative"
-            >
-              <CartIcon 
-                {...(userId ? { userId } : {})}
-                size="md"
-                className="mb-1"
-                iconClassName="h-5 w-5"
-                badgeClassName="bg-red-500 text-white"
-              />
-              <span className="text-xs font-medium">Cart</span>
-            </button>
-          </div>
+            return (
+              <motion.button
+                key={tab.id}
+                onTap={() => {
+                  if (tab.id === 'cart') {
+                    // Cart opens drawer, doesn't change active tab
+                    handleCartIconClick();
+                  } else {
+                    setActiveTab(tab.id);
+                  }
+                }}
+                className="flex flex-col items-center justify-center py-2 px-3 min-w-0 flex-1"
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.1 }}
+              >
+                <div className="relative">
+                  {tab.id === 'cart' ? (
+                    <CartIcon
+                      {...(userId ? { userId } : {})}
+                      className=""
+                      iconClassName={`w-6 h-6 transition-colors duration-200 ${
+                        isActive 
+                          ? 'text-blue-500' 
+                          : 'text-gray-500'
+                      }`}
+                      badgeClassName="bg-red-500 text-white"
+                      size="md"
+                      showBadge={true}
+                    />
+                  ) : (
+                    <Icon 
+                      className={`w-6 h-6 transition-colors duration-200 ${
+                        isActive 
+                          ? 'text-blue-500' 
+                          : 'text-gray-500'
+                      }`}
+                      fill={isActive ? 'currentColor' : 'none'}
+                    />
+                  )}
+                </div>
+                <span 
+                  className={`text-xs mt-1 transition-colors duration-200 ${
+                    isActive 
+                      ? 'text-blue-500 font-medium' 
+                      : 'text-gray-500'
+                  }`}
+                >
+                  {tab.name}
+                </span>
+              </motion.button>
+            );
+          })}
         </div>
       </div>
 
@@ -187,7 +218,6 @@ function CultureMadeInner() {
         isOpen={cartDrawerOpen}
         onClose={() => setCartDrawerOpen(false)}
         {...(userId ? { userId } : {})}
-        onCheckout={handleCheckout}
       />
     </div>
   );
