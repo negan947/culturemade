@@ -15,9 +15,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { productId, variantId, quantity, userId, sessionId } = body;
 
-    if (!productId || !variantId || !quantity) {
+    if (!productId || !quantity) {
       return NextResponse.json(
-        { error: 'productId, variantId, and quantity are required' },
+        { error: 'productId and quantity are required' },
         { status: 400 }
       );
     }
@@ -38,11 +38,34 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient();
 
-    // First, validate that the product variant exists and has inventory
+    let actualVariantId = variantId;
+
+    // If no variant ID provided, find the first available variant for the product
+    if (!actualVariantId) {
+      const { data: firstVariant, error: firstVariantError } = await supabase
+        .from('product_variants')
+        .select('id')
+        .eq('product_id', productId)
+        .gt('quantity', 0) // Only select variants with stock
+        .order('position', { ascending: true })
+        .limit(1)
+        .single();
+
+      if (firstVariantError || !firstVariant) {
+        return NextResponse.json(
+          { error: 'No available variants found for this product' },
+          { status: 404 }
+        );
+      }
+
+      actualVariantId = firstVariant.id;
+    }
+
+    // Validate that the product variant exists and has inventory
     const { data: variant, error: variantError } = await supabase
       .from('product_variants')
       .select('id, price, quantity, products(id, name)')
-      .eq('id', variantId)
+      .eq('id', actualVariantId)
       .single();
 
     if (variantError || !variant) {
@@ -60,12 +83,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if item already exists in cart
-    const { data: existingItem, error: checkError } = await supabase
+    let existingItemQuery = supabase
       .from('cart_items')
       .select('id, quantity')
-      .eq('product_variant_id', variantId)
-      .or(`user_id.eq.${userId},session_id.eq.${sessionId}`)
-      .single();
+      .eq('variant_id', actualVariantId);
+
+    // Build the OR condition based on what we have
+    if (userId && sessionId) {
+      existingItemQuery = existingItemQuery.or(`user_id.eq.${userId},session_id.eq.${sessionId}`);
+    } else if (userId) {
+      existingItemQuery = existingItemQuery.eq('user_id', userId);
+    } else if (sessionId) {
+      existingItemQuery = existingItemQuery.eq('session_id', sessionId);
+    }
+
+    const { data: existingItem, error: checkError } = await existingItemQuery.single();
 
     if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows found
       throw new Error(`Failed to check existing cart item: ${checkError.message}`);
@@ -103,7 +135,8 @@ export async function POST(request: NextRequest) {
       const { data, error: insertError } = await supabase
         .from('cart_items')
         .insert({
-          product_variant_id: variantId,
+          product_id: productId,
+          variant_id: actualVariantId,
           quantity,
           user_id: userId || null,
           session_id: sessionId || null,
@@ -119,9 +152,22 @@ export async function POST(request: NextRequest) {
       result = data;
     }
 
+    // After successful add/update, fetch and return the complete cart
+    const cartResponse = await fetch(`${request.nextUrl.origin}/api/cart?${new URLSearchParams({
+      ...(userId ? { userId } : {}),
+      ...(sessionId ? { sessionId } : {})
+    })}`);
+    
+    if (!cartResponse.ok) {
+      throw new Error('Failed to fetch updated cart');
+    }
+    
+    const cartData = await cartResponse.json();
+    
     return NextResponse.json({
       success: true,
       message: existingItem ? 'Cart item quantity updated' : 'Item added to cart',
+      cart: cartData.cart,
       cartItem: result,
       product: {
         id: variant.products.id,
@@ -131,9 +177,9 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error: any) {
-    
+    console.error('Cart add error:', error);
     return NextResponse.json(
-      { error: 'Failed to add item to cart' },
+      { error: 'Failed to add item to cart', details: error.message },
       { status: 500 }
     );
   }

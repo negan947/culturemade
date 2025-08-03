@@ -111,9 +111,22 @@ export async function PUT(request: NextRequest) {
       throw new Error(`Failed to update cart item: ${error.message}`);
     }
 
+    // After successful update, fetch and return the complete cart
+    const cartResponse = await fetch(`${request.nextUrl.origin}/api/cart?${new URLSearchParams({
+      ...(userId ? { userId } : {}),
+      ...(sessionId ? { sessionId } : {})
+    })}`);
+    
+    if (!cartResponse.ok) {
+      throw new Error('Failed to fetch updated cart');
+    }
+    
+    const cartData = await cartResponse.json();
+    
     return NextResponse.json({
       success: true,
       message: 'Cart item quantity updated',
+      cart: cartData.cart,
       cartItem: data,
       product: {
         id: cartItem.product_variants.products.id,

@@ -89,7 +89,7 @@ export default function HomeScreen() {
         },
         body: JSON.stringify({
           productId,
-          variantId: variantId || null, // Let the API handle finding a variant
+          variantId, // API will find first available variant if null/undefined
           quantity,
           sessionId,
         }),

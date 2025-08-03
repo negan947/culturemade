@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
         hasLowStockItems: false,
         hasOutOfStockItems: false
       };
-      return NextResponse.json(emptyCart);
+      return NextResponse.json({ cart: emptyCart });
     }
 
     // Get variant IDs to fetch details
@@ -165,7 +165,7 @@ export async function GET(request: NextRequest) {
       hasOutOfStockItems
     };
 
-    return NextResponse.json(cart);
+    return NextResponse.json({ cart });
 
   } catch (error: any) {
     

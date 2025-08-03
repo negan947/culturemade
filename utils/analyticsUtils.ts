@@ -346,7 +346,7 @@ export async function flushAnalyticsEvents(): Promise<void> {
     
     // Re-queue events for retry (with limit to prevent infinite growth)
     if (eventQueue.length < 100) {
-      eventQueue.unshift(...(arguments[0] as any));
+      eventQueue.unshift(...eventsToSend);
     }
   }
 }
