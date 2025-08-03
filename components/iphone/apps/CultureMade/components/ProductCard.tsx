@@ -12,11 +12,12 @@ import ProductImage from './ProductImage';
 interface ProductCardProps {
   product: ProductListItem;
   onProductClick: (productId: string) => void;
+  onAddToCart?: (productId: string, variantId?: string, quantity?: number) => Promise<void>;
   className?: string;
   loading?: boolean;
 }
 
-const ProductCard = memo(function ProductCard({ product, onProductClick, className, loading }: ProductCardProps) {
+const ProductCard = memo(function ProductCard({ product, onProductClick, onAddToCart, className, loading }: ProductCardProps) {
   // Calculate if product is on sale
   const isOnSale = product.compare_at_price && 
     parseFloat(product.compare_at_price) > parseFloat(product.price);

@@ -1,0 +1,87 @@
+hooks/useAddToCart.ts(75,24): error TS2379: Argument of type '{ userId: string | undefined; sessionId: string | undefined; }' is not assignable to parameter of type '{ userId?: string; sessionId?: string; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'userId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+hooks/useAddToCart.ts(81,25): error TS2345: Argument of type '{ userId: string | undefined; sessionId: string | undefined; }' is not assignable to parameter of type 'undefined'.
+hooks/useAddToCart.ts(143,13): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+hooks/useAddToCart.ts(148,19): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+hooks/useAddToCart.ts(165,47): error TS2379: Argument of type '{ userId: string | undefined; sessionId: string | undefined; quantity: number; productId: string; variantId: string; }' is not assignable to parameter of type 'AddToCartRequest' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'userId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+hooks/useAddToCart.ts(185,45): error TS2345: Argument of type 'CartSummary' is not assignable to parameter of type '{ originalState: CartState; }'.
+  Property 'originalState' is missing in type 'CartSummary' but required in type '{ originalState: CartState; }'.
+hooks/useAddToCart.ts(205,43): error TS2345: Argument of type 'CartSummary' is not assignable to parameter of type '{ originalState: CartState; }'.
+  Property 'originalState' is missing in type 'CartSummary' but required in type '{ originalState: CartState; }'.
+hooks/useAddToCart.ts(251,9): error TS2353: Object literal may only specify known properties, and 'userId' does not exist in type '{ cartItemId: string; quantity: number; }'.
+hooks/useAddToCart.ts(269,45): error TS2345: Argument of type 'CartSummary' is not assignable to parameter of type '{ originalState: CartState; }'.
+  Property 'originalState' is missing in type 'CartSummary' but required in type '{ originalState: CartState; }'.
+hooks/useAddToCart.ts(289,43): error TS2345: Argument of type 'CartSummary' is not assignable to parameter of type '{ originalState: CartState; }'.
+  Property 'originalState' is missing in type 'CartSummary' but required in type '{ originalState: CartState; }'.
+hooks/useAddToCart.ts(325,39): error TS2345: Argument of type 'string' is not assignable to parameter of type '{ cartItemId: string; }'.
+hooks/useAddToCart.ts(330,9): error TS2353: Object literal may only specify known properties, and 'userId' does not exist in type '{ cartItemId: string; }'.
+hooks/useAddToCart.ts(348,45): error TS2345: Argument of type 'CartSummary' is not assignable to parameter of type '{ originalState: CartState; }'.
+  Property 'originalState' is missing in type 'CartSummary' but required in type '{ originalState: CartState; }'.
+hooks/useAddToCart.ts(368,43): error TS2345: Argument of type 'CartSummary' is not assignable to parameter of type '{ originalState: CartState; }'.
+  Property 'originalState' is missing in type 'CartSummary' but required in type '{ originalState: CartState; }'.
+hooks/useAddToCart.ts(402,52): error TS2345: Argument of type '{ userId: string | undefined; sessionId: string | undefined; }' is not assignable to parameter of type 'undefined'.
+hooks/useAddToCart.ts(450,29): error TS2345: Argument of type '{ userId: string | undefined; sessionId: string | undefined; }' is not assignable to parameter of type 'undefined'.
+hooks/useAddToCart.ts(490,31): error TS2379: Argument of type '{ userId: string | undefined; sessionId: string | undefined; enableOptimisticUpdates: true; showNotifications: true; autoRefreshOnMount: true; }' is not assignable to parameter of type 'UseAddToCartOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'userId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+hooks/useAddToCart.ts(510,80): error TS2379: Argument of type '{ userId: string | undefined; sessionId: string | undefined; enableOptimisticUpdates: true; showNotifications: false; }' is not assignable to parameter of type 'UseAddToCartOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'userId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+hooks/useCart.ts(87,26): error TS2379: Argument of type '{ userId: string | undefined; sessionId: string | undefined; }' is not assignable to parameter of type '{ userId?: string; sessionId?: string; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'userId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+hooks/useCart.ts(114,31): error TS2345: Argument of type '{ userId: string | undefined; sessionId: string | undefined; }' is not assignable to parameter of type 'undefined'.
+hooks/useCart.ts(125,36): error TS2345: Argument of type '{ userId: string | undefined; sessionId: string | undefined; }' is not assignable to parameter of type 'undefined'.
+hooks/useCart.ts(138,11): error TS2375: Type '{ userId: string | undefined; sessionId: string | undefined; quantity: number; productId: string; variantId: string; }' is not assignable to type 'AddToCartRequest' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'userId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+hooks/useCart.ts(155,11): error TS2353: Object literal may only specify known properties, and 'price' does not exist in type 'CartItem'.
+hooks/useCart.ts(177,43): error TS2345: Argument of type 'CartSummary' is not assignable to parameter of type '{ originalState: CartState; }'.
+  Property 'originalState' is missing in type 'CartSummary' but required in type '{ originalState: CartState; }'.
+hooks/useCart.ts(198,41): error TS2345: Argument of type 'string' is not assignable to parameter of type '{ cartItemId: string; }'.
+hooks/useCart.ts(205,67): error TS2353: Object literal may only specify known properties, and 'userId' does not exist in type '{ cartItemId: string; quantity: number; }'.
+hooks/useCart.ts(214,43): error TS2345: Argument of type 'CartSummary' is not assignable to parameter of type '{ originalState: CartState; }'.
+  Property 'originalState' is missing in type 'CartSummary' but required in type '{ originalState: CartState; }'.
+hooks/useCart.ts(234,39): error TS2345: Argument of type 'string' is not assignable to parameter of type '{ cartItemId: string; }'.
+hooks/useCart.ts(238,53): error TS2353: Object literal may only specify known properties, and 'userId' does not exist in type '{ cartItemId: string; }'.
+hooks/useCart.ts(247,43): error TS2345: Argument of type 'CartSummary' is not assignable to parameter of type '{ originalState: CartState; }'.
+  Property 'originalState' is missing in type 'CartSummary' but required in type '{ originalState: CartState; }'.
+hooks/useCart.ts(262,37): error TS2345: Argument of type '{ userId: string | undefined; sessionId: string | undefined; }' is not assignable to parameter of type 'undefined'.
+hooks/useCart.ts(336,18): error TS2379: Argument of type '{ userId: string | undefined; sessionId: string | undefined; enableOptimisticUpdates: false; autoRefresh: true; }' is not assignable to parameter of type 'UseCartOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'userId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+hooks/useCart.ts(357,36): error TS2345: Argument of type '{ userId: string | undefined; sessionId: string | undefined; }' is not assignable to parameter of type 'undefined'.
+hooks/useDragScroll.ts(181,5): error TS2322: Type 'RefObject<HTMLElement | null>' is not assignable to type 'RefObject<HTMLElement>'.
+  Type 'HTMLElement | null' is not assignable to type 'HTMLElement'.
+    Type 'null' is not assignable to type 'HTMLElement'.
+hooks/useErrorHandler.ts(170,11): error TS2375: Type '{ type: ErrorType; message: string; code: string | undefined; retryable: boolean; retryCount: any; timestamp: Date; context: Record<string, any> | undefined; }' is not assignable to type 'ErrorState' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'code' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+hooks/useErrorHandler.ts(257,7): error TS2322: Type '() => Promise<R>' is not assignable to type '() => Promise<void>'.
+  Type 'Promise<R>' is not assignable to type 'Promise<void>'.
+    Type 'R' is not assignable to type 'void'.
+hooks/useErrorHandler.ts(257,52): error TS2304: Cannot find name '_args'.
+hooks/useErrorHandler.ts(261,36): error TS2304: Cannot find name '_args'.
+hooks/useErrorHandler.ts(264,21): error TS2352: Conversion of type 'ErrorState | null' to type 'Error' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Property 'name' is missing in type 'ErrorState' but required in type 'Error'.
+hooks/useInfiniteScroll.ts(141,30): error TS2339: Property 'error' does not exist on type 'ApiResponse'.
+hooks/useInfiniteScroll.ts(195,9): error TS18048: 'entry' is possibly 'undefined'.
+hooks/useInventoryStatus.ts(346,79): error TS2379: Argument of type '{ variants: ProductVariant[]; selectedVariantId: string | undefined; }' is not assignable to parameter of type 'UseInventoryStatusOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'selectedVariantId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+hooks/useInventoryStatus.ts(371,5): error TS2322: Type 'boolean | undefined' is not assignable to type 'boolean'.
+  Type 'undefined' is not assignable to type 'boolean'.

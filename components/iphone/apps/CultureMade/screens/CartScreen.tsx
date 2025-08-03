@@ -25,7 +25,7 @@ export default function CartScreen() {
     removeItem,
     clearCart,
     refreshCart
-  } = useCart({ userId, sessionId });
+  } = useCart({ ...(userId ? { userId } : {}), ...(sessionId ? { sessionId } : {}) });
 
   // Listen for cart updates from other components
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function CartScreen() {
   };
 
   const handleRemoveItem = async (cartItemId: string) => {
-    return await removeItem(cartItemId);
+    await removeItem(cartItemId);
   };
 
   const handleClearCart = async () => {
@@ -159,23 +159,40 @@ export default function CartScreen() {
       {/* Cart Items */}
       <DragScrollContainer className="flex-1 overflow-y-auto culturemade-scrollable">
         <div className="px-4 py-4 space-y-4">
-          {items.map((item, index) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
-              className="bg-white rounded-lg shadow-sm border border-gray-200"
-            >
-              <CartItem
-                item={item}
-                onQuantityUpdate={handleQuantityUpdate}
-                onRemove={handleRemoveItem}
-                size="lg"
-                className="border-none bg-transparent"
-              />
-            </motion.div>
-          ))}
+          {items.map((item, index) => {
+            // Transform cart item to match CartItemData interface
+            const itemPrice = item.variant_price || 0;
+            const cartItemData = {
+              id: item.id,
+              product_name: item.product_name || 'Unknown Product',
+              ...(item.variant_name !== undefined ? { variant_title: item.variant_name } : {}),
+              price: itemPrice,
+              quantity: item.quantity,
+              total: itemPrice * item.quantity,
+              ...(item.product_image !== undefined ? { image_url: item.product_image } : {}),
+              image_alt: item.product_name || 'Product Image',
+              // inventory_quantity omitted since not available
+              is_available: true, // Assume available since it's in cart
+            };
+
+            return (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+                className="bg-white rounded-lg shadow-sm border border-gray-200"
+              >
+                <CartItem
+                  item={cartItemData}
+                  onQuantityUpdate={handleQuantityUpdate}
+                  onRemove={handleRemoveItem}
+                  size="lg"
+                  className="border-none bg-transparent"
+                />
+              </motion.div>
+            );
+          })}
         </div>
       </DragScrollContainer>
 
@@ -224,8 +241,8 @@ export default function CartScreen() {
               try {
                 // Validate cart before proceeding to checkout
                 const checkoutPrep = await prepareForCheckout({
-                  userId,
-                  sessionId,
+                  ...(userId ? { userId } : {}),
+                  ...(sessionId ? { sessionId } : {}),
                   autoResolveConflicts: true,
                   removeUnavailable: true
                 });

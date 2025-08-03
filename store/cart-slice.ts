@@ -17,8 +17,8 @@ export interface CartState {
   isLoading: boolean;
   error: string | null;
   lastAddedItem: CartItem | null;
-  userId?: string;
-  sessionId?: string;
+  userId?: string | undefined;
+  sessionId?: string | undefined;
 }
 
 const initialState: CartState = {
@@ -189,7 +189,7 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     // Synchronous actions
-    setCartId: (state, action: PayloadAction<{ userId?: string; sessionId?: string }>) => {
+    setCartId: (state, action: PayloadAction<{ userId?: string | undefined; sessionId?: string | undefined }>) => {
       state.userId = action.payload.userId;
       state.sessionId = action.payload.sessionId;
     },
@@ -217,7 +217,9 @@ const cartSlice = createSlice({
       const itemIndex = state.items.findIndex(item => item.id === action.payload.cartItemId);
       if (itemIndex !== -1) {
         const item = state.items[itemIndex];
-        state.itemCount -= item.quantity;
+        if (item) {
+          state.itemCount -= item.quantity;
+        }
         state.items.splice(itemIndex, 1);
       }
     },
@@ -237,8 +239,11 @@ const cartSlice = createSlice({
         state.isLoading = false;
         if (action.payload.cart) {
           state.items = action.payload.cart.items || [];
-          state.summary = action.payload.cart.summary || null;
-          state.itemCount = action.payload.cart.items?.reduce((total, item) => total + item.quantity, 0) || 0;
+          state.summary = {
+            ...action.payload.cart,
+            summary: action.payload.cart
+          };
+          state.itemCount = action.payload.cart.items?.reduce((total: number, item: CartItem) => total + item.quantity, 0) || 0;
         }
       })
       .addCase(addToCart.rejected, (state, action) => {
@@ -256,8 +261,11 @@ const cartSlice = createSlice({
         state.isLoading = false;
         if (action.payload.cart) {
           state.items = action.payload.cart.items || [];
-          state.summary = action.payload.cart.summary || null;
-          state.itemCount = action.payload.cart.items?.reduce((total, item) => total + item.quantity, 0) || 0;
+          state.summary = {
+            ...action.payload.cart,
+            summary: action.payload.cart
+          };
+          state.itemCount = action.payload.cart.items?.reduce((total: number, item: CartItem) => total + item.quantity, 0) || 0;
         }
       })
       .addCase(updateQuantity.rejected, (state, action) => {
@@ -275,8 +283,11 @@ const cartSlice = createSlice({
         state.isLoading = false;
         if (action.payload.cart) {
           state.items = action.payload.cart.items || [];
-          state.summary = action.payload.cart.summary || null;
-          state.itemCount = action.payload.cart.items?.reduce((total, item) => total + item.quantity, 0) || 0;
+          state.summary = {
+            ...action.payload.cart,
+            summary: action.payload.cart
+          };
+          state.itemCount = action.payload.cart.items?.reduce((total: number, item: CartItem) => total + item.quantity, 0) || 0;
         }
       })
       .addCase(removeItem.rejected, (state, action) => {
@@ -294,8 +305,11 @@ const cartSlice = createSlice({
         state.isLoading = false;
         if (action.payload.cart) {
           state.items = action.payload.cart.items || [];
-          state.summary = action.payload.cart.summary || null;
-          state.itemCount = action.payload.cart.items?.reduce((total, item) => total + item.quantity, 0) || 0;
+          state.summary = {
+            ...action.payload.cart,
+            summary: action.payload.cart
+          };
+          state.itemCount = action.payload.cart.items?.reduce((total: number, item: CartItem) => total + item.quantity, 0) || 0;
         }
       })
       .addCase(loadCart.rejected, (state, action) => {

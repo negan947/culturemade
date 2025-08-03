@@ -25,8 +25,8 @@ import { RootState, AppDispatch } from '@/store/store';
 import { AddToCartRequest, CartItem } from '@/utils/cartUtils';
 
 interface UseCartOptions {
-  userId?: string;
-  sessionId?: string;
+  userId?: string | undefined;
+  sessionId?: string | undefined;
   enableOptimisticUpdates?: boolean;
   autoRefresh?: boolean;
 }
@@ -111,7 +111,7 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
     if (!userId && !sessionId) return;
     
     try {
-      await dispatch(loadCart({ userId, sessionId })).unwrap();
+      await dispatch(loadCart()).unwrap();
     } catch {
       // Error handled by slice
     }
@@ -122,7 +122,7 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
     if (!userId && !sessionId) return;
     
     try {
-      await dispatch(loadItemCount({ userId, sessionId })).unwrap();
+      await dispatch(loadItemCount()).unwrap();
     } catch {
       // Error handled by slice
     }
@@ -137,8 +137,8 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
 
     const fullRequest: AddToCartRequest = {
       ...request,
-      userId,
-      sessionId
+      userId: userId || '',
+      sessionId: sessionId || ''
     };
 
     // Store current state for potential rollback
@@ -152,13 +152,8 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
           variant_id: request.variantId,
           product_id: request.productId,
           quantity: request.quantity,
-          price: 0, // Will be updated after API call
-          product_name: '',
-          variant_title: '',
-          image_url: null,
-          image_alt: null,
-          total: 0,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         };
         
         dispatch(optimisticAddItem(optimisticItem));
@@ -174,7 +169,7 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
     } catch {
       // Rollback optimistic update
       if (enableOptimisticUpdates && previousState) {
-        dispatch(rollbackOptimisticUpdate(previousState));
+        dispatch(rollbackOptimisticUpdate({ originalState: cartState }));
       }
       
       return false;
@@ -195,14 +190,14 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
       // Optimistic update
       if (enableOptimisticUpdates) {
         if (quantity === 0) {
-          dispatch(optimisticRemoveItem(cartItemId));
+          dispatch(optimisticRemoveItem({ cartItemId }));
         } else {
           dispatch(optimisticUpdateQuantity({ cartItemId, quantity }));
         }
       }
 
       // API call
-      await dispatch(updateQuantityAction({ cartItemId, quantity, userId, sessionId })).unwrap();
+      await dispatch(updateQuantityAction({ cartItemId, quantity })).unwrap();
       
       // Refresh cart to get accurate totals
       await refreshCart();
@@ -211,7 +206,7 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
     } catch {
       // Rollback optimistic update
       if (enableOptimisticUpdates && previousState) {
-        dispatch(rollbackOptimisticUpdate(previousState));
+        dispatch(rollbackOptimisticUpdate({ originalState: cartState }));
       }
       
       return false;
@@ -231,11 +226,11 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
     try {
       // Optimistic update
       if (enableOptimisticUpdates) {
-        dispatch(optimisticRemoveItem(cartItemId));
+        dispatch(optimisticRemoveItem({ cartItemId }));
       }
 
       // API call
-      await dispatch(removeItemAction({ cartItemId, userId, sessionId })).unwrap();
+      await dispatch(removeItemAction({ cartItemId })).unwrap();
       
       // Refresh cart to get accurate totals
       await refreshCart();
@@ -244,7 +239,7 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
     } catch {
       // Rollback optimistic update
       if (enableOptimisticUpdates && previousState) {
-        dispatch(rollbackOptimisticUpdate(previousState));
+        dispatch(rollbackOptimisticUpdate({ originalState: cartState }));
       }
       
       return false;
@@ -259,7 +254,7 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
     }
 
     try {
-      await dispatch(clearCartAsync({ userId, sessionId })).unwrap();
+      await dispatch(clearCartAsync()).unwrap();
       return true;
     } catch {
       return false;
@@ -354,7 +349,7 @@ export function useCartCount(userId?: string, sessionId?: string) {
     if (!userId && !sessionId) return;
     
     try {
-      await dispatch(loadItemCount({ userId, sessionId })).unwrap();
+      await dispatch(loadItemCount()).unwrap();
     } catch {
       // Error handled by slice
     }

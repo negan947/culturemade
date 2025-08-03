@@ -11,6 +11,7 @@ import {
 import { useState, useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { useSelector, useDispatch } from 'react-redux';
+import type { AppDispatch } from '@/store/store';
 
 import { loadItemCount } from '@/store/cart-slice';
 import { store } from '@/store/store';
@@ -66,7 +67,7 @@ const tabs: Tab[] = [
 function CultureMadeInner() {
   const [activeTab, setActiveTab] = useState<TabId>('home');
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const cartItemCount = useSelector((state: RootState) => state.cart.itemCount);
 
   // TODO: Get userId from auth context when available
@@ -75,7 +76,7 @@ function CultureMadeInner() {
 
   // Load cart item count on app mount
   useEffect(() => {
-    dispatch(loadItemCount({ userId, sessionId }));
+    dispatch(loadItemCount());
   }, [dispatch, userId, sessionId]);
 
   const currentTab = tabs.find(tab => tab.id === activeTab);
@@ -89,12 +90,17 @@ function CultureMadeInner() {
   const handleCheckout = async () => {
     try {
       // Validate cart before proceeding to checkout
-      const checkoutPrep = await prepareForCheckout({
-        userId,
-        sessionId,
+      const checkoutOptions: any = {
         autoResolveConflicts: true,
         removeUnavailable: true
-      });
+      };
+      if (userId) {
+        checkoutOptions.userId = userId;
+      }
+      if (sessionId) {
+        checkoutOptions.sessionId = sessionId;
+      }
+      const checkoutPrep = await prepareForCheckout(checkoutOptions);
 
       const statusMessage = getCheckoutStatusMessage(checkoutPrep.validationResult);
 
@@ -164,7 +170,7 @@ function CultureMadeInner() {
               className="flex flex-col items-center justify-center py-2 px-3 rounded-lg text-gray-600 hover:text-gray-900 transition-colors duration-200 relative"
             >
               <CartIcon 
-                userId={userId}
+                {...(userId ? { userId } : {})}
                 size="md"
                 className="mb-1"
                 iconClassName="h-5 w-5"
@@ -180,7 +186,7 @@ function CultureMadeInner() {
       <CartDrawer
         isOpen={cartDrawerOpen}
         onClose={() => setCartDrawerOpen(false)}
-        userId={userId}
+        {...(userId ? { userId } : {})}
         onCheckout={handleCheckout}
       />
     </div>

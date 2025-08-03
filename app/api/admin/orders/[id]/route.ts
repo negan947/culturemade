@@ -3,12 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUserContext } from '@/lib/supabase/auth';
 import { createClient } from '@/lib/supabase/server';
 
-interface OrderUpdateData {
-  status?: string;
-  fulfillment_status?: string;
-  notes?: string;
-  metadata?: any;
-}
 
 export async function GET(
   _request: NextRequest,

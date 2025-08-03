@@ -32,16 +32,6 @@ const createProductSchema = z.object({
 
 // const updateProductSchema = createProductSchema.partial();
 
-const listProductsSchema = z.object({
-  page: z.string().optional().transform((val) => val ? Math.max(1, parseInt(val)) : 1),
-  limit: z.string().optional().transform((val) => val ? Math.min(100, Math.max(1, parseInt(val))) : 20),
-  search: z.string().optional(),
-  status: z.enum(['active', 'draft', 'archived']).optional(),
-  category: z.string().uuid().optional(),
-  sort: z.enum(['name', 'price', 'created_at', 'updated_at']).default('created_at'),
-  order: z.enum(['asc', 'desc']).default('desc')
-});
-
 async function requireAdmin() {
   const supabase = await createClient();
   

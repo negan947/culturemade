@@ -98,5 +98,9 @@ export const getUserContext = cache(async () => {
     .eq('id', user.id)
     .single();
     
-  return { user, profile };
+  return { 
+    user, 
+    profile, 
+    isAdmin: profile?.role === 'admin' 
+  };
 });

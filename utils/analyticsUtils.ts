@@ -16,9 +16,9 @@ export interface ProductInteractionEvent {
   user_session: string;
   timestamp: string;
   source_component: string;        // 'product_grid', 'search_results', 'recommendations'
-  position_index?: number;         // Position in grid/list for impression tracking
-  search_query?: string;           // If from search results
-  category_id?: string;            // If from category browsing
+  position_index?: number | undefined;         // Position in grid/list for impression tracking
+  search_query?: string | undefined;           // If from search results
+  category_id?: string | undefined;            // If from category browsing
 }
 
 export interface AnalyticsConfig {
@@ -154,9 +154,9 @@ export function trackProductImpression(
     user_session: getCurrentSession().sessionId,
     timestamp: new Date().toISOString(),
     source_component: sourceComponent,
-    position_index: options.positionIndex,
-    search_query: options.searchQuery,
-    category_id: options.categoryId
+    ...(options.positionIndex !== undefined ? { position_index: options.positionIndex } : {}),
+    ...(options.searchQuery !== undefined ? { search_query: options.searchQuery } : {}),
+    ...(options.categoryId !== undefined ? { category_id: options.categoryId } : {})
   };
   
   queueAnalyticsEvent(event);
@@ -187,9 +187,9 @@ export function trackProductClick(
     user_session: getCurrentSession().sessionId,
     timestamp: new Date().toISOString(),
     source_component: sourceComponent,
-    position_index: options.positionIndex,
-    search_query: options.searchQuery,
-    category_id: options.categoryId
+    ...(options.positionIndex !== undefined ? { position_index: options.positionIndex } : {}),
+    ...(options.searchQuery ? { search_query: options.searchQuery } : {}),
+    ...(options.categoryId ? { category_id: options.categoryId } : {})
   };
   
   queueAnalyticsEvent(event);
@@ -219,8 +219,8 @@ export function trackProductDetailView(
     user_session: getCurrentSession().sessionId,
     timestamp: new Date().toISOString(),
     source_component: sourceComponent,
-    search_query: options.searchQuery,
-    category_id: options.categoryId
+    ...(options.searchQuery ? { search_query: options.searchQuery } : {}),
+    ...(options.categoryId ? { category_id: options.categoryId } : {})
   };
   
   queueAnalyticsEvent(event);
@@ -254,8 +254,8 @@ export function trackAddToCart(
     user_session: getCurrentSession().sessionId,
     timestamp: new Date().toISOString(),
     source_component: sourceComponent,
-    search_query: options.searchQuery,
-    category_id: options.categoryId
+    ...(options.searchQuery ? { search_query: options.searchQuery } : {}),
+    ...(options.categoryId ? { category_id: options.categoryId } : {})
   };
   
   queueAnalyticsEvent(event);
@@ -346,7 +346,7 @@ export async function flushAnalyticsEvents(): Promise<void> {
     
     // Re-queue events for retry (with limit to prevent infinite growth)
     if (eventQueue.length < 100) {
-      eventQueue.unshift(..._eventsToSend);
+      eventQueue.unshift(...(arguments[0] as any));
     }
   }
 }
@@ -466,7 +466,7 @@ export function debounce<T extends (...args: any[]) => void>(
   
   return (...args: Parameters<T>) => {
     clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func(..._args), delay);
+    timeoutId = setTimeout(() => func(...args), delay);
   };
 }
 
@@ -484,7 +484,7 @@ export function throttle<T extends (...args: any[]) => void>(
     const now = Date.now();
     if (now - lastCall >= delay) {
       lastCall = now;
-      func(..._args);
+      func(...args);
     }
   };
 }

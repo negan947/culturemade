@@ -29,20 +29,6 @@ interface Product {
   inventory_total: number;
 }
 
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-interface FilterState {
-  search: string;
-  status: string;
-  category: string;
-  priceMin: string;
-  priceMax: string;
-  inventoryLevel: string;
-}
 
 interface SortState {
   field: 'name' | 'price' | 'created_at' | 'inventory_total' | 'status';
@@ -266,20 +252,19 @@ function ProductsTable({
 export default function AdminProducts() {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filters, setFilters] = useState<FilterState>({
-    search: '',
-    status: '',
-    category: '',
-    priceMin: '',
-    priceMax: '',
-    inventoryLevel: ''
-  });
+  const [error, setError] = useState<string | null>(null);
   const [sort, setSort] = useState<SortState>({
     field: 'created_at',
     direction: 'desc'
   });
+
+  const handleSort = (field: SortState['field']) => {
+    setSort(prev => ({
+      field,
+      direction: prev.field === field && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
 
   useEffect(() => {
     async function loadData() {
@@ -304,30 +289,25 @@ export default function AdminProducts() {
           return;
         }
 
-        // Load products and categories
-        const [productsResult, categoriesResult] = await Promise.all([
-          supabase
-            .from('products')
-            .select(`
-              id,
-              name,
-              status,
-              price,
-              compare_at_price,
-              created_at,
-              product_variants!inner(id, quantity),
-              product_categories!left(
-                categories!inner(name)
-              )
-            `)
-            .order('created_at', { ascending: false }),
-          supabase
-            .from('categories')
-            .select('id, name, slug')
-            .order('name')
-        ]);
+        // Load products
+        const productsResult = await supabase
+          .from('products')
+          .select(`
+            id,
+            name,
+            status,
+            price,
+            compare_at_price,
+            created_at,
+            product_variants!inner(id, quantity),
+            product_categories!left(
+              categories!inner(name)
+            )
+          `)
+          .order('created_at', { ascending: false });
 
         if (productsResult.error) {
+          setError('Failed to load products');
         } else {
           const formattedProducts = productsResult.data.map(product => ({
             id: product.id,
@@ -343,32 +323,66 @@ export default function AdminProducts() {
           }));
           setProducts(formattedProducts);
         }
-
-        if (categoriesResult.data) {
-          setCategories(categoriesResult.data);
-        }
-      } catch (error) {
+      } catch (_err) {
         setError('Failed to load products');
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
-    };
+    }
 
-    fetchProducts();
-  }, []);
+    loadData();
+  }, [router]);
 
-  if (loading) {
-    return <div>Loading...</div>;
+  if (isLoading) {
+    return <ProductTableSkeleton />;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div className="text-center py-12">
+        <h3 className="text-lg font-medium text-admin-light-text-primary dark:text-admin-text-primary mb-2">
+          Error loading products
+        </h3>
+        <p className="text-admin-light-text-secondary dark:text-admin-text-secondary mb-4">
+          {error}
+        </p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-admin-accent text-white rounded-lg hover:bg-admin-accent-hover transition-colors duration-200"
+        >
+          Try Again
+        </button>
+      </div>
+    );
   }
 
   return (
-    <div>
-      <h1>Admin Products</h1>
-      {/* Add products list here */}
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-admin-light-text-primary dark:text-admin-text-primary">
+            Products
+          </h1>
+          <p className="text-admin-light-text-secondary dark:text-admin-text-secondary">
+            Manage your product catalog
+          </p>
+        </div>
+        <Link
+          href="/admin/products/new"
+          className="flex items-center px-4 py-2 bg-admin-accent text-white rounded-lg hover:bg-admin-accent-hover transition-colors duration-200"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Product
+        </Link>
+      </div>
+
+      <div className="bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg border border-admin-light-border dark:border-admin-border">
+        <ProductsTable 
+          products={products} 
+          sort={sort} 
+          onSort={handleSort} 
+        />
+      </div>
     </div>
   );
 }

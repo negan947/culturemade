@@ -2,9 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { createClient } from '@/lib/supabase/client';
 
 interface TestResult {
@@ -31,20 +28,20 @@ interface AuthState {
 }
 
 export default function TestAuth() {
-  const [tests, setTests] = useState<TestResult[]>([]);
-  const [authState, setAuthState] = useState<AuthState>({
+  const [_tests, setTests] = useState<TestResult[]>([]);
+  const [_authState, setAuthState] = useState<AuthState>({
     user: null,
     profile: null,
     isAuthenticated: false,
     isAdmin: false,
   });
-  const [testCredentials, setTestCredentials] = useState({
+  const [_testCredentials, _setTestCredentials] = useState({
     email: 'test@example.com',
     password: 'testpassword123',
     adminEmail: 'admin@example.com',
     adminPassword: 'adminpassword123',
   });
-  const [isRunningAll, setIsRunningAll] = useState(false);
+  const [_isRunningAll, _setIsRunningAll] = useState(false);
 
   const supabase = createClient();
 

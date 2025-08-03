@@ -8,7 +8,7 @@ interface DragScrollOptions {
 }
 
 interface DragScrollReturn {
-  dragScrollRef: React.RefObject<HTMLElement>;
+  dragScrollRef: React.RefObject<HTMLElement | null>;
   isDragging: boolean;
 }
 
@@ -18,7 +18,7 @@ export function useDragScroll({
   smoothness = 0.1,
   disabled = false
 }: DragScrollOptions = {}): DragScrollReturn {
-  const dragScrollRef = useRef<HTMLElement>(null);
+  const dragScrollRef = useRef<HTMLElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const dragState = useRef({
     isDragging: false,

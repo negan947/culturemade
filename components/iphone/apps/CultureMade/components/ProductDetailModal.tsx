@@ -137,7 +137,7 @@ const ProductDetailModal = ({
                   </h2>
                   {product.categories && product.categories.length > 0 && (
                     <p className="text-sm text-gray-600">
-                      {product.categories[0].name}
+                      {product.categories[0]?.name}
                     </p>
                   )}
                 </div>
@@ -157,7 +157,7 @@ const ProductDetailModal = ({
               {/* Product Image Gallery */}
               <div className="w-full">
                 <ProductImageGallery
-                  images={product.images || []}
+                  images={(product as any).images || []}
                   productName={product.name}
                   className="w-full"
                 />
@@ -168,7 +168,7 @@ const ProductDetailModal = ({
                 <ProductInfoSection
                   product={product}
                   pricingInfo={pricingInfo}
-                  inventoryStatus={inventoryStatus}
+                  inventoryStatus={inventoryStatus as any}
                   className="mb-6"
                 />
 
@@ -177,13 +177,13 @@ const ProductDetailModal = ({
                   <motion.button
                     whileTap={{ scale: 0.98 }}
                     onClick={handleAddToCartClick}
-                    disabled={isAddingToCart || !inventoryStatus?.inStock}
+                    disabled={isAddingToCart || !inventoryStatus?.isAvailable}
                     className={`
                       w-full py-4 px-6 rounded-xl font-bold text-lg shadow-lg
                       transition-all duration-200 flex items-center justify-center gap-2
                       ${addToCartSuccess
                         ? 'bg-green-500 text-white'
-                        : inventoryStatus?.inStock
+                        : inventoryStatus?.isAvailable
                         ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800'
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       }
@@ -199,7 +199,7 @@ const ProductDetailModal = ({
                         <Check className="h-5 w-5" />
                         Added to Cart!
                       </div>
-                    ) : !inventoryStatus?.inStock ? (
+                    ) : !inventoryStatus?.isAvailable ? (
                       'Out of Stock'
                     ) : (
                       `Add to Cart • ${pricingInfo?.displayPrice || 'Price not available'}`
@@ -208,7 +208,7 @@ const ProductDetailModal = ({
 
                   {inventoryStatus?.stockLevel && (
                     <p className="text-center text-sm text-gray-600 mt-2">
-                      {getStockLevelText(inventoryStatus.stockLevel, inventoryStatus.quantity)}
+                      {getStockLevelText(inventoryStatus)}
                     </p>
                   )}
                 </div>

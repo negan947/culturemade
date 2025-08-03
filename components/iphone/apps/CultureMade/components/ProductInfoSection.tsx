@@ -63,12 +63,12 @@ const ProductInfoSection = memo(function ProductInfoSection({
             <span className="text-2xl font-bold text-gray-900">
               {pricingInfo.displayPrice}
             </span>
-            {pricingInfo.compareAtPrice && (
+            {pricingInfo.originalPrice && (
               <span className="text-lg text-gray-500 line-through">
-                {pricingInfo.compareAtPrice}
+                {pricingInfo.originalPrice}
               </span>
             )}
-            {pricingInfo.onSale && (
+            {pricingInfo.isOnSale && (
               <span className="inline-flex items-center px-2 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-full">
                 Sale
               </span>
@@ -76,9 +76,9 @@ const ProductInfoSection = memo(function ProductInfoSection({
           </div>
         )}
         
-        {pricingInfo?.savings && (
+        {pricingInfo?.discountPercentage && (
           <div className="text-sm text-green-600 font-medium">
-            Save {pricingInfo.savingsPercent}% (${pricingInfo.savings.toFixed(2)})
+            Save {pricingInfo.discountPercentage}%
           </div>
         )}
       </div>

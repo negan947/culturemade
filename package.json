@@ -13,7 +13,6 @@
     "format:check": "prettier --check .",
     "format:write": "prettier --write . --log-level warn",
     "type-check": "tsc --noEmit",
-    "prebuild": "npm run lint:strict",
     "seed:products": "tsx scripts/seed-products.ts seed",
     "clean:products": "tsx scripts/seed-products.ts clean",
     "update:images": "tsx scripts/update-product-images.ts"

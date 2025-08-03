@@ -69,7 +69,7 @@ export function useQuantitySelector(options: UseQuantitySelectorOptions): UseQua
   } = options;
 
   // State
-  const [quantity, setQuantityState] = useState(initialQuantity);
+  const [quantity, setQuantity] = useState(initialQuantity);
   const [quantityState, setQuantityState] = useState<QuantityState | null>(null);
   const [validation, setValidation] = useState<QuantityValidation | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -127,7 +127,7 @@ export function useQuantitySelector(options: UseQuantitySelectorOptions): UseQua
       // Auto-adjust quantity if it exceeds max allowed
       if (quantity > state.maxAllowed && state.maxAllowed > 0) {
         const adjustedQuantity = Math.max(constraints.minQuantity, state.maxAllowed);
-        setQuantityState(adjustedQuantity);
+        setQuantity(adjustedQuantity);
         onQuantityChange?.(adjustedQuantity, state.errors.length === 0);
       }
       
@@ -181,9 +181,9 @@ export function useQuantitySelector(options: UseQuantitySelectorOptions): UseQua
   }, [currentVariantId, quantity, constraints, onValidationChange]);
 
   // Set quantity with validation
-  const setQuantity = useCallback((newQuantity: number) => {
+  const setQuantityFn = useCallback((newQuantity: number) => {
     const parsedQuantity = Math.max(constraints.minQuantity, Math.floor(newQuantity));
-    setQuantityState(parsedQuantity);
+    setQuantity(parsedQuantity);
     
     if (autoValidate) {
       validateCurrent();
@@ -197,19 +197,19 @@ export function useQuantitySelector(options: UseQuantitySelectorOptions): UseQua
   const increment = useCallback((step: number = 1) => {
     const maxAllowed = quantityState?.maxAllowed || limits.max;
     const newQuantity = incrementQuantity(quantity, maxAllowed, step, constraints);
-    setQuantity(newQuantity);
-  }, [quantity, quantityState, limits.max, constraints, setQuantity]);
+    setQuantityFn(newQuantity);
+  }, [quantity, quantityState, limits.max, constraints, setQuantityFn]);
 
   // Decrement quantity
   const decrement = useCallback((step: number = 1) => {
     const newQuantity = decrementQuantity(quantity, step, constraints);
-    setQuantity(newQuantity);
-  }, [quantity, constraints, setQuantity]);
+    setQuantityFn(newQuantity);
+  }, [quantity, constraints, setQuantityFn]);
 
   // Reset to default
   const reset = useCallback(() => {
-    setQuantity(constraints.defaultQuantity);
-  }, [constraints.defaultQuantity, setQuantity]);
+    setQuantityFn(constraints.defaultQuantity);
+  }, [constraints.defaultQuantity, setQuantityFn]);
 
   // Refresh state
   const refreshState = useCallback(() => {
@@ -248,7 +248,7 @@ export function useQuantitySelector(options: UseQuantitySelectorOptions): UseQua
     isLoading,
     
     // Actions
-    setQuantity,
+    setQuantity: setQuantityFn,
     increment,
     decrement,
     reset,
@@ -265,7 +265,7 @@ export function useSimpleQuantitySelector(
   initialQuantity: number = 1
 ) {
   const result = useQuantitySelector({
-    variantId,
+    ...(variantId && { variantId }),
     initialQuantity,
     autoValidate: true
   });
@@ -292,9 +292,9 @@ export function useQuantityInput(
   const [inputValue, setInputValue] = useState('1');
   
   const quantitySelector = useQuantitySelector({
-    variantId,
+    ...(variantId && { variantId }),
     autoValidate: true,
-    onQuantityChange
+    ...(onQuantityChange && { onQuantityChange })
   });
 
   const handleInputChange = useCallback((value: string) => {

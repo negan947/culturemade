@@ -8,11 +8,11 @@ export type ErrorType = 'network' | 'server' | 'timeout' | 'validation' | 'authe
 export interface ErrorState {
   type: ErrorType;
   message: string;
-  code?: string;
+  code?: string | undefined;
   retryable: boolean;
   retryCount: number;
   timestamp: Date;
-  context?: Record<string, any>;
+  context?: Record<string, any> | undefined;
 }
 
 export interface RetryConfig {
@@ -170,7 +170,7 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}): UseErrorH
     const errorState: ErrorState = {
       type: errorType,
       message: userMessage,
-      code: typeof error === 'object' && 'code' in error ? error.code as string : undefined,
+      code: typeof error === 'object' && 'code' in error ? error.code as string | undefined : undefined,
       retryable: isRetryable,
       retryCount: error && typeof error === 'object' && 'retryCount' in error 
         ? (error as any).retryCount 
@@ -254,15 +254,17 @@ export function useErrorHandler(options: UseErrorHandlerOptions = {}): UseErrorH
     context?: Record<string, any>
   ) => {
     return async (...args: T): Promise<R> => {
-      lastFailedOperationRef.current = () => fn(..._args);
+      lastFailedOperationRef.current = async () => {
+        await fn(...args);
+      };
       
       try {
         clearError();
-        const result = await fn(..._args);
+        const result = await fn(...args);
         return result;
-      } catch (_error) {
-        handleError(error as Error, context);
-        throw error;
+      } catch (caughtError) {
+        handleError(caughtError as Error, context);
+        throw caughtError;
       }
     };
   }, [clearError, handleError]);

@@ -51,6 +51,8 @@ const HomeBar: FC<Props> = ({ handleHomeBar, handleDragEnd }) => {
 
     const handleTouchStart = (e: TouchEvent) => {
       const touch = e.touches[0];
+      if (!touch) return;
+      
       startPoint = { x: touch.clientX, y: touch.clientY };
       
       // Only capture if starting from bottom area
@@ -65,6 +67,8 @@ const HomeBar: FC<Props> = ({ handleHomeBar, handleDragEnd }) => {
       if (!isNativeCapturing || !startPoint) return;
       
       const touch = e.touches[0];
+      if (!touch) return;
+      
       const offsetX = touch.clientX - startPoint.x;
       const offsetY = touch.clientY - startPoint.y;
       
@@ -76,6 +80,8 @@ const HomeBar: FC<Props> = ({ handleHomeBar, handleDragEnd }) => {
       if (!isNativeCapturing || !startPoint) return;
       
       const touch = e.changedTouches[0];
+      if (!touch) return;
+      
       const offsetY = touch.clientY - startPoint.y;
       
       handleDragEnd(offsetY);
@@ -100,22 +106,24 @@ const HomeBar: FC<Props> = ({ handleHomeBar, handleDragEnd }) => {
     <motion.div
       ref={homeBarRef}
       // Use Framer Motion for desktop, native events handle mobile
-      onPanStart={isMobile ? undefined : (_e, info) => {
-        startPointRef.current = { x: info.point.x, y: info.point.y };
-        setIsCapturing(true);
-      }}
-      onPan={isMobile ? undefined : (_e, info) => {
-        if (isCapturing) {
-          handleHomeBar(info.offset.x, info.offset.y);
+      {...(!isMobile && {
+        onPanStart: (_e, info) => {
+          startPointRef.current = { x: info.point.x, y: info.point.y };
+          setIsCapturing(true);
+        },
+        onPan: (_e, info) => {
+          if (isCapturing) {
+            handleHomeBar(info.offset.x, info.offset.y);
+          }
+        },
+        onPanEnd: (_e, info) => {
+          if (isCapturing) {
+            handleDragEnd(info.offset.y);
+            setIsCapturing(false);
+          }
+          startPointRef.current = null;
         }
-      }}
-      onPanEnd={isMobile ? undefined : (_e, info) => {
-        if (isCapturing) {
-          handleDragEnd(info.offset.y);
-          setIsCapturing(false);
-        }
-        startPointRef.current = null;
-      }}
+      })}
       style={{ 
         touchAction: isMobile ? 'none' : 'auto',
         height: isMobile ? '25px' : '16px', // Larger touch target on mobile

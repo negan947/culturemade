@@ -119,8 +119,8 @@ export function calculateVariantPricing(
     .map(variant => variant.price ? parseFloat(variant.price) : basePrice)
     .filter(price => !isNaN(price));
 
-  const minPrice = Math.min(..._variantPrices);
-  const maxPrice = Math.max(..._variantPrices);
+  const minPrice = variantPrices.length > 0 ? Math.min(...variantPrices) : basePrice;
+  const maxPrice = variantPrices.length > 0 ? Math.max(...variantPrices) : basePrice;
   const hasVariablePricing = minPrice !== maxPrice;
 
   // Use lowest price for display when variable

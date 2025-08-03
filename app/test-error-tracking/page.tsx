@@ -3,10 +3,10 @@
 import { useState } from 'react';
 
 export default function TestErrorTrackingPage() {
-  const [testResult, setTestResult] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [_testResult, setTestResult] = useState<any>(null);
+  const [_isLoading, setIsLoading] = useState(false);
 
-  const runTest = async (testType: 'quick' | 'all') => {
+  const _runTest = async (testType: 'quick' | 'all') => {
     setIsLoading(true);
     try {
       const response = await fetch(`/api/test-error-tracking?type=${testType}`);

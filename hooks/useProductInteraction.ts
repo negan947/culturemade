@@ -157,10 +157,10 @@ export function useProductInteraction(
       // Track analytics
       if (enableAnalytics && !options.skipAnalytics) {
         trackProductClick(productId, sourceComponent, {
-          positionIndex,
-          searchQuery,
-          categoryId,
-          clickTarget: options.clickTarget,
+          ...(positionIndex !== undefined && { positionIndex }),
+          ...(searchQuery !== undefined && { searchQuery }),
+          ...(categoryId !== undefined && { categoryId }),
+          ...(options.clickTarget !== undefined && { clickTarget: options.clickTarget }),
           additionalData: {
             session_id: getCurrentSession().sessionId,
             click_count: clickCount + 1,
@@ -216,9 +216,9 @@ export function useProductInteraction(
 
     if (enableAnalytics) {
       trackProductImpression(productId, sourceComponent, {
-        positionIndex,
-        searchQuery,
-        categoryId,
+        ...(positionIndex !== undefined && { positionIndex }),
+        ...(searchQuery !== undefined && { searchQuery }),
+        ...(categoryId !== undefined && { categoryId }),
         additionalData: {
           session_id: getCurrentSession().sessionId,
           viewport_visible: true,
@@ -282,13 +282,13 @@ export function useProductInteraction(
     if (!enableAnalytics || options.skipAnalytics) return;
 
     trackProductDetailView(productId, sourceComponent, {
-      searchQuery,
-      categoryId,
+      ...(searchQuery !== undefined && { searchQuery }),
+      ...(categoryId !== undefined && { categoryId }),
       referrer: options.referrer || document.referrer,
       additionalData: {
         session_id: getCurrentSession().sessionId,
         opened_from: sourceComponent,
-        position_index: positionIndex,
+        ...(positionIndex !== undefined && { position_index: positionIndex }),
         ...options.additionalData
       }
     });
@@ -308,15 +308,15 @@ export function useProductInteraction(
     simulateHapticFeedback('medium');
 
     trackAddToCart(productId, sourceComponent, {
-      variantId: options.variantId,
+      ...(options.variantId !== undefined && { variantId: options.variantId }),
       quantity: options.quantity || 1,
-      price: options.price,
-      searchQuery,
-      categoryId,
+      ...(options.price !== undefined && { price: options.price }),
+      ...(searchQuery !== undefined && { searchQuery }),
+      ...(categoryId !== undefined && { categoryId }),
       additionalData: {
         session_id: getCurrentSession().sessionId,
         added_from: sourceComponent,
-        position_index: positionIndex,
+        ...(positionIndex !== undefined && { position_index: positionIndex }),
         ...options.additionalData
       }
     });
@@ -426,10 +426,10 @@ export function useProductAnalytics(
 
   const trackClick = useCallback((productId: string, clickTarget?: string) => {
     trackProductClick(productId, sourceComponent, {
-      positionIndex,
-      searchQuery,
-      categoryId,
-      clickTarget,
+      ...(positionIndex !== undefined && { positionIndex }),
+      ...(searchQuery !== undefined && { searchQuery }),
+      ...(categoryId !== undefined && { categoryId }),
+      ...(clickTarget !== undefined && { clickTarget }),
       additionalData: {
         session_id: getCurrentSession().sessionId,
         timestamp: new Date().toISOString()
@@ -439,9 +439,9 @@ export function useProductAnalytics(
 
   const trackImpression = useCallback((productId: string) => {
     trackProductImpression(productId, sourceComponent, {
-      positionIndex,
-      searchQuery,
-      categoryId,
+      ...(positionIndex !== undefined && { positionIndex }),
+      ...(searchQuery !== undefined && { searchQuery }),
+      ...(categoryId !== undefined && { categoryId }),
       additionalData: {
         session_id: getCurrentSession().sessionId,
         timestamp: new Date().toISOString()
@@ -451,8 +451,8 @@ export function useProductAnalytics(
 
   const trackDetailView = useCallback((productId: string, referrer?: string) => {
     trackProductDetailView(productId, sourceComponent, {
-      searchQuery,
-      categoryId,
+      ...(searchQuery !== undefined && { searchQuery }),
+      ...(categoryId !== undefined && { categoryId }),
       referrer: referrer || document.referrer,
       additionalData: {
         session_id: getCurrentSession().sessionId,
@@ -468,11 +468,11 @@ export function useProductAnalytics(
     price?: number
   ) => {
     trackAddToCart(productId, sourceComponent, {
-      variantId,
+      ...(variantId !== undefined && { variantId }),
       quantity: quantity || 1,
-      price,
-      searchQuery,
-      categoryId,
+      ...(price !== undefined && { price }),
+      ...(searchQuery !== undefined && { searchQuery }),
+      ...(categoryId !== undefined && { categoryId }),
       additionalData: {
         session_id: getCurrentSession().sessionId,
         timestamp: new Date().toISOString()

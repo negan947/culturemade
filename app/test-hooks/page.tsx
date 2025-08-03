@@ -1,42 +1,42 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 
 export default function TestHooksPage() {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const _containerRef = useRef<HTMLDivElement>(null);
   
   // Test infinite scroll hook
   const {
-    products,
-    loading,
-    error,
-    hasMore,
-    loadMore,
-    retry,
-    refresh,
-    pagination,
-    observerRef,
+    products: _products,
+    loading: _loading,
+    error: _error,
+    hasMore: _hasMore,
+    loadMore: _loadMore,
+    retry: _retry,
+    refresh: _refresh,
+    pagination: _pagination,
+    observerRef: _observerRef,
   } = useInfiniteScroll({
     pageSize: 20,
     threshold: 0.8,
   });
 
   // Test error handler hook
-  const errorHandler = useErrorHandler({
+  const _errorHandler = useErrorHandler({
     maxRetries: 3,
-    onError: (error) => {
+    onError: (_error) => {
 
     },
-    onRetry: (error, attempt) => {
+    onRetry: (_error, _attempt) => {
 
     },
   });
 
   // Test API endpoint directly
-  const testApiEndpoint = async () => {
+  const _testApiEndpoint = async () => {
     try {
       const response = await fetch('/api/products?page=1&limit=5');
       const data = await response.json();

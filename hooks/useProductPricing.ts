@@ -127,13 +127,13 @@ export function useProductPricing(
 
   return {
     pricing: activePricing,
-    selectedVariantPricing,
+    ...(selectedVariantPricing && { selectedVariantPricing }),
     formatPrice,
     isOnSale: activePricing.isOnSale,
-    discountText,
+    ...(discountText && { discountText }),
     priceText: activePricing.displayPrice,
-    originalPriceText: activePricing.originalPrice,
-    savingsText,
+    ...(activePricing.originalPrice && { originalPriceText: activePricing.originalPrice }),
+    ...(savingsText && { savingsText }),
     hasVariants,
     canShowFromPrice
   };
@@ -164,9 +164,9 @@ export function useSimpleProductPricing(
 
   return {
     price: pricing.displayPrice,
-    originalPrice: pricing.originalPrice,
+    ...(pricing.originalPrice && { originalPrice: pricing.originalPrice }),
     isOnSale: pricing.isOnSale,
-    discount: pricing.discountPercentage ? `${pricing.discountPercentage}% off` : undefined
+    ...(pricing.discountPercentage && { discount: `${pricing.discountPercentage}% off` })
   };
 }
 
@@ -212,7 +212,7 @@ export function useVariantPricing(
 
   return {
     basePricing,
-    variantPricing,
+    ...(variantPricing && { variantPricing }),
     priceChanged,
     priceChangeAmount,
     isMoreExpensive
@@ -282,8 +282,8 @@ export function usePriceComparison(
     }
 
     const prices = products.map(p => parseFloat(p.min_price));
-    const minPrice = Math.min(..._prices);
-    const maxPrice = Math.max(..._prices);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
     const averagePrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
 
     const cheapest = products.find(p => parseFloat(p.min_price) === minPrice) || null;

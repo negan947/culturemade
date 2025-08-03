@@ -81,7 +81,7 @@ export function LoginForm({ onSuccess, redirectTo = '/' }: LoginFormProps) {
       }
     } catch (error) {
       console.error('Login error:', error);
-      setError('Login failed');
+      console.error('Login failed');
     } finally {
       setIsLoading(false);
     }

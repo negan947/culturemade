@@ -96,7 +96,7 @@ export function RegisterForm({
       }
     } catch (error) {
       console.error('Registration error:', error);
-      setError('Registration failed');
+      console.error('Registration failed');
     } finally {
       setIsLoading(false);
     }

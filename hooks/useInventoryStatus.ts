@@ -24,10 +24,10 @@ import {
 // =============================================================================
 
 export interface UseInventoryStatusOptions extends Partial<InventoryThresholds> {
-  variants?: ProductVariant[];           // Optional variants for detailed inventory
-  selectedVariantId?: string;            // Selected variant for specific inventory
-  showExactQuantity?: boolean;           // Show exact numbers vs. text levels
-  enableBadges?: boolean;                // Enable/disable badge display
+  variants?: ProductVariant[] | undefined;           // Optional variants for detailed inventory
+  selectedVariantId?: string | undefined;            // Selected variant for specific inventory
+  showExactQuantity?: boolean | undefined;           // Show exact numbers vs. text levels
+  enableBadges?: boolean | undefined;                // Enable/disable badge display
 }
 
 export interface UseInventoryStatusResult {
@@ -159,7 +159,7 @@ export function useInventoryStatus(
 
   return {
     inventory,
-    selectedVariantInventory,
+    ...(selectedVariantInventory && { selectedVariantInventory }),
     badge,
     cardClasses,
     stockText,
@@ -169,8 +169,8 @@ export function useInventoryStatus(
     isNew: inventory.isNew,
     isOnSale: inventory.isOnSale,
     showStockWarning,
-    availableVariantCount: variantInventoryData?.availableVariants,
-    totalVariantCount: variants.length || undefined
+    ...(variantInventoryData?.availableVariants !== undefined && { availableVariantCount: variantInventoryData.availableVariants }),
+    ...(variants.length > 0 && { totalVariantCount: variants.length })
   };
 }
 
@@ -241,7 +241,7 @@ export function useVariantAvailability(
 
   return {
     productAvailability,
-    variantAvailability,
+    ...(variantAvailability && { variantAvailability }),
     availabilityChanged,
     isSelectedVariantAvailable,
     availableVariants,
@@ -361,7 +361,7 @@ export function useStockLevelIndicator(
     }
   }, [stockLevel]);
 
-  const showQuantity = stockLevel === 'low' || (selectedVariantInventory && selectedVariantInventory.quantity <= 10);
+  const showQuantity = stockLevel === 'low' || (selectedVariantInventory ? selectedVariantInventory.quantity <= 10 : false);
   const exactQuantity = selectedVariantInventory?.quantity || inventory.totalQuantity;
 
   return {

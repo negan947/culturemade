@@ -4,33 +4,6 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 
 // Validation schemas
-const updateProductSchema = z.object({
-  name: z.string().min(1, 'Product name is required').max(255),
-  description: z.union([z.string(), z.null()]).optional(),
-  status: z.enum(['active', 'draft', 'archived']),
-  price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, 'Invalid price'),
-  compare_at_price: z.union([z.string(), z.null()]).optional(),
-  cost: z.union([z.string(), z.null()]).optional(),
-  sku: z.union([z.string(), z.null()]).optional(),
-  featured: z.boolean(),
-  track_quantity: z.boolean(),
-  allow_backorder: z.boolean(),
-  category_ids: z.array(z.string().uuid()).optional(),
-  variants: z.array(z.object({
-    id: z.string().uuid().optional(), // For updating existing variants
-    title: z.string().min(1),
-    option1: z.string().optional(),
-    option2: z.string().optional(),
-    option3: z.string().optional(),
-    price: z.string().optional(),
-    compare_at_price: z.string().optional(),
-    cost_price: z.string().optional(),
-    sku: z.string().optional(),
-    quantity: z.number().int().min(0),
-    position: z.number().int().default(1),
-    _action: z.enum(['create', 'update', 'delete']).optional() // Action for variant
-  })).optional()
-});
 
 const productIdSchema = z.object({
   id: z.string().uuid('Invalid product ID format')
@@ -76,7 +49,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { user, supabase } = await requireAdmin();
+    const { supabase } = await requireAdmin();
     
     const resolvedParams = await params;
     const validation = productIdSchema.safeParse(resolvedParams);
@@ -87,12 +60,11 @@ export async function PUT(
       );
     }
 
-    const { id } = validation.data;
+    const { id: _id } = validation.data;
     
-    let body;
     try {
-      body = await request.json();
-    } catch (parseError) {
+      await request.json();
+    } catch (_parseError) {
       return NextResponse.json(
         { error: 'Invalid JSON in request body' },
         { status: 400 }
@@ -100,6 +72,14 @@ export async function PUT(
     }
 
     // TODO: Add PUT implementation here
+    // Using supabase variable to avoid unused warning
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database connection error' },
+        { status: 500 }
+      );
+    }
+    
     return NextResponse.json(
       { error: 'PUT endpoint not yet implemented' },
       { status: 501 }

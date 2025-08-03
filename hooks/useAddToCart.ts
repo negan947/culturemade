@@ -46,8 +46,8 @@ export interface UseAddToCartResult {
 }
 
 export interface UseAddToCartOptions {
-  userId?: string;
-  sessionId?: string;
+  userId?: string | undefined;
+  sessionId?: string | undefined;
   enableOptimisticUpdates?: boolean;
   showNotifications?: boolean;
   autoRefreshOnMount?: boolean;
@@ -72,13 +72,15 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
 
   // Set cart ID on mount or when userId/sessionId changes
   useEffect(() => {
-    dispatch(setCartId({ userId, sessionId }));
+    if (userId || sessionId) {
+      dispatch(setCartId({ userId, sessionId }));
+    }
   }, [dispatch, userId, sessionId]);
 
   // Auto-refresh cart on mount
   useEffect(() => {
-    if (autoRefreshOnMount) {
-      dispatch(loadCart({ userId, sessionId }));
+    if (autoRefreshOnMount && (userId || sessionId)) {
+      dispatch(loadCart());
     }
   }, [dispatch, userId, sessionId, autoRefreshOnMount]);
 
@@ -135,7 +137,7 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
       );
 
       if (!validation.isValid) {
-        const errorMessage = validation.errors[0];
+        const errorMessage = validation.errors[0] || 'Invalid request';
         
         if (showNotifications) {
           dispatch(notificationActions.new({
@@ -164,8 +166,8 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
       // Dispatch actual add to cart
       const result = await dispatch(addToCart({
         ...request,
-        userId,
-        sessionId
+        userId: userId || '',
+        sessionId: sessionId || ''
       }));
 
       if (addToCart.fulfilled.match(result)) {
@@ -177,15 +179,15 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
           }));
         }
         
-        onSuccess?.('add', result.payload.cartItem);
+        onSuccess?.('add', result.payload?.cartItem);
         return true;
       } else {
         // Rollback optimistic update
         if (enableOptimisticUpdates && cart.summary) {
-          dispatch(rollbackOptimisticUpdate(cart.summary));
+          dispatch(rollbackOptimisticUpdate({ originalState: cart }));
         }
         
-        const errorMessage = result.payload || 'Failed to add item to cart';
+        const errorMessage = (result.payload as string) || 'Failed to add item to cart';
         
         if (showNotifications) {
           dispatch(notificationActions.new({
@@ -202,7 +204,7 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
     } catch {
       // Rollback optimistic update
       if (enableOptimisticUpdates && cart.summary) {
-        dispatch(rollbackOptimisticUpdate(cart.summary));
+        dispatch(rollbackOptimisticUpdate({ originalState: cart }));
       }
       
       const errorMessage = 'An unexpected error occurred';
@@ -247,9 +249,7 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
 
       const result = await dispatch(updateQuantity({
         cartItemId,
-        quantity,
-        userId,
-        sessionId
+        quantity
       }));
 
       if (updateQuantity.fulfilled.match(result)) {
@@ -266,7 +266,7 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
       } else {
         // Rollback optimistic update
         if (enableOptimisticUpdates && cart.summary) {
-          dispatch(rollbackOptimisticUpdate(cart.summary));
+          dispatch(rollbackOptimisticUpdate({ originalState: cart }));
         }
         
         const errorMessage = result.payload || 'Failed to update quantity';
@@ -286,7 +286,7 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
     } catch {
       // Rollback optimistic update
       if (enableOptimisticUpdates && cart.summary) {
-        dispatch(rollbackOptimisticUpdate(cart.summary));
+        dispatch(rollbackOptimisticUpdate({ originalState: cart }));
       }
       
       const errorMessage = 'Failed to update quantity';
@@ -322,13 +322,11 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
     try {
       // Optimistic update
       if (enableOptimisticUpdates) {
-        dispatch(optimisticRemoveItem(cartItemId));
+        dispatch(optimisticRemoveItem({ cartItemId }));
       }
 
       const result = await dispatch(removeItem({
-        cartItemId,
-        userId,
-        sessionId
+        cartItemId
       }));
 
       if (removeItem.fulfilled.match(result)) {
@@ -345,7 +343,7 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
       } else {
         // Rollback optimistic update
         if (enableOptimisticUpdates && cart.summary) {
-          dispatch(rollbackOptimisticUpdate(cart.summary));
+          dispatch(rollbackOptimisticUpdate({ originalState: cart }));
         }
         
         const errorMessage = result.payload || 'Failed to remove item';
@@ -365,7 +363,7 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
     } catch {
       // Rollback optimistic update
       if (enableOptimisticUpdates && cart.summary) {
-        dispatch(rollbackOptimisticUpdate(cart.summary));
+        dispatch(rollbackOptimisticUpdate({ originalState: cart }));
       }
       
       const errorMessage = 'Failed to remove item';
@@ -399,7 +397,7 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
     setIsProcessing(true);
 
     try {
-      const result = await dispatch(clearCartAsync({ userId, sessionId }));
+      const result = await dispatch(clearCartAsync());
 
       if (clearCartAsync.fulfilled.match(result)) {
         if (showNotifications) {
@@ -447,7 +445,9 @@ export function useAddToCart(options: UseAddToCartOptions = {}): UseAddToCartRes
 
   // Refresh cart
   const refreshCart = useCallback(async (): Promise<void> => {
-    await dispatch(loadCart({ userId, sessionId }));
+    if (userId || sessionId) {
+      await dispatch(loadCart());
+    }
   }, [dispatch, userId, sessionId]);
 
   // Clear error

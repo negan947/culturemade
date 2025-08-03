@@ -305,7 +305,13 @@ export default function SearchResults({
                       value={filters.minPrice || ''}
                       onChange={(e) => {
                         const value = e.target.value;
-                        handleFilterChange(value ? { minPrice: parseFloat(value) } : { minPrice: undefined });
+                        if (value) {
+                          handleFilterChange({ minPrice: parseFloat(value) });
+                        } else {
+                          const newFilters = { ...filters };
+                          delete newFilters.minPrice;
+                          handleFilterChange(newFilters);
+                        }
                       }}
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
@@ -315,7 +321,13 @@ export default function SearchResults({
                       value={filters.maxPrice || ''}
                       onChange={(e) => {
                         const value = e.target.value;
-                        handleFilterChange(value ? { maxPrice: parseFloat(value) } : { maxPrice: undefined });
+                        if (value) {
+                          handleFilterChange({ maxPrice: parseFloat(value) });
+                        } else {
+                          const newFilters = { ...filters };
+                          delete newFilters.maxPrice;
+                          handleFilterChange(newFilters);
+                        }
                       }}
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />

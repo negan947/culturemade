@@ -77,6 +77,7 @@ export async function getProductVariants(productId: string): Promise<ProductVari
     // Note: MCP functions are only available to Claude, not in application runtime
     // const result = await mcp__supabasecm__execute_sql({ query: query.replace('$1', `'${productId}'`) });
     // Application should use standard Supabase client
+    const result: any = null; // Placeholder for actual implementation
     throw new Error('This utility requires application-level database implementation');
   } catch (_error) {
 
@@ -100,8 +101,11 @@ export async function checkVariantAvailability(variantId: string): Promise<Varia
     `;
 
     // const result = await mcp__supabasecm__execute_sql({ query });
+    // const result: any = null; // Placeholder for actual implementation
     throw new Error('This utility requires application-level database implementation');
     
+    // Unreachable code after throw - kept for reference
+    /*
     if (!result || typeof result !== 'string') {
       throw new Error('Invalid response from database');
     }
@@ -123,6 +127,7 @@ export async function checkVariantAvailability(variantId: string): Promise<Varia
       is_available: available_quantity > 0,
       is_low_stock: available_quantity <= 5 && available_quantity > 0
     };
+    */
   } catch (_error) {
 
     throw new Error('Variant error: ' + JSON.stringify({
@@ -215,8 +220,8 @@ export function getVariantPricing(variants: ProductVariant[]) {
   }
 
   const prices = variants.map(v => v.price);
-  const minPrice = Math.min(..._prices);
-  const maxPrice = Math.max(..._prices);
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
 
   return {
     minPrice,
@@ -254,8 +259,11 @@ export async function getBulkProductVariants(productIds: string[]): Promise<Map<
     `;
 
     // const result = await mcp__supabasecm__execute_sql({ query });
+    // const result: any = null; // Placeholder for actual implementation
     throw new Error('This utility requires application-level database implementation');
     
+    // Unreachable code after throw - kept for reference
+    /*
     if (!result || typeof result !== 'string') {
       throw new Error('Invalid response from database');
     }
@@ -276,6 +284,7 @@ export async function getBulkProductVariants(productIds: string[]): Promise<Map<
     });
 
     return variantMap;
+    */
   } catch (_error) {
 
     throw new Error('Variant error: ' + JSON.stringify({

@@ -43,6 +43,7 @@ interface ApiResponse {
   success: boolean;
   data: Product[];
   pagination: PaginationInfo;
+  error?: string;
 }
 
 interface UseInfiniteScrollOptions {
@@ -192,7 +193,7 @@ export function useInfiniteScroll(options: UseInfiniteScrollOptions = {}): UseIn
   // Intersection Observer callback
   const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
     const [entry] = entries;
-    if (entry.isIntersecting && hasMore && !loading && !loadingRef.current) {
+    if (entry && entry.isIntersecting && hasMore && !loading && !loadingRef.current) {
       loadMore();
     }
   }, [hasMore, loading, loadMore]);

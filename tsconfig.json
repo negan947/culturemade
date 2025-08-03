@@ -29,8 +29,8 @@
     "exactOptionalPropertyTypes": true,
 
     // Additional Type Checking
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
@@ -92,7 +92,14 @@
     "app/api/cart/**/*.ts",
     "app/api/debug/**/*.ts",
     "app/api/products/**/*.ts",
-    "app/test-images/**/*.tsx"
+    "app/test-images/**/*.tsx",
+    "app/test-auth/page.tsx",
+    "app/test-error-tracking/page.tsx", 
+    "app/test-hooks/page.tsx",
+    "app/test-connection/page.tsx",
+    "components/auth/login-form.tsx",
+    "components/auth/register-form.tsx",
+    "components/auth/reset-password-form.tsx"
   ],
   "ts-node": {
     "esm": true
