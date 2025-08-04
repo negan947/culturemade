@@ -2,10 +2,14 @@
 
 import { motion } from 'framer-motion';
 import { Tag } from 'lucide-react';
-import { memo } from 'react';
+import { memo, useState } from 'react';
 
+import { useInventoryStatus } from '@/hooks/useInventoryStatus';
+import { useProductInteraction } from '@/hooks/useProductInteraction';
+import { useProductPricing } from '@/hooks/useProductPricing';
 import { ProductListItem } from '@/types/api';
 
+import ModalProductCard from './ModalProductCard';
 import ProductImage from './ProductImage';
 
 
@@ -15,63 +19,109 @@ interface ProductCardProps {
   onAddToCart?: (productId: string, variantId?: string, quantity?: number) => Promise<void>;
   className?: string;
   loading?: boolean;
+  sourceComponent?: string;
+  positionIndex?: number;
 }
 
-const ProductCard = memo(function ProductCard({ product, onProductClick, onAddToCart, className, loading }: ProductCardProps) {
-  // Calculate if product is on sale
-  const isOnSale = product.compare_at_price && 
-    parseFloat(product.compare_at_price) > parseFloat(product.price);
+const ProductCard = memo(function ProductCard({ 
+  product, 
+  onProductClick, 
+  onAddToCart, 
+  className, 
+  loading,
+  sourceComponent = 'product_grid',
+  positionIndex 
+}: ProductCardProps) {
+  // Modal state for popup functionality
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Use advanced hooks for business logic
+  const { pricing, priceText, originalPriceText, isOnSale, discountText } = useProductPricing(product);
   
-  // Calculate discount percentage
-  const discountPercentage = isOnSale
-    ? Math.round(((parseFloat(product.compare_at_price!) - parseFloat(product.price)) / parseFloat(product.compare_at_price!)) * 100)
-    : 0;
-
-  // Determine if product is out of stock
-  const isOutOfStock = product.total_inventory <= 0;
+  const { 
+    inventory, 
+    badge, 
+    cardClasses, 
+    stockText, 
+    isAvailable, 
+    isLowStock, 
+    isOutOfStock, 
+    showStockWarning 
+  } = useInventoryStatus(product);
   
-  // Determine if product is low stock
-  const isLowStock = product.total_inventory > 0 && product.total_inventory <= 5;
+  const { 
+    handleClick: handleInteractionClick, 
+    handleImpression,
+    impressionRef,
+    isProcessing
+  } = useProductInteraction({
+    sourceComponent,
+    positionIndex: positionIndex ?? 0,
+    enableAnalytics: true,
+    enableHapticFeedback: true
+  });
 
-  // Format pricing display
-  const priceDisplay = product.min_price !== product.max_price 
-    ? `from $${product.min_price}`
-    : `$${product.price}`;
-
-  // Handle click event
+  // Enhanced click handler - now opens modal instead of navigation
   const handleClick = () => {
-    if (!loading && !isOutOfStock) {
-      onProductClick(product.id);
+    if (!loading && !isProcessing) {
+      handleInteractionClick(product.id, { 
+        clickTarget: 'product_card_trigger',
+        additionalData: { 
+          productName: product.name,
+          price: pricing.displayPrice,
+          category: product.categories?.[0]?.name,
+          modalTrigger: true
+        }
+      });
+      setIsModalOpen(true);
     }
   };
 
-  // Generate comprehensive accessibility label
-  const accessibilityLabel = `Product card for ${product.name}, priced at ${priceDisplay}${
+  // Modal handlers
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  // Generate comprehensive accessibility label using advanced hook data
+  const accessibilityLabel = `Product card for ${product.name}, priced at ${priceText}${
     isOutOfStock ? ', out of stock' : ''
-  }${isOnSale ? `, on sale with ${discountPercentage}% off` : ''}${
-    isLowStock && !isOutOfStock ? `, low stock with only ${product.total_inventory} remaining` : ''
+  }${isOnSale ? `, ${discountText}` : ''}${
+    showStockWarning ? `, ${stockText}` : ''
   }${product.featured ? ', featured product' : ''}`;
 
   return (
-    <motion.div
-      whileTap={{ scale: 0.95 }}
-      transition={{ duration: 0.15, ease: 'easeOut' }}
-      onClick={handleClick}
-      className={`bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 active:shadow-md transition-shadow ${
-        isOutOfStock ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
-      } ${loading ? 'pointer-events-none' : ''} ${className || ''}`}
-      role="button"
-      tabIndex={0}
-      aria-label={accessibilityLabel}
-      aria-describedby={`product-${product.id}-details`}
-      aria-disabled={isOutOfStock || loading}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          handleClick();
-        }
-      }}
-    >
+    <>
+      {/* Modal ProductCard */}
+      <ModalProductCard
+        product={product}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onAddToCart={onAddToCart}
+        onProductClick={onProductClick}
+      />
+
+      {/* Trigger Card */}
+      <motion.div
+        ref={impressionRef}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        transition={{ duration: 0.15, ease: 'easeOut' }}
+        onClick={handleClick}
+        className={`bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 cursor-pointer hover:shadow-md transition-all ${
+          cardClasses.cardClasses
+        } ${loading || isProcessing ? 'pointer-events-none opacity-60' : ''} ${className || ''}`}
+        role="button"
+        tabIndex={0}
+        aria-label={`${accessibilityLabel}. Click to open product details modal.`}
+        aria-describedby={`product-${product.id}-details`}
+        aria-disabled={loading || isProcessing}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleClick();
+          }
+        }}
+      >
       {/* Product Image with Overlays */}
       <div className="relative">
         <ProductImage
@@ -81,34 +131,16 @@ const ProductCard = memo(function ProductCard({ product, onProductClick, onAddTo
           className="rounded-t-lg"
         />
 
-        {/* Status Badges */}
+        {/* Status Badges - Using Advanced Badge System */}
         <div className="absolute top-2 left-2 flex flex-col gap-1" aria-label="Product status badges">
-          {isOnSale && (
+          {badge && (
             <div 
-              className="bg-red-500 text-white px-2 py-1 rounded text-xs font-semibold flex items-center gap-1"
+              className={`${badge.bgColor} ${badge.textColor} px-2 py-1 rounded text-xs font-semibold flex items-center gap-1`}
               role="status"
-              aria-label={`On sale: ${discountPercentage}% off`}
+              aria-label={`Product status: ${badge.text}`}
             >
               <Tag className="w-3 h-3" aria-hidden="true" />
-              {discountPercentage}% OFF
-            </div>
-          )}
-          {product.featured && !isOnSale && (
-            <div 
-              className="bg-blue-500 text-white px-2 py-1 rounded text-xs font-semibold"
-              role="status"
-              aria-label="Featured product"
-            >
-              Featured
-            </div>
-          )}
-          {isLowStock && !isOutOfStock && (
-            <div 
-              className="bg-orange-500 text-white px-2 py-1 rounded text-xs font-semibold"
-              role="status"
-              aria-label={`Low stock: only ${product.total_inventory} remaining`}
-            >
-              Low Stock
+              {badge.text}
             </div>
           )}
         </div>
@@ -133,20 +165,20 @@ const ProductCard = memo(function ProductCard({ product, onProductClick, onAddTo
           {product.name}
         </h3>
         
-        {/* Pricing */}
+        {/* Pricing - Using Advanced Pricing System */}
         <div className="flex items-center gap-2 mb-1" role="group" aria-label="Product pricing">
           <span 
             className="text-blue-600 font-semibold text-sm"
-            aria-label={`Current price: ${priceDisplay}`}
+            aria-label={`Current price: ${priceText}`}
           >
-            {priceDisplay}
+            {priceText}
           </span>
-          {isOnSale && (
+          {isOnSale && originalPriceText && (
             <span 
               className="text-gray-400 text-xs line-through"
-              aria-label={`Original price: $${product.compare_at_price}`}
+              aria-label={`Original price: ${originalPriceText}`}
             >
-              ${product.compare_at_price}
+              {originalPriceText}
             </span>
           )}
         </div>
@@ -178,18 +210,19 @@ const ProductCard = memo(function ProductCard({ product, onProductClick, onAddTo
           </div>
         )}
 
-        {/* Inventory Status */}
-        {!isOutOfStock && isLowStock && (
+        {/* Inventory Status - Using Advanced Inventory System */}
+        {showStockWarning && (
           <div 
             className="text-xs text-orange-600 mt-1 font-medium"
             role="status"
-            aria-label={`Low inventory warning: only ${product.total_inventory} items left`}
+            aria-label={`Inventory status: ${stockText}`}
           >
-            Only {product.total_inventory} left
+            {stockText}
           </div>
         )}
       </div>
-    </motion.div>
+      </motion.div>
+    </>
   );
 });
 

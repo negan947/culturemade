@@ -96,6 +96,8 @@ const ProductGrid = memo(function ProductGrid({
           <ProductCard
             product={product}
             onProductClick={onProductClick}
+            positionIndex={index}
+            sourceComponent="product_grid"
           />
         </motion.div>
       ))}
