@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { config } from 'dotenv';
 
-import { generatePlaceholderImage } from '../lib/utils/image-utils';
+// import { generatePlaceholderImage } from '../lib/utils/image-utils'; // Removed - no placeholders
 import type {
   CategoryInsert,
   Database,
@@ -145,13 +145,7 @@ const products: SeedProduct[] = [
     sku: 'TSHIRT-CLASSIC',
     categorySlug: 'mens-shirts',
     featured: true,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Classic White T-Shirt'),
-        alt_text: 'Classic White T-Shirt',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'White / Small',
@@ -238,13 +232,7 @@ const products: SeedProduct[] = [
     sku: 'JACKET-DENIM',
     categorySlug: 'mens-shirts',
     featured: true,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Vintage Denim Jacket'),
-        alt_text: 'Vintage Denim Jacket',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'Light Blue / Small',
@@ -306,13 +294,7 @@ const products: SeedProduct[] = [
     sku: 'HOODIE-COTTON',
     categorySlug: 'mens-shirts',
     featured: false,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Cotton Hoodie'),
-        alt_text: 'Cotton Hoodie',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'Black / Small',
@@ -382,13 +364,7 @@ const products: SeedProduct[] = [
     sku: 'POLO-CLASSIC',
     categorySlug: 'mens-shirts',
     featured: false,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Polo Shirt'),
-        alt_text: 'Polo Shirt',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'White / Small',
@@ -450,13 +426,7 @@ const products: SeedProduct[] = [
     sku: 'HENLEY-LS',
     categorySlug: 'mens-shirts',
     featured: false,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Long Sleeve Henley'),
-        alt_text: 'Long Sleeve Henley',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'Gray / Small',
@@ -512,13 +482,7 @@ const products: SeedProduct[] = [
     sku: 'JEANS-SLIM',
     categorySlug: 'mens-pants',
     featured: true,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Slim Fit Jeans'),
-        alt_text: 'Slim Fit Jeans',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'Blue / 30',
@@ -588,13 +552,7 @@ const products: SeedProduct[] = [
     sku: 'CHINO-CLASSIC',
     categorySlug: 'mens-pants',
     featured: false,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Chino Pants'),
-        alt_text: 'Chino Pants',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'Khaki / 30',
@@ -664,13 +622,7 @@ const products: SeedProduct[] = [
     sku: 'JOGGER-ATHLETIC',
     categorySlug: 'mens-pants',
     featured: false,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Jogger Pants'),
-        alt_text: 'Jogger Pants',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'Gray / Small',
@@ -732,13 +684,7 @@ const products: SeedProduct[] = [
     sku: 'DRESS-FORMAL',
     categorySlug: 'mens-pants',
     featured: false,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Dress Pants'),
-        alt_text: 'Dress Pants',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'Black / 30',
@@ -800,13 +746,7 @@ const products: SeedProduct[] = [
     sku: 'SHORTS-CARGO',
     categorySlug: 'mens-pants',
     featured: false,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Cargo Shorts'),
-        alt_text: 'Cargo Shorts',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'Khaki / 30',
@@ -862,13 +802,7 @@ const products: SeedProduct[] = [
     sku: 'SNEAKER-WHITE',
     categorySlug: 'mens-shoes',
     featured: true,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'White Sneakers'),
-        alt_text: 'White Sneakers',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'White / 8',
@@ -938,13 +872,7 @@ const products: SeedProduct[] = [
     sku: 'CANVAS-CLASSIC',
     categorySlug: 'mens-shoes',
     featured: false,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Canvas Shoes'),
-        alt_text: 'Canvas Shoes',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'White / 8',
@@ -1006,13 +934,7 @@ const products: SeedProduct[] = [
     sku: 'RUNNING-ATHLETIC',
     categorySlug: 'mens-shoes',
     featured: true,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Running Shoes'),
-        alt_text: 'Running Shoes',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'Black / 8',
@@ -1074,13 +996,7 @@ const products: SeedProduct[] = [
     sku: 'BOOTS-LEATHER',
     categorySlug: 'mens-shoes',
     featured: false,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Leather Boots'),
-        alt_text: 'Leather Boots',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'Brown / 8',
@@ -1134,13 +1050,7 @@ const products: SeedProduct[] = [
     sku: 'SANDALS-SUMMER',
     categorySlug: 'mens-shoes',
     featured: false,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Sandals'),
-        alt_text: 'Sandals',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'Brown / 8',
@@ -1196,13 +1106,7 @@ const products: SeedProduct[] = [
     sku: 'CAP-BASEBALL',
     categorySlug: 'accessories',
     featured: false,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Baseball Cap'),
-        alt_text: 'Baseball Cap',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'Black / One Size',
@@ -1248,13 +1152,7 @@ const products: SeedProduct[] = [
     sku: 'BELT-LEATHER',
     categorySlug: 'accessories',
     featured: true,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Leather Belt'),
-        alt_text: 'Leather Belt',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'Brown / 32',
@@ -1316,13 +1214,7 @@ const products: SeedProduct[] = [
     sku: 'SOCKS-COTTON-3PK',
     categorySlug: 'accessories',
     featured: false,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Cotton Socks Pack'),
-        alt_text: 'Cotton Socks Pack',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'White / Small',
@@ -1384,13 +1276,7 @@ const products: SeedProduct[] = [
     sku: 'WATCH-CLASSIC',
     categorySlug: 'accessories',
     featured: true,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Wrist Watch'),
-        alt_text: 'Wrist Watch',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'Silver / One Size',
@@ -1428,13 +1314,7 @@ const products: SeedProduct[] = [
     sku: 'SUNGLASSES-STYLE',
     categorySlug: 'accessories',
     featured: false,
-    images: [
-      {
-        url: generatePlaceholderImage(400, 400, 'Sunglasses'),
-        alt_text: 'Sunglasses',
-        position: 1,
-      },
-    ],
+    images: [], // No placeholder images - admin should upload real images
     variants: [
       {
         name: 'Black / One Size',

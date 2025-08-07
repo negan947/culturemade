@@ -117,8 +117,12 @@ export function getProductImageWithFallback(
     return null;
   }
 
-  // If it's a placeholder URL, treat as no image
-  if (imagePath.includes('placeholder')) {
+  // If it's a placeholder URL (Lorem Picsum, placeholder APIs, etc.), treat as no image
+  if (imagePath.includes('placeholder') || 
+      imagePath.includes('picsum.photos') || 
+      imagePath.includes('via.placeholder') ||
+      imagePath.includes('placehold') ||
+      imagePath.includes('dummyimage')) {
     return null;
   }
 

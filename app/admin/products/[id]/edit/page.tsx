@@ -7,6 +7,8 @@ import { useState, useEffect, use } from 'react';
 import { toast } from 'sonner';
 
 import { createClient } from '@/lib/supabase/client';
+import { getProductImageWithFallback } from '@/lib/utils/image-utils';
+import ProductPlaceholder from '@/components/ui/ProductPlaceholder';
 
 interface Product {
   id: string;
@@ -832,18 +834,22 @@ export default function EditProduct({
                   return (
                     <div key={image.id || index} className="relative group">
                       <div className="relative w-full h-32 border border-admin-light-border dark:border-admin-border rounded-lg overflow-hidden">
-                        <Image
-                          src={image.url || '/api/placeholder/200x128'}
-                          alt={image.alt_text || 'Product image'}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 50vw, 25vw"
-                          onError={(e) => {
-                            // Fallback to a placeholder if image fails to load
-                            const target = e.target as HTMLImageElement;
-                            target.src = '/api/placeholder/200x128';
-                          }}
-                        />
+                        {(() => {
+                          const validImageUrl = getProductImageWithFallback(image.url, 'medium');
+                          return validImageUrl ? (
+                            <Image
+                              src={validImageUrl}
+                              alt={image.alt_text || 'Product image'}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 50vw, 25vw"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <ProductPlaceholder size="large" variant="pattern" className="w-full h-full" />
+                            </div>
+                          );
+                        })()}
                       </div>
                       <button
                         onClick={() => deleteImage(index)}

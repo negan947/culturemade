@@ -11,10 +11,13 @@ import {
   ArrowDown
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
 import { createClient } from '@/lib/supabase/client';
+import { getProductImageWithFallback } from '@/lib/utils/image-utils';
+import ProductPlaceholder from '@/components/ui/ProductPlaceholder';
 
 
 interface Product {
@@ -27,6 +30,7 @@ interface Product {
   variant_count: number;
   category_name: string | null;
   inventory_total: number;
+  image_url: string | null;
 }
 
 
@@ -170,8 +174,24 @@ function ProductsTable({
               >
                 <td className="py-4 px-4">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-admin-light-bg-hover dark:bg-admin-bg-hover rounded-lg flex items-center justify-center">
-                      <Package className="h-5 w-5 text-admin-light-text-disabled dark:text-admin-text-disabled" />
+                    <div className="w-10 h-10 overflow-hidden">
+                      {(() => {
+                        const validImageUrl = getProductImageWithFallback(product.image_url, 'thumbnail');
+                        return validImageUrl ? (
+                          <Image
+                            src={validImageUrl}
+                            alt={product.name}
+                            width={40}
+                            height={40}
+                            className="w-full h-full object-cover rounded-lg"
+                            onError={() => {
+                              // Fallback handled by ProductPlaceholder
+                            }}
+                          />
+                        ) : (
+                          <ProductPlaceholder size="small" variant="icon" />
+                        );
+                      })()}
                     </div>
                     <div>
                       <div className="font-medium text-admin-light-text-primary dark:text-admin-text-primary">
@@ -302,25 +322,35 @@ export default function AdminProducts() {
             product_variants!inner(id, quantity),
             product_categories!left(
               categories!inner(name)
-            )
+            ),
+            product_images!left(url, position)
           `)
           .order('created_at', { ascending: false });
 
         if (productsResult.error) {
           setError('Failed to load products');
         } else {
-          const formattedProducts = productsResult.data.map(product => ({
-            id: product.id,
-            name: product.name,
-            status: product.status as 'active' | 'draft' | 'archived',
-            price: product.price,
-            compare_at_price: product.compare_at_price,
-            created_at: product.created_at,
-            variant_count: product.product_variants?.length || 0,
-            category_name: (product.product_categories as any)?.[0]?.categories?.name || null,
-            inventory_total: product.product_variants?.reduce((sum: number, variant: any) => 
-              sum + (variant.quantity || 0), 0) || 0
-          }));
+          const formattedProducts = productsResult.data.map(product => {
+            // Get the first image (lowest position) or null if no images
+            const sortedImages = (product.product_images as any)?.sort((a: any, b: any) => 
+              (a.position || 0) - (b.position || 0)
+            );
+            const firstImage = sortedImages?.[0];
+            
+            return {
+              id: product.id,
+              name: product.name,
+              status: product.status as 'active' | 'draft' | 'archived',
+              price: product.price,
+              compare_at_price: product.compare_at_price,
+              created_at: product.created_at,
+              variant_count: product.product_variants?.length || 0,
+              category_name: (product.product_categories as any)?.[0]?.categories?.name || null,
+              inventory_total: product.product_variants?.reduce((sum: number, variant: any) => 
+                sum + (variant.quantity || 0), 0) || 0,
+              image_url: firstImage?.url || null
+            };
+          });
           setProducts(formattedProducts);
         }
       } catch {
