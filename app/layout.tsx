@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { Toaster } from 'sonner';
 
 import { ErrorBoundary } from '@/components/error/error-boundary';
 
@@ -100,6 +101,13 @@ export default function RootLayout({
         >
           {children}
         </ErrorBoundary>
+        <Toaster 
+          theme="system"
+          position="top-right"
+          expand={false}
+          richColors
+          closeButton
+        />
       </body>
     </html>
   );

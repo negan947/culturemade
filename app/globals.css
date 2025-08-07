@@ -233,6 +233,68 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Admin table scrolling optimization */
+.admin-table-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: auto;
+  overscroll-behavior-y: auto;
+  touch-action: pan-x pan-y;
+  cursor: grab;
+}
+
+.admin-table-scroll:active {
+  cursor: grabbing;
+}
+
+.admin-table-scroll::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.admin-table-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-table-scroll::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.3);
+  border-radius: 4px;
+}
+
+.admin-table-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 58, 237, 0.5);
+}
+
+/* Admin table container */
+.admin-table-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+
+.admin-table-container .admin-table-scroll {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+}
+
+/* Responsive table cell adjustments */
+@media (max-width: 768px) {
+  .admin-table-scroll table th,
+  .admin-table-scroll table td {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .admin-table-scroll {
+    cursor: grab;
+  }
+  
+  .admin-table-scroll:active {
+    cursor: grabbing;
+  }
+}
+
 /* iOS-specific font weights and sizes */
 .ios-ultra-light {
   font-weight: 100;

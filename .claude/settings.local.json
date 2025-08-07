@@ -29,7 +29,9 @@
       "Bash(sed:*)",
       "Bash(for:*)",
       "Bash(do echo \"=== $file ===\")",
-      "Bash(done)"
+      "Bash(done)",
+      "mcp__supabasecm__search_docs",
+      "mcp__supabasecm__apply_migration"
     ],
     "deny": []
   }

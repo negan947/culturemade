@@ -79,7 +79,12 @@ const nextConfig: NextConfig = {
   // Configure images optimization
   images: {
     // Configure image domains (add your CDN domains here)
-    domains: ['localhost', 'gaifxrqdngirhetkvaqe.supabase.co'],
+    domains: [
+      'localhost', 
+      'gaifxrqdngirhetkvaqe.supabase.co',
+      'picsum.photos', // For placeholder images
+      'via.placeholder.com', // Additional placeholder service
+    ],
 
     // Configure image formats
     formats: ['image/webp', 'image/avif'],
@@ -87,6 +92,9 @@ const nextConfig: NextConfig = {
     // Configure image sizes
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+
+    // Allow unoptimized images for development
+    unoptimized: process.env.NODE_ENV === 'development',
   },
 
   // Configure security headers

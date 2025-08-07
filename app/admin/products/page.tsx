@@ -103,8 +103,8 @@ function ProductsTable({
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
+    <div className="overflow-x-auto admin-table-scroll" style={{ touchAction: 'pan-x pan-y' }}>
+      <table className="w-full min-w-[900px]">
         <thead>
           <tr className="border-b border-admin-light-border dark:border-admin-border">
             <th className="text-left py-3 px-4 font-medium text-admin-light-text-secondary dark:text-admin-text-secondary text-sm">
@@ -323,7 +323,7 @@ export default function AdminProducts() {
           }));
           setProducts(formattedProducts);
         }
-      } catch (_err) {
+      } catch {
         setError('Failed to load products');
       } finally {
         setIsLoading(false);
@@ -376,7 +376,7 @@ export default function AdminProducts() {
         </Link>
       </div>
 
-      <div className="bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg border border-admin-light-border dark:border-admin-border">
+      <div className="bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg border border-admin-light-border dark:border-admin-border admin-table-container">
         <ProductsTable 
           products={products} 
           sort={sort} 

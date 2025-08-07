@@ -49,6 +49,11 @@ async function getNextPosition(supabase: any, productId: string): Promise<number
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('=== UPLOAD API DEBUG START ===');
+    console.log('Upload API - Request received');
+    console.log('Upload API - Request method:', request.method);
+    console.log('Upload API - Request headers:', Object.fromEntries(request.headers.entries()));
+    
     const supabase = await createClient();
 
     // Check authentication and admin role
@@ -75,10 +80,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse form data
+    console.log('Upload API - Parsing form data...');
     const formData = await request.formData();
     const files = formData.getAll('files') as File[];
     const productId = formData.get('productId') as string;
     const altText = formData.get('altText') as string | null;
+    
+    console.log('Upload API - Form data parsed:', {
+      filesCount: files.length,
+      productId,
+      altText,
+      allFormKeys: Array.from(formData.keys())
+    });
+    
+    files.forEach((file, index) => {
+      console.log(`Upload API - File ${index}:`, {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        lastModified: file.lastModified
+      });
+    });
 
     // Validate request data
     const validation = uploadSchema.safeParse({
@@ -151,9 +173,16 @@ export async function POST(request: NextRequest) {
           });
 
         if (uploadError) {
+          console.error('Upload API - Upload error details:', {
+            file: file.name,
+            error: uploadError,
+            message: uploadError.message,
+            details: uploadError.details || 'No additional details'
+          });
           errors.push({
             file: file.name,
-            error: `Upload failed: ${uploadError.message}`
+            error: `Upload failed: ${uploadError.message}`,
+            details: uploadError.details
           });
           continue;
         }
@@ -171,7 +200,7 @@ export async function POST(request: NextRequest) {
           .from('product_images')
           .insert({
             product_id: productId,
-            image_url: urlData.publicUrl,
+            url: urlData.publicUrl,
             alt_text: altText,
             position,
           })
@@ -194,7 +223,7 @@ export async function POST(request: NextRequest) {
         uploadResults.push({
           file: file.name,
           imageId: imageData.id,
-          imageUrl: imageData.image_url,
+          imageUrl: imageData.url,
           position: imageData.position
         });
       } catch (fileError: any) {
@@ -205,13 +234,25 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    console.log('Upload API - Upload completed:', {
+      successfulUploads: uploadResults.length,
+      errors: errors.length,
+      uploadResults,
+      errors
+    });
+    console.log('=== UPLOAD API DEBUG END ===');
+    
     return NextResponse.json({
       success: true,
-      message: 'Images uploaded successfully',
-      data: uploadResults
+      message: `${uploadResults.length} image(s) uploaded successfully`,
+      data: uploadResults,
+      errors: errors.length > 0 ? errors : undefined
     });
 
     } catch (error: any) {
+      console.error('Upload API - Unexpected error:', error);
+      console.error('Upload API - Error stack:', error.stack);
+      console.log('=== UPLOAD API DEBUG END (ERROR) ===');
       
       if (error.message === 'Unauthorized') {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -221,7 +262,10 @@ export async function POST(request: NextRequest) {
       }
       
       return NextResponse.json(
-        { error: 'Internal server error' },
+        { 
+          error: 'Internal server error',
+          details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        },
         { status: 500 }
       );
     }
