@@ -6,7 +6,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { getCartSessionId } from '@/utils/cartSync';
 
-import AddressForm, { AddressFields } from '../components/AddressForm';
+import AddressForm, { AddressFields, validateAddress } from '../components/AddressForm';
 import PaymentForm from '../components/PaymentForm';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import OrderConfirmation from '../components/OrderConfirmation';
@@ -80,6 +80,48 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
     // Ensure we start in-place for manual exit animation control
     controls.set({ x: 0, opacity: 1 });
   }, [controls]);
+
+  // Persist/restore checkout form state in localStorage
+  useEffect(() => {
+    try {
+      const storedBilling = localStorage.getItem('cm_checkout_billing');
+      if (storedBilling) {
+        const parsed = JSON.parse(storedBilling) as AddressFields;
+        setBilling(parsed);
+        setBillingValid(validateAddress(parsed).success);
+      }
+
+      const storedUseBilling = localStorage.getItem('cm_checkout_use_billing_for_shipping');
+      if (storedUseBilling) {
+        setUseBillingForShipping(storedUseBilling === 'true');
+      }
+
+      const storedShipping = localStorage.getItem('cm_checkout_shipping');
+      if (storedShipping) {
+        const parsed = JSON.parse(storedShipping) as AddressFields;
+        setShipping(parsed);
+        setShippingValid(validateAddress(parsed).success);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('cm_checkout_billing', JSON.stringify(billing));
+    } catch {}
+  }, [billing]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('cm_checkout_use_billing_for_shipping', String(useBillingForShipping));
+    } catch {}
+  }, [useBillingForShipping]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('cm_checkout_shipping', JSON.stringify(shipping));
+    } catch {}
+  }, [shipping]);
 
   // Load a lightweight cart summary for the dropdown
   useEffect(() => {
