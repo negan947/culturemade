@@ -1,5 +1,6 @@
 'use client';
 
+import { motion, useAnimation } from 'framer-motion';
 import { ChevronLeft } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 
@@ -30,6 +31,7 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
   const [step, setStep] = useState<StepId>('address');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const controls = useAnimation();
 
   const [billing, setBilling] = useState<AddressFields>({
     first_name: '',
@@ -69,6 +71,11 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
   useEffect(() => {
     setServerError(null);
   }, [step]);
+
+  useEffect(() => {
+    // Ensure we start in-place for manual exit animation control
+    controls.set({ x: 0, opacity: 1 });
+  }, [controls]);
 
   const handleSubmitAddresses = async () => {
     setServerError(null);
@@ -118,21 +125,35 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
     }
   };
 
+  const handleBack = async () => {
+    if (step === 'address') {
+      await controls.start({ x: '100%', opacity: 0, transition: { duration: 0.25, ease: [0.4, 0, 0.2, 1] } });
+      onClose();
+      return;
+    }
+    if (step === 'payment') return setStep('address');
+    if (step === 'confirm') return setStep('payment');
+  };
+
   return (
-    <div className="h-full w-full bg-gray-50 flex flex-col pt-safe-top pt-12 pb-safe-bottom">
+    <motion.div
+      className="relative h-full w-full bg-white flex flex-col pt-[48px] pb-3"
+      animate={controls}
+      initial={{ x: 0, opacity: 1 }}
+    >
+      {/* Safe-area fillers to match header/footer color */}
+      <div className="pointer-events-none absolute top-0 inset-x-0 h-safe-top bg-white" />
+      <div className="pointer-events-none absolute bottom-0 inset-x-0 h-safe-bottom bg-white" />
       {/* Header */}
       <div className="bg-white px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-        <button
-          onClick={() => {
-            if (step === 'address') return onClose();
-            if (step === 'payment') return setStep('address');
-            if (step === 'confirm') return setStep('payment');
-          }}
+        <motion.button
+          onClick={handleBack}
           className="p-2 rounded-full hover:bg-gray-100 text-gray-600"
           aria-label="Back"
+          whileTap={{ scale: 0.95 }}
         >
           <ChevronLeft className="h-5 w-5" />
-        </button>
+        </motion.button>
         <div>
           <h2 className="text-lg font-semibold text-gray-900">Checkout</h2>
           <p className="text-xs text-gray-500">Step {step === 'address' ? '1' : step === 'payment' ? '2' : '3'} of 3</p>
@@ -141,7 +162,7 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
         {serverError && (
           <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3">
             {serverError}
@@ -162,7 +183,7 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
             </div>
 
             <div className="border rounded-xl p-3">
-              <label className="flex items-center gap-2 text-sm">
+              <label className="flex items-center gap-2 text-sm text-gray-600">
                 <input
                   type="checkbox"
                   className="h-4 w-4"
@@ -170,7 +191,7 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
                   onChange={(e) => setUseBillingForShipping(e.target.checked)}
                   disabled={isSubmitting}
                 />
-                <span>Shipping address is the same as billing</span>
+                <span className="text-gray-600">Shipping address is the same as billing</span>
               </label>
             </div>
 
@@ -203,7 +224,7 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-200 bg-white flex items-center justify-end gap-3">
+      <div className="p-4 border-t border-gray-200 bg-white flex items-center justify-end gap-3 pb-[calc(env(safe-area-inset-bottom)+12px)] sticky bottom-0">
         {step === 'address' && (
           <button
             className={`px-4 py-2 rounded-lg text-sm font-semibold text-white ${canContinue ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-300 cursor-not-allowed'}`}
@@ -214,7 +235,7 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
           </button>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
