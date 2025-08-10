@@ -60,13 +60,15 @@ export async function POST(request: NextRequest) {
         }
       | null = null;
 
-    if (checkoutSessionId) {
+    if (checkoutSessionId && userId) {
+      // Authenticated users can read their own checkout sessions (RLS should allow by user_id)
       const { data, error } = await supabase
         .from('checkout_sessions')
         .select(
           'id,user_id,guest_session_id,currency,subtotal,tax_amount,shipping_amount,discount_amount,total_amount,discount_code,status,items'
         )
         .eq('id', checkoutSessionId)
+        .eq('user_id', userId)
         .maybeSingle();
       if (error) {
         return NextResponse.json(
@@ -75,19 +77,19 @@ export async function POST(request: NextRequest) {
         );
       }
       sessionRow = (data as any) ?? null;
-    } else {
-      // Fallback: compute totals from current cart (guest only)
+    }
+
+    // Fallback for guests or when session row isn't readable due to RLS: compute from cart
+    if (!sessionRow) {
       if (!userId && !sessionId) {
         return NextResponse.json(
           { error: 'Missing sessionId for guest payment' },
           { status: 400 }
         );
       }
-
       const queryParams = new URLSearchParams(
         userId ? { userId } : { sessionId: sessionId as string }
       );
-
       const cartResponse = await fetch(
         `${request.nextUrl.origin}/api/cart?${queryParams.toString()}`,
         { cache: 'no-store' }
@@ -117,11 +119,9 @@ export async function POST(request: NextRequest) {
             total: number;
           }
         | undefined;
-
       if (!cart || cart.items.length === 0) {
         return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
       }
-
       sessionRow = {
         id: 'ephemeral',
         user_id: userId,
@@ -145,13 +145,6 @@ export async function POST(request: NextRequest) {
           line_total: i.total,
         })),
       };
-    }
-
-    if (!sessionRow) {
-      return NextResponse.json(
-        { error: 'No checkout session or cart found' },
-        { status: 404 }
-      );
     }
 
     // Optionally attach Stripe customer if available for authenticated user

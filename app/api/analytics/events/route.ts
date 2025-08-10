@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
+import { getUser } from '@/lib/supabase/auth';
 
 /**
  * POST /api/analytics/events - Store analytics events
@@ -26,18 +27,26 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = await createClient();
+    const { user } = await getUser();
 
-    // Transform events for database insertion
+    // Transform events to match public.analytics_events schema
+    // Table columns: event_name, user_id, session_id, properties, created_at
     const eventsToInsert = events.map((event: any) => ({
-      event_type: event.event_type,
-      event_data: event.event_data || {},
-      product_id: event.product_id || null,
-      user_id: event.user_id || null,
+      event_name: String(event.event_type || event.event_name || 'event'),
+      user_id: event.user_id || user?.id || null,
       session_id: session_id || event.session_id || null,
+      properties: {
+        product_id: event.product_id || null,
+        event_data: event.event_data || {},
+        source_component: event.source_component || null,
+        position_index: event.position_index ?? null,
+        search_query: event.search_query || null,
+        category_id: event.category_id || null,
+        user_agent: event.user_agent || (typeof navigator !== 'undefined' ? navigator.userAgent : null),
+        page_url: event.page_url || (typeof location !== 'undefined' ? location.href : null),
+        referrer: event.referrer || (typeof document !== 'undefined' ? document.referrer : null)
+      },
       created_at: event.created_at || new Date().toISOString(),
-      user_agent: event.user_agent || null,
-      page_url: event.page_url || null,
-      referrer: event.referrer || null
     }));
 
     // Insert events into analytics_events table

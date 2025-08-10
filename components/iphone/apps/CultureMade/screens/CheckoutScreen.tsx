@@ -30,6 +30,7 @@ interface AddressApiResponse {
 export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps) {
   const sessionId = !userId ? getCartSessionId() : undefined;
   const [step, setStep] = useState<StepId>('address');
+  const [checkoutSessionId, setCheckoutSessionId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const controls = useAnimation();
@@ -135,6 +136,21 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
         }
       }
 
+      // Create a checkout session to lock totals and pass to payment intent
+      const sessionRes = await fetch('/api/checkout/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...(sessionId ? { sessionId } : {}),
+          currency: 'USD',
+        }),
+      });
+      const sessionJson = await sessionRes.json();
+      if (!sessionRes.ok || sessionJson.error || !sessionJson.session?.id) {
+        throw new Error(sessionJson.error || 'Failed to create checkout session');
+      }
+
+      setCheckoutSessionId(String(sessionJson.session.id));
       setStep('payment');
     } catch (err: any) {
       setServerError(err.message || 'Failed to submit addresses');
@@ -266,6 +282,7 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
         {step === 'payment' && (
           <PaymentForm
             {...(userId ? { userId } : {})}
+            {...(checkoutSessionId ? { checkoutSessionId } : {})}
             onSuccess={() => setStep('confirm')}
             onError={(msg) => setServerError(msg)}
           />

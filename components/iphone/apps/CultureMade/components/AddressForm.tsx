@@ -42,6 +42,15 @@ const phoneSchema = z
   .optional()
   .nullable();
 
+const postalCodeValidators: Record<string, RegExp> = {
+  US: /^\d{5}(-\d{4})?$/,
+  CA: /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/,
+  GB: /^(GIR 0AA|[A-Z]{1,2}\d[A-Z\d]? \d[ABD-HJLNP-UW-Z]{2})$/i,
+  AU: /^\d{4}$/,
+  DE: /^\d{5}$/,
+  FR: /^\d{5}$/,
+};
+
 const addressSchema = z.object({
   first_name: z.string().trim().min(1, 'First name is required').max(50),
   last_name: z.string().trim().min(1, 'Last name is required').max(50),
@@ -53,6 +62,15 @@ const addressSchema = z.object({
   postal_code: z.string().trim().min(3, 'Postal code is required').max(20),
   country_code: countryCodeSchema,
   phone: phoneSchema,
+}).superRefine((val, ctx) => {
+  const re = postalCodeValidators[val.country_code];
+  if (re && !re.test(val.postal_code)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['postal_code'],
+      message: 'Invalid postal/ZIP code for selected country',
+    });
+  }
 });
 
 export function validateAddress(value: AddressFields) {
@@ -67,6 +85,16 @@ const COUNTRIES: Array<{ code: string; name: string }> = [
   { code: 'AU', name: 'Australia' },
   { code: 'DE', name: 'Germany' },
   { code: 'FR', name: 'France' },
+  { code: 'IT', name: 'Italy' },
+  { code: 'ES', name: 'Spain' },
+  { code: 'NL', name: 'Netherlands' },
+  { code: 'SE', name: 'Sweden' },
+  { code: 'NO', name: 'Norway' },
+  { code: 'DK', name: 'Denmark' },
+  { code: 'IE', name: 'Ireland' },
+  { code: 'NZ', name: 'New Zealand' },
+  { code: 'JP', name: 'Japan' },
+  { code: 'SG', name: 'Singapore' },
 ];
 
 export default function AddressForm({ addressType, value, onChange, disabled }: AddressFormProps) {
