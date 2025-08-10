@@ -29,6 +29,8 @@ export { default as CheckoutModal } from './CheckoutModal';
 export { default as AddressForm } from './AddressForm';
 export { default as PaymentForm } from './PaymentForm';
 export { default as OrderConfirmation } from './OrderConfirmation';
+export { default as OrderHistory } from './OrderHistory';
+export { default as OrderDetail } from './OrderDetail';
 
 // Utility Components
 export { default as DragScrollContainer } from './DragScrollContainer';

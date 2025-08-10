@@ -6,7 +6,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { getCartSessionId } from '@/utils/cartSync';
 
-import AddressForm, { AddressFields } from './AddressForm';
+import AddressForm, { AddressFields, validateAddress } from './AddressForm';
 import PaymentForm from './PaymentForm';
 import OrderConfirmation from './OrderConfirmation';
 
@@ -32,6 +32,8 @@ export default function CheckoutModal({ isOpen, onClose, userId }: CheckoutModal
   const [step, setStep] = useState<StepId>('address');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  const [orderTotal, setOrderTotal] = useState<number | null>(null);
 
   const [billing, setBilling] = useState<AddressFields>({
     first_name: '',
@@ -74,6 +76,48 @@ export default function CheckoutModal({ isOpen, onClose, userId }: CheckoutModal
       setServerError(null);
     }
   }, [isOpen]);
+
+  // Persist/restore checkout form state in localStorage (modal variant)
+  useEffect(() => {
+    try {
+      const storedBilling = localStorage.getItem('cm_checkout_billing');
+      if (storedBilling) {
+        const parsed = JSON.parse(storedBilling) as AddressFields;
+        setBilling(parsed);
+        setBillingValid(validateAddress(parsed).success);
+      }
+
+      const storedUseBilling = localStorage.getItem('cm_checkout_use_billing_for_shipping');
+      if (storedUseBilling) {
+        setUseBillingForShipping(storedUseBilling === 'true');
+      }
+
+      const storedShipping = localStorage.getItem('cm_checkout_shipping');
+      if (storedShipping) {
+        const parsed = JSON.parse(storedShipping) as AddressFields;
+        setShipping(parsed);
+        setShippingValid(validateAddress(parsed).success);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('cm_checkout_billing', JSON.stringify(billing));
+    } catch {}
+  }, [billing]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('cm_checkout_use_billing_for_shipping', String(useBillingForShipping));
+    } catch {}
+  }, [useBillingForShipping]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('cm_checkout_shipping', JSON.stringify(shipping));
+    } catch {}
+  }, [shipping]);
 
   const handleSubmitAddresses = async () => {
     setServerError(null);
@@ -209,13 +253,31 @@ export default function CheckoutModal({ isOpen, onClose, userId }: CheckoutModal
               {step === 'payment' && (
                 <PaymentForm
                   {...(userId ? { userId } : {})}
-                  onSuccess={() => setStep('confirm')}
+                  onSuccess={async ({ paymentIntentId }) => {
+                    try {
+                      const res = await fetch('/api/orders', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          paymentIntentId,
+                          ...(sessionId ? { sessionId } : {}),
+                        }),
+                      });
+                      const json = await res.json();
+                      if (!res.ok || json.error) throw new Error(json.error || 'Failed to create order');
+                      setOrderNumber(json.orderNumber || null);
+                      setOrderTotal(typeof json.total === 'number' ? json.total : null);
+                      setStep('confirm');
+                    } catch (e: any) {
+                      setServerError(e.message || 'Failed to finalize order');
+                    }
+                  }}
                   onError={(msg) => setServerError(msg)}
                 />
               )}
 
               {step === 'confirm' && (
-                <OrderConfirmation onDone={onClose} />
+                <OrderConfirmation orderNumber={orderNumber ?? undefined} total={orderTotal ?? undefined} onDone={onClose} />
               )}
             </div>
 

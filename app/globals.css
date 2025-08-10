@@ -104,6 +104,7 @@ body {
 
 .drag-scroll-container.dragging {
   cursor: grabbing;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -208,6 +209,34 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+}
+
+/* Chrome/Safari autofill readability in light/dark themes */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: rgb(17 24 39 / 1); /* gray-900 */
+  transition: background-color 9999s ease-in-out 0s;
+  animation-name: cm-autofill-start;
+  animation-duration: 0.01s;
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark textarea:-webkit-autofill,
+.dark select:-webkit-autofill {
+  -webkit-text-fill-color: rgb(243 244 246 / 1); /* gray-100 */
+  caret-color: rgb(243 244 246 / 1);
+  animation-name: cm-autofill-start;
+  animation-duration: 0.01s;
+}
+
+@keyframes cm-autofill-start {
+  from {}
+  to {}
 }
 
 /* San Francisco Font System - iOS Typography */

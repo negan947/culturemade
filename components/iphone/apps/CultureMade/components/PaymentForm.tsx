@@ -21,6 +21,7 @@ export default function PaymentForm({ userId, checkoutSessionId, onSuccess, onEr
   const [elements, setElements] = useState<StripeElements | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isConfirming, setIsConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [total, setTotal] = useState<number>(0);
   const [currency, setCurrency] = useState<string>('usd');
@@ -145,24 +146,31 @@ export default function PaymentForm({ userId, checkoutSessionId, onSuccess, onEr
   }, [userId, sessionId, showError, total, currency]);
 
   const handleConfirm = useCallback(async () => {
-    if (!stripe || !elements || !clientSecret) return;
+    if (!stripe || !elements || !clientSecret || isConfirming) return;
+    setIsConfirming(true);
     try {
+      // Validate and submit payment element inputs per Stripe deferred flow
+      const { error: submitError } = await elements.submit();
+      if (submitError) {
+        setIsConfirming(false);
+        return showError(submitError.message || 'Please check your payment details');
+      }
+
       const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
         elements,
         clientSecret,
         redirect: 'if_required',
       });
       if (confirmError) return showError(confirmError.message || 'Payment failed');
-      if (paymentIntent && paymentIntent.status === 'succeeded') {
-        onSuccess({ paymentIntentId: paymentIntent.id, clientSecret });
-      } else if (paymentIntent && paymentIntent.status === 'requires_action') {
-        // In case 3DS was required and handled
+      if (paymentIntent && (paymentIntent.status === 'succeeded' || paymentIntent.status === 'requires_action')) {
         onSuccess({ paymentIntentId: paymentIntent.id, clientSecret });
       }
     } catch (err: any) {
       showError(err.message || 'Payment failed');
+    } finally {
+      setIsConfirming(false);
     }
-  }, [stripe, elements, clientSecret, onSuccess, showError]);
+  }, [stripe, elements, clientSecret, onSuccess, showError, isConfirming]);
 
   return (
     <div className="space-y-4">
@@ -184,11 +192,11 @@ export default function PaymentForm({ userId, checkoutSessionId, onSuccess, onEr
       </div>
 
       <button
-        disabled={isLoading || !clientSecret}
+        disabled={isLoading || !clientSecret || isConfirming}
         onClick={handleConfirm}
-        className={`w-full px-4 py-2 rounded-lg text-sm font-semibold text-white ${isLoading || !clientSecret ? 'bg-blue-300' : 'bg-blue-600 hover:bg-blue-700'}`}
+        className={`w-full px-4 py-2 rounded-lg text-sm font-semibold text-white ${isLoading || !clientSecret || isConfirming ? 'bg-blue-300' : 'bg-blue-600 hover:bg-blue-700'}`}
       >
-        {isLoading ? 'Loading payment...' : 'Pay now'}
+        {isLoading ? 'Loading payment...' : isConfirming ? 'Processing…' : 'Pay now'}
       </button>
     </div>
   );

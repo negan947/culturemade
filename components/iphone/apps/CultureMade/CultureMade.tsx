@@ -95,7 +95,12 @@ function CultureMadeInner() {
   useEffect(() => {
     const handler = () => setShowCheckoutScreen(true);
     window.addEventListener('openCheckout', handler);
-    return () => window.removeEventListener('openCheckout', handler);
+    const openCartHandler = () => setCartDrawerOpen(true);
+    window.addEventListener('openCart', openCartHandler);
+    return () => {
+      window.removeEventListener('openCheckout', handler);
+      window.removeEventListener('openCart', openCartHandler);
+    };
   }, []);
 
   const currentTab = tabs.find(tab => tab.id === activeTab);

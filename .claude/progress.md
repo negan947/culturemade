@@ -91,7 +91,7 @@
   - ✅ Save and validate billing/shipping addresses (authenticated persistence via RLS)
   - ✅ Implement address validation with format checking (Zod + country postal checks)
   - ✅ Calculate shipping costs based on address (country-aware quote)
-  - ⏭️ Support address autocomplete integration
+  - ✅ Support address autocomplete integration (Chrome Autofill tokens + autosuggest)
   
 - [✅] **Checkout Validation**: Final pre-payment validation
   - ✅ Create `app/api/checkout/validate/route.ts` for final checks
@@ -144,7 +144,7 @@
 - [✅] **Address Form**: Billing and shipping address collection
   - ✅ `AddressForm.tsx` with comprehensive fields and Zod validation
   - ✅ Same-as-billing toggle
-  - ⏭️ Address autocomplete (pending)
+  - ✅ Address autocomplete (Chrome Autofill + autosuggest with full ISO list)
   - ✅ Persists for authenticated users (RLS)
   
 - [✅] **Payment Form**: Secure payment method collection
@@ -164,42 +164,50 @@
 
 #### **2.2.1: Order Processing API**
 **Build comprehensive order management backend**
-- [ ] **Order Creation**: Process completed orders
-  - Create `app/api/orders/route.ts` with POST handler
-  - Generate unique order numbers with proper formatting
-  - Create order records after successful payment
-  - Update inventory quantities and movement tracking
-  - Send order confirmation emails to customers
+- [✅] **Order Creation**: Process completed orders
+  - ✅ Create `app/api/orders/route.ts` with POST handler
+  - ✅ Generate unique order numbers with proper formatting (e.g., `CM-YYMMDD-#####`)
+  - ✅ Create order records after successful payment (Stripe `payment_intent` verified as `succeeded`)
+  - ✅ Link payment to order and mark payment as `succeeded`
+  - ✅ Update inventory quantities and create `inventory_movements` entries
+  - ✅ Clear cart after order creation
+  - ✅ Send order confirmation emails to customers (Resend; non-blocking)
   
-- [ ] **Order Retrieval**: Customer order history
-  - Implement GET handler for customer order history
-  - Include pagination for large order lists
-  - Filter orders by status, date range, etc.
-  - Show order details with itemized breakdown
-  - Support order search by order number
+- [✅] **Order Retrieval**: Customer order history
+  - ✅ Implement GET handler for customer order history in `app/api/orders/route.ts`
+  - ✅ Include pagination (page, limit) and newest-first sorting
+  - ⏭️ Future filters: status, date range, search by order number
   
-- [ ] **Order Details**: Individual order information
-  - Create `app/api/orders/[id]/route.ts` for single orders
-  - Return complete order information with items
-  - Include order status and tracking information
-  - Show payment and shipping details
-  - Add order timeline and status updates
+- [✅] **Order Details**: Individual order information
+  - ✅ Create `app/api/orders/[id]/route.ts` for single order retrieval
+  - ✅ Return complete order information with items
+  - ⏭️ Future: tracking information and timeline/status updates
 
 #### **2.2.2: Order UI Components**
 **Build customer-facing order interfaces**
-- [ ] **Order History**: Customer order history display
-  - Create `OrderHistory.tsx` with paginated order list
-  - Show order cards with key information (date, total, status)
-  - Include order status indicators with visual cues
-  - Add quick reorder functionality for previous orders
-  - Support order filtering and search
+- [✅] **Order History**: Customer order history display
+  - Created `components/iphone/apps/CultureMade/components/OrderHistory.tsx` with paginated order list
+  - Shows order cards (date, total, status) with visual status badges
+  - Added quick reorder functionality that re-adds items to cart and opens cart drawer
+  - Supports search/filter by order number
   
-- [ ] **Order Detail**: Comprehensive order information
-  - Create `OrderDetail.tsx` with complete order display
-  - Show itemized order breakdown with product details
-  - Include shipping address and payment information
-  - Display order timeline and tracking information
-  - Add customer support contact options
+- [✅] **Order Detail**: Comprehensive order information
+  - Created `components/iphone/apps/CultureMade/components/OrderDetail.tsx` with complete order display
+  - Shows itemized order breakdown with totals, currency formatting
+  - Displays shipping/billing addresses if provided in order metadata
+  - Includes Contact Support CTA and Reorder Items button
+
+Integration Notes:
+- Wired `OrderHistory` and `OrderDetail` into `ProfileScreen.tsx` with simple in-screen navigation
+- Added `openCart` window event handling in `CultureMade.tsx` to open cart drawer after reorder
+
+#### **2.2.3: Profile Auth Gate & Login Flow (Customer App)**
+**Require login to access order history and account features**
+- [✅] Add lightweight client auth hook `hooks/useAuth.ts` (Supabase onAuthStateChange)
+- [✅] Gate `ProfileScreen` content by auth status; show Sign In / Create Account CTA if guest
+- [✅] Link to existing `/login` and `/register` pages from Profile screen
+- [✅] Hook up Sign Out to Supabase client signOut
+- [⏭️] Future: Replace placeholder profile stats with real user/profile data
 
 ---
 

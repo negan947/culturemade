@@ -13,6 +13,9 @@ import {
   Bell,
   Shield
 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { OrderDetail, OrderHistory } from '../components';
+import useAuth from '@/hooks/useAuth';
 
 interface MenuItem {
   id: string;
@@ -24,7 +27,10 @@ interface MenuItem {
 }
 
 export default function ProfileScreen() {
-  const isLoggedIn = true; // Will connect to real auth state later
+  const { user, loading, signIn, register, signOut, error } = useAuth();
+  const isLoggedIn = !!user;
+  const [view, setView] = useState<'root' | 'orders' | 'orderDetail'>('root');
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
   const accountMenuItems: MenuItem[] = [
     {
@@ -85,13 +91,13 @@ export default function ProfileScreen() {
   ];
 
   const handleMenuItemPress = (item: MenuItem) => {
-
-    // Will implement navigation later
+    if (item.id === 'orders') {
+      setView('orders');
+    }
   };
 
-  const handleSignOut = () => {
-
-    // Will implement real sign out later
+  const handleSignOut = async () => {
+    await signOut();
   };
 
   if (!isLoggedIn) {
@@ -115,20 +121,44 @@ export default function ProfileScreen() {
             <div className="space-y-3">
               <motion.button
                 whileTap={{ scale: 0.95 }}
+                onClick={() => (window.location.href = '/login')}
                 className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium"
               >
                 Sign In
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.95 }}
+                onClick={() => (window.location.href = '/register')}
                 className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-medium"
               >
                 Create Account
               </motion.button>
+              {error && <div className="text-xs text-red-600">{error}</div>}
             </div>
           </motion.div>
         </div>
       </div>
+    );
+  }
+
+  if (view === 'orders') {
+    return (
+      <OrderHistory
+        onBack={() => setView('root')}
+        onSelectOrder={(orderId) => {
+          setSelectedOrderId(orderId);
+          setView('orderDetail');
+        }}
+      />
+    );
+  }
+
+  if (view === 'orderDetail' && selectedOrderId) {
+    return (
+      <OrderDetail
+        orderId={selectedOrderId}
+        onBack={() => setView('orders')}
+      />
     );
   }
 
@@ -147,12 +177,12 @@ export default function ProfileScreen() {
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center space-x-4"
           >
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
               <User className="h-8 w-8 text-blue-600" />
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-semibold text-gray-900">John Doe</h2>
-              <p className="text-gray-500">john.doe@example.com</p>
+              <h2 className="text-xl font-semibold text-gray-900">{user?.email || 'Customer'}</h2>
+              <p className="text-gray-500">Signed in</p>
               <p className="text-sm text-blue-600 mt-1">Premium Member</p>
             </div>
           </motion.div>
@@ -240,7 +270,7 @@ export default function ProfileScreen() {
         </div>
 
         {/* Sign Out */}
-        <div className="px-4 pb-8">
+            <div className="px-4 pb-8">
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
