@@ -19,6 +19,7 @@ import { RootState } from '@/store/store';
 import { getCartSessionId } from '@/utils/cartSync';
 
 import { CartDrawer, CartIcon } from './components';
+import CheckoutScreen from './screens/CheckoutScreen';
 // Import screen components
 import CartScreen from './screens/CartScreen';
 import CategoriesScreen from './screens/CategoriesScreen';
@@ -73,6 +74,8 @@ const tabs: Tab[] = [
 function CultureMadeInner() {
   const [activeTab, setActiveTab] = useState<TabId>('home');
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [showCheckoutScreen, setShowCheckoutScreen] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const cartItemCount = useSelector((state: RootState) => state.cart.itemCount);
 
@@ -221,7 +224,21 @@ function CultureMadeInner() {
         isOpen={cartDrawerOpen}
         onClose={() => setCartDrawerOpen(false)}
         {...(userId ? { userId } : {})}
+        onCheckout={() => {
+          setCartDrawerOpen(false);
+          setShowCheckoutScreen(true);
+        }}
       />
+
+      {/* Checkout Screen (full-screen inside app) */}
+      {showCheckoutScreen && (
+        <div className="absolute inset-0 z-40 bg-white pt-safe-top pb-safe-bottom">
+          <CheckoutScreen
+            onClose={() => setShowCheckoutScreen(false)}
+            {...(userId ? { userId } : {})}
+          />
+        </div>
+      )}
     </div>
   );
 }

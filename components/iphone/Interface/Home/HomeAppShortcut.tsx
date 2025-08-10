@@ -28,7 +28,12 @@ const HomeAppShortcut: FC<Props> = ({ appId, icon, name }) => {
   };
 
   return (
-    <motion.div className='w-full aspect-square flex flex-col justify-center items-center gap-1'>
+    <motion.div 
+      className='w-full aspect-square flex flex-col justify-center items-center gap-1'
+      initial={{ opacity: 1, scale: 1 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0 }}
+    >
       <motion.div
         animate={imgAnimation}
         onClick={() => {
@@ -40,6 +45,9 @@ const HomeAppShortcut: FC<Props> = ({ appId, icon, name }) => {
         className='w-full aspect-square'
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95, filter: 'brightness(70%)' }}
+        initial={{ opacity: 1, scale: 1 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0 }}
         style={{
           borderRadius: 15,
           backgroundImage: icon
@@ -51,9 +59,14 @@ const HomeAppShortcut: FC<Props> = ({ appId, icon, name }) => {
         }}
       />
       {name && (
-        <p className='text-zinc-800 whitespace-nowrap text-ellipsis overflow-hidden text-xs font-normal'>
+        <motion.p 
+          className='text-zinc-800 whitespace-nowrap text-ellipsis overflow-hidden text-xs font-normal'
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0 }}
+        >
           {name}
-        </p>
+        </motion.p>
       )}
     </motion.div>
   );

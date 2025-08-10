@@ -98,14 +98,25 @@ const IPhoneShell: FC<Props> = ({ children }) => {
           </motion.div>
         )}
 
-        {/* Home & AppView shared layout */}
+        {/* Home & AppView shared layout - Always mounted to prevent refresh animation */}
         <LayoutGroup id='iphone-interface-group'>
+          {/* Home screen - always mounted but hidden when locked */}
+          <motion.div
+            className="absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ 
+              opacity: !isLocked && !currentApp ? 1 : 0,
+              pointerEvents: !isLocked && !currentApp ? 'auto' : 'none',
+            }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            <ErrorBoundary key='homescreen' level='component'>
+              {children}
+            </ErrorBoundary>
+          </motion.div>
+          
+          {/* App view - only mount when needed */}
           <AnimatePresence>
-            {!isLocked && (
-              <ErrorBoundary key='homescreen' level='component'>
-                {children}
-              </ErrorBoundary>
-            )}
             {!isLocked && currentApp && (
               <ErrorBoundary key={`app-${currentApp}`} level='component'>
                 <AppView appId={currentApp} />

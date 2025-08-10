@@ -25,6 +25,10 @@ export { default as SearchFilters } from './SearchFilters';
 export { CartDrawer } from './CartDrawer';
 export { CartIcon, CartIconBadge, CartIconWithDropdown } from './CartIcon';
 export { default as CartItem, CartItemSkeleton } from './CartItem';
+export { default as CheckoutModal } from './CheckoutModal';
+export { default as AddressForm } from './AddressForm';
+export { default as PaymentForm } from './PaymentForm';
+export { default as OrderConfirmation } from './OrderConfirmation';
 
 // Utility Components
 export { default as DragScrollContainer } from './DragScrollContainer';

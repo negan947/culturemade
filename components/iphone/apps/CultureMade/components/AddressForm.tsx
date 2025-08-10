@@ -228,6 +228,7 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
             onBlur={() => setTouched((t) => ({ ...t, country_code: true }))}
             disabled={disabled}
             autoComplete={`${addressType}-country`}
+            aria-label="Country"
           >
             {COUNTRIES.map((c) => (
               <option key={c.code} value={c.code}>{c.name}</option>
