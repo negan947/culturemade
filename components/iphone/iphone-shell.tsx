@@ -1,12 +1,13 @@
 'use client';
 
 import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 import { ErrorBoundary } from '@/components/error/error-boundary';
 import { RootState } from '@/store/store';
 
+import { getAllApps } from './apps/getApp';
 import AppView from './Interface/AppView/AppView';
 import LockScreen from './Interface/LockScreen/LockScreen';
 import LayoutView from './Interface/SystemLayout/LayoutView';
@@ -18,6 +19,40 @@ interface Props {
 const IPhoneShell: FC<Props> = ({ children }) => {
   const currentApp = useSelector((state: RootState) => state.interface.appId);
   const isLocked = useSelector((state: RootState) => state.interface.isLocked);
+
+  // Preload app icons and wallpaper when component mounts (before unlock)
+  useEffect(() => {
+    const preloadImages = async () => {
+      const apps = getAllApps();
+      
+      // Preload all app icons
+      const iconPromises = apps.map((app) => {
+        return new Promise<void>((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve();
+          img.onerror = () => resolve(); // Continue even if some icons fail to load
+          img.src = `/images/icons/${app.icon}.png`;
+        });
+      });
+
+      // Preload wallpaper
+      const wallpaperPromise = new Promise<void>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+        img.src = '/images/wallpaper-cm.jpg';
+      });
+
+      try {
+        await Promise.all([...iconPromises, wallpaperPromise]);
+        console.log('App icons and wallpaper preloaded successfully');
+      } catch (error) {
+        console.warn('Some images failed to preload:', error);
+      }
+    };
+
+    preloadImages();
+  }, []);
 
   // Shared iOS wallpaper background - single source of truth
   const iOSWallpaperStyles = {

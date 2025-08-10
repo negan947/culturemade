@@ -78,50 +78,55 @@
 
 #### **2.1.1: Checkout API Foundation**
 **Build secure checkout session management**
-- [ ] **Checkout Session API**: Create checkout session management
-  - Create `app/api/checkout/session/route.ts` for session creation
-  - Validate cart items and inventory before checkout
-  - Calculate final totals (subtotal, tax, shipping, discounts)
-  - Generate secure checkout session ID
-  - Handle guest checkout and authenticated user flows
+- [🔄] **Checkout Session API**: Create checkout session management (in progress)
+  - ✅ Create `app/api/checkout/session/route.ts` for session creation
+  - ✅ Validate cart items and inventory before checkout (uses `/api/cart` data)
+  - ✅ Calculate final totals (subtotal, tax, shipping; discounts placeholder)
+  - ✅ Generate secure checkout session ID
+  - ✅ Handle guest checkout and authenticated user flows (requires sessionId for guests)
+  - ✅ Persist session in DB with RLS policies (insert only for anon; insert/select for authenticated)
   
-- [ ] **Address Management**: Customer address handling
-  - Create `app/api/checkout/address/route.ts` for address operations
-  - Save and validate billing/shipping addresses
-  - Implement address validation with format checking
-  - Calculate shipping costs based on address
-  - Support address autocomplete integration
+- [✅] **Address Management**: Customer address handling
+  - ✅ Create `app/api/checkout/address/route.ts` for address operations
+  - ✅ Save and validate billing/shipping addresses (authenticated persistence via RLS)
+  - ✅ Implement address validation with format checking (Zod + country postal checks)
+  - ✅ Calculate shipping costs based on address (country-aware quote)
+  - ⏭️ Support address autocomplete integration
   
-- [ ] **Checkout Validation**: Final pre-payment validation
-  - Create `app/api/checkout/validate/route.ts` for final checks
-  - Perform inventory check before payment processing
-  - Recalculate totals in case of price changes
-  - Reserve inventory during checkout process
-  - Handle checkout conflicts and race conditions
+- [✅] **Checkout Validation**: Final pre-payment validation
+  - ✅ Create `app/api/checkout/validate/route.ts` for final checks
+  - ✅ Perform inventory check before payment processing (live variant quantities)
+  - ✅ Recalculate totals in case of price changes (server-side)
+  - ⏭️ Reserve inventory during checkout process (recommend reservation table)
+  - ✅ Handle checkout conflicts by returning per-item conflicts
 
 #### **2.1.2: Stripe Payment Integration**
 **Implement secure payment processing with Stripe**
-- [ ] **Stripe Configuration**: Set up Stripe payment system
-  - Install and configure Stripe SDK for Next.js
-  - Set up environment variables for Stripe keys
-  - Create Stripe customers on user registration
-  - Configure webhook endpoints for payment events
+- [🔄] **Stripe Configuration**: Set up Stripe payment system
+  - ✅ Install and configure Stripe SDK for Next.js (server helper `lib/stripe.ts`)
+  - ✅ Set up environment variables for Stripe keys (validated in `lib/validations/env.ts`)
+  - ⏭️ Create Stripe customers on user registration
+  - ⏭️ Configure webhook endpoints for payment events
   
-- [ ] **Payment Intent API**: Create Stripe payment processing
-  - Create `app/api/checkout/payment-intent/route.ts`
-  - Generate Stripe PaymentIntent with order metadata
-  - Handle payment method collection and validation
-  - Include order details in payment metadata
-  - Support multiple payment methods (card, digital wallets)
+- [✅] **Payment Intent API**: Create Stripe payment processing
+  - ✅ Create `app/api/checkout/payment-intent/route.ts`
+  - ✅ Generate Stripe PaymentIntent with order metadata
+  - ✅ Handle payment method collection and validation (automatic payment methods enabled)
+  - ✅ Include order details in payment metadata
+  - ✅ Support multiple payment methods (card, digital wallets)
   
-- [ ] **Webhook Handling**: Process Stripe webhook events
-  - Create `app/api/webhooks/stripe/route.ts` for event processing
-  - Handle payment confirmation and failure events
-  - Update order status based on payment results
-  - Implement idempotent webhook processing
-  - Add webhook signature verification for security
+- [✅] **Webhook Handling**: Process Stripe webhook events
+  - ✅ Create `app/api/webhooks/stripe/route.ts` for event processing
+  - ✅ Handle payment confirmation and failure events
+  - ✅ Update payment/checkout session status based on payment results
+  - ✅ Implement idempotent webhook processing (via `public.webhook_events`)
+  - ✅ Add webhook signature verification for security
   
-- [ ] **Apple Pay Integration**: Add Apple Pay support
+- [🔄] **Apple Pay Integration**: Add Apple Pay support
+  - ✅ Server-side readiness (Stripe automatic payment methods, env key for merchant id)
+  - ⏭️ Configure Apple Pay merchant ID and domain verification
+  - ⏭️ Add Apple Pay button in checkout UI (Stripe Elements)
+  - ⏭️ Handle Apple Pay flow and validation
   - Configure Apple Pay merchant ID and domain verification
   - Implement Apple Pay button in checkout interface
   - Handle Apple Pay payment flow and validation

@@ -155,14 +155,6 @@ const ProductInfoSection = memo(function ProductInfoSection({
           </div>
         </div>
       </div>
-
-      {/* Product Meta */}
-      <div className="pt-4 border-t border-gray-200 text-sm text-gray-500 space-y-1">
-        <div>Product ID: {product.id}</div>
-        {product.created_at && (
-          <div>Added: {formatDate(product.created_at)}</div>
-        )}
-      </div>
     </div>
   );
 });

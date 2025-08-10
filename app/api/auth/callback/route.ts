@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
+import { createStripeCustomer } from '@/lib/stripe';
 import {
   authLogger,
   errorLogger,
@@ -62,11 +63,11 @@ async function handleAuthCallback(request: NextRequest) {
 
           // User context tracking disabled
 
-          // Check if profile exists
+          // Check if profile exists and whether it has a Stripe customer id
           const profileStartTime = Date.now();
-          const { error: profileError } = await supabase
+          const { data: profileRow, error: profileError } = await supabase
             .from('profiles')
-            .select('id')
+            .select('id, role, full_name, phone, /* @ts-ignore */ stripe_customer_id')
             .eq('id', user.id)
             .single();
           const profileDuration = Date.now() - profileStartTime;
@@ -112,6 +113,32 @@ async function handleAuthCallback(request: NextRequest) {
             } else {
               logAuthEvent('profile_created', user.id, true);
             }
+          }
+
+          // Create Stripe customer if missing and column exists
+          try {
+            const role: string | null = (profileRow as any)?.role ?? null;
+            const stripeCustomerId: string | null = (profileRow as any)?.stripe_customer_id ?? null;
+            // Only create Stripe customers for customer accounts, never for admin
+            if (role === 'customer' && !stripeCustomerId) {
+              const customer = await createStripeCustomer({
+                email: user.email ?? undefined,
+                name:
+                  (profileRow as any)?.full_name ||
+                  (user.user_metadata?.['full_name'] as string | undefined) ||
+                  undefined,
+                phone: (profileRow as any)?.phone || undefined,
+                metadata: { user_id: user.id },
+              });
+
+              // Best effort update; ignore typing until DB types are regenerated
+              await supabase
+                .from('profiles')
+                .update({ stripe_customer_id: customer.id } as any)
+                .eq('id', user.id);
+            }
+          } catch (e) {
+            // Non-fatal: if column not present or Stripe error, continue
           }
 
           authLogger.info('Auth callback successful', {

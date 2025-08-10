@@ -57,16 +57,16 @@ const tabs: Tab[] = [
     screen: SearchScreen,
   },
   {
-    id: 'cart',
-    name: 'Cart',
-    icon: ShoppingBag,
-    screen: CartScreen,
-  },
-  {
     id: 'profile',
     name: 'Profile',
     icon: User,
     screen: ProfileScreen,
+  },
+  {
+    id: 'cart',
+    name: 'Cart',
+    icon: ShoppingBag,
+    screen: CartScreen,
   },
 ];
 

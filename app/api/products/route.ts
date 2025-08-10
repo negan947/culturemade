@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
         id,
         name,
         slug,
+        description,
         price,
         compare_at_price,
         featured,

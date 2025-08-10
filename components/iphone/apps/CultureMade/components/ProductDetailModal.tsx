@@ -157,7 +157,7 @@ const ProductDetailModal = ({
               {/* Product Image Gallery */}
               <div className="w-full">
                 <ProductImageGallery
-                  images={(product as any).images || []}
+                  images={product.primary_image ? [product.primary_image] : []}
                   productName={product.name}
                   className="w-full"
                 />

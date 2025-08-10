@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ShoppingCart, Heart, Share, Star, ChevronDown } from 'lucide-react';
+import { X, ShoppingCart, Heart, Share, Star } from 'lucide-react';
 import { useEffect, memo, useState } from 'react';
 
 import { useInventoryStatus } from '@/hooks/useInventoryStatus';
@@ -26,8 +26,6 @@ const ModalProductCard = memo(function ModalProductCard({
   onAddToCart,
   onProductClick
 }: ModalProductCardProps) {
-  // State for nutritional facts section
-  const [isNutritionExpanded, setIsNutritionExpanded] = useState(false);
 
   // Use advanced hooks for comprehensive product data
   const { pricing, priceText, originalPriceText, isOnSale, discountText, savingsText } = useProductPricing(product);
@@ -179,7 +177,7 @@ const ModalProductCard = memo(function ModalProductCard({
             onClick={(e) => e.stopPropagation()}
           >
             {/* Product Image with Overlay Effects */}
-            <div className="relative aspect-square bg-gray-50 rounded-t-2xl flex items-center justify-center">
+            <div className="relative aspect-square bg-gray-50 rounded-t-2xl">
               {/* Close Button - positioned over image */}
               <div className="absolute top-4 left-4 z-20">
                 <motion.button
@@ -191,22 +189,15 @@ const ModalProductCard = memo(function ModalProductCard({
                   <X className="w-6 h-6 text-gray-700" />
                 </motion.button>
               </div>
-              {/* Package/Box icon placeholder */}
-              <div className="w-20 h-20 text-gray-300 flex items-center justify-center">
-                <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                  <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                  <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                </svg>
-              </div>
               
-              {/* Option dots */}
-              <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2">
-                <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-              </div>
+              {/* Actual Product Image */}
+              <ProductImage
+                src={product.primary_image?.url || null}
+                alt={product.primary_image?.alt_text || `${product.name} product image`}
+                productName={product.name}
+                className="w-full h-full rounded-t-2xl"
+              />
+              
               
               {/* Sale Badge */}
               {badge && (
@@ -330,62 +321,10 @@ const ModalProductCard = memo(function ModalProductCard({
                   id={`modal-description-${product.id}`}
                   className="text-gray-600 text-sm leading-relaxed"
                 >
-                  Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Nullam quis risus eget urna mollis ornare vel eu leo.
+                  {product.description || 'No description available for this product.'}
                 </p>
               </motion.div>
 
-              {/* Nutritional Facts Collapsible Section */}
-              <motion.div 
-                className="border-t border-gray-200 pt-4"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-              >
-                <motion.button
-                  onClick={() => setIsNutritionExpanded(!isNutritionExpanded)}
-                  className="flex items-center justify-between w-full py-2 text-left"
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <span className="font-semibold text-gray-900 text-lg">Nutritional facts</span>
-                  <motion.div
-                    animate={{ rotate: isNutritionExpanded ? 180 : 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <ChevronDown className="w-5 h-5 text-gray-500" />
-                  </motion.div>
-                </motion.button>
-                
-                <AnimatePresence>
-                  {isNutritionExpanded && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="pt-3 text-sm text-gray-600 space-y-2">
-                        <div className="flex justify-between">
-                          <span>Calories</span>
-                          <span>120</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Total Fat</span>
-                          <span>8g</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Sodium</span>
-                          <span>95mg</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Protein</span>
-                          <span>12g</span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
               
             </motion.div>
           </motion.div>
