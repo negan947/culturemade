@@ -70,7 +70,6 @@ const COUNTRIES: Array<{ code: string; name: string }> = [
 ];
 
 export default function AddressForm({ addressType, value, onChange, disabled }: AddressFormProps) {
-  const [local, setLocal] = useState<AddressFields>(value);
   const [touched, setTouched] = useState<Record<keyof AddressFields, boolean>>({
     first_name: false,
     last_name: false,
@@ -84,17 +83,14 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
     phone: false as any,
   });
 
-  useEffect(() => {
-    setLocal(value);
-  }, [value]);
-
-  const validation = useMemo(() => validateAddress(local), [local]);
+  const validation = useMemo(() => validateAddress(value), [value]);
   const isValid = validation.success;
 
-  useEffect(() => {
-    onChange(local, isValid);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [local, isValid]);
+  const updateField = <K extends keyof AddressFields>(key: K, newValue: AddressFields[K]) => {
+    const next: AddressFields = { ...value, [key]: newValue } as AddressFields;
+    const nextValid = validateAddress(next).success;
+    onChange(next, nextValid);
+  };
 
   const getError = (field: keyof AddressFields) => {
     if (!touched[field]) return '';
@@ -109,9 +105,9 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
         <div>
           <label className="block text-xs text-gray-600 mb-1">First name</label>
           <input
-            className={`w-full rounded-lg border px-3 py-2 text-sm ${getError('first_name') ? 'border-red-500' : 'border-gray-300'}`}
-            value={local.first_name}
-            onChange={(e) => setLocal((s) => ({ ...s, first_name: e.target.value }))}
+            className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('first_name') ? 'border-red-500' : 'border-gray-300'}`}
+            value={value.first_name}
+            onChange={(e) => updateField('first_name', e.target.value)}
             onBlur={() => setTouched((t) => ({ ...t, first_name: true }))}
             disabled={disabled}
             placeholder="John"
@@ -122,9 +118,9 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
         <div>
           <label className="block text-xs text-gray-600 mb-1">Last name</label>
           <input
-            className={`w-full rounded-lg border px-3 py-2 text-sm ${getError('last_name') ? 'border-red-500' : 'border-gray-300'}`}
-            value={local.last_name}
-            onChange={(e) => setLocal((s) => ({ ...s, last_name: e.target.value }))}
+            className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('last_name') ? 'border-red-500' : 'border-gray-300'}`}
+            value={value.last_name}
+            onChange={(e) => updateField('last_name', e.target.value)}
             onBlur={() => setTouched((t) => ({ ...t, last_name: true }))}
             disabled={disabled}
             placeholder="Doe"
@@ -137,9 +133,9 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
       <div>
         <label className="block text-xs text-gray-600 mb-1">Company (optional)</label>
         <input
-          className={`w-full rounded-lg border px-3 py-2 text-sm ${getError('company') ? 'border-red-500' : 'border-gray-300'}`}
-          value={local.company ?? ''}
-          onChange={(e) => setLocal((s) => ({ ...s, company: e.target.value || null }))}
+          className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('company') ? 'border-red-500' : 'border-gray-300'}`}
+          value={value.company ?? ''}
+          onChange={(e) => updateField('company', (e.target.value || null) as any)}
           onBlur={() => setTouched((t) => ({ ...t, company: true as any }))}
           disabled={disabled}
           placeholder="Company"
@@ -151,9 +147,9 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
       <div>
         <label className="block text-xs text-gray-600 mb-1">Address line 1</label>
         <input
-          className={`w-full rounded-lg border px-3 py-2 text-sm ${getError('address_line_1') ? 'border-red-500' : 'border-gray-300'}`}
-          value={local.address_line_1}
-          onChange={(e) => setLocal((s) => ({ ...s, address_line_1: e.target.value }))}
+          className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('address_line_1') ? 'border-red-500' : 'border-gray-300'}`}
+          value={value.address_line_1}
+          onChange={(e) => updateField('address_line_1', e.target.value)}
           onBlur={() => setTouched((t) => ({ ...t, address_line_1: true }))}
           disabled={disabled}
           placeholder="123 Main St"
@@ -165,9 +161,9 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
       <div>
         <label className="block text-xs text-gray-600 mb-1">Address line 2 (optional)</label>
         <input
-          className={`w-full rounded-lg border px-3 py-2 text-sm ${getError('address_line_2') ? 'border-red-500' : 'border-gray-300'}`}
-          value={local.address_line_2 ?? ''}
-          onChange={(e) => setLocal((s) => ({ ...s, address_line_2: e.target.value || null }))}
+          className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('address_line_2') ? 'border-red-500' : 'border-gray-300'}`}
+          value={value.address_line_2 ?? ''}
+          onChange={(e) => updateField('address_line_2', (e.target.value || null) as any)}
           onBlur={() => setTouched((t) => ({ ...t, address_line_2: true as any }))}
           disabled={disabled}
           placeholder="Apt, suite, etc."
@@ -180,9 +176,9 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
         <div className="col-span-2">
           <label className="block text-xs text-gray-600 mb-1">City</label>
           <input
-            className={`w-full rounded-lg border px-3 py-2 text-sm ${getError('city') ? 'border-red-500' : 'border-gray-300'}`}
-            value={local.city}
-            onChange={(e) => setLocal((s) => ({ ...s, city: e.target.value }))}
+            className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('city') ? 'border-red-500' : 'border-gray-300'}`}
+            value={value.city}
+            onChange={(e) => updateField('city', e.target.value)}
             onBlur={() => setTouched((t) => ({ ...t, city: true }))}
             disabled={disabled}
             placeholder="City"
@@ -193,9 +189,9 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
         <div>
           <label className="block text-xs text-gray-600 mb-1">State/Province</label>
           <input
-            className={`w-full rounded-lg border px-3 py-2 text-sm ${getError('state_province') ? 'border-red-500' : 'border-gray-300'}`}
-            value={local.state_province}
-            onChange={(e) => setLocal((s) => ({ ...s, state_province: e.target.value }))}
+            className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('state_province') ? 'border-red-500' : 'border-gray-300'}`}
+            value={value.state_province}
+            onChange={(e) => updateField('state_province', e.target.value)}
             onBlur={() => setTouched((t) => ({ ...t, state_province: true }))}
             disabled={disabled}
             placeholder="State/Province"
@@ -209,9 +205,9 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
         <div>
           <label className="block text-xs text-gray-600 mb-1">Postal code</label>
           <input
-            className={`w-full rounded-lg border px-3 py-2 text-sm ${getError('postal_code') ? 'border-red-500' : 'border-gray-300'}`}
-            value={local.postal_code}
-            onChange={(e) => setLocal((s) => ({ ...s, postal_code: e.target.value }))}
+            className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('postal_code') ? 'border-red-500' : 'border-gray-300'}`}
+            value={value.postal_code}
+            onChange={(e) => updateField('postal_code', e.target.value)}
             onBlur={() => setTouched((t) => ({ ...t, postal_code: true }))}
             disabled={disabled}
             placeholder="ZIP/Postal code"
@@ -222,9 +218,9 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
         <div className="col-span-2">
           <label className="block text-xs text-gray-600 mb-1">Country</label>
           <select
-            className={`w-full rounded-lg border px-3 py-2 text-sm ${getError('country_code') ? 'border-red-500' : 'border-gray-300'}`}
-            value={local.country_code}
-            onChange={(e) => setLocal((s) => ({ ...s, country_code: e.target.value.toUpperCase() }))}
+            className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 ${getError('country_code') ? 'border-red-500' : 'border-gray-300'}`}
+            value={value.country_code}
+            onChange={(e) => updateField('country_code', e.target.value.toUpperCase() as any)}
             onBlur={() => setTouched((t) => ({ ...t, country_code: true }))}
             disabled={disabled}
             autoComplete={`${addressType}-country`}
@@ -241,9 +237,9 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
       <div>
         <label className="block text-xs text-gray-600 mb-1">Phone (optional)</label>
         <input
-          className={`w-full rounded-lg border px-3 py-2 text-sm ${getError('phone') ? 'border-red-500' : 'border-gray-300'}`}
-          value={local.phone ?? ''}
-          onChange={(e) => setLocal((s) => ({ ...s, phone: e.target.value || null }))}
+          className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('phone') ? 'border-red-500' : 'border-gray-300'}`}
+          value={value.phone ?? ''}
+          onChange={(e) => updateField('phone', (e.target.value || null) as any)}
           onBlur={() => setTouched((t) => ({ ...t, phone: true as any }))}
           disabled={disabled}
           placeholder="+15551234567"
