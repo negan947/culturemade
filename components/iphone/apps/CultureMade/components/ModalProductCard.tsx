@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ShoppingCart, Heart, Share, Star } from 'lucide-react';
+import { X, ShoppingCart, Heart, Share, Star, Check } from 'lucide-react';
 import { useEffect, memo, useState } from 'react';
 
 import { useInventoryStatus } from '@/hooks/useInventoryStatus';
@@ -79,9 +79,10 @@ const ModalProductCard = memo(function ModalProductCard({
   }, [isOpen, onClose]);
 
   // Enhanced click handler with analytics
-  const handleAddToCart = async () => {
-    if (!onAddToCart || isOutOfStock || isProcessing) return;
+  const handleAddToCart = async (): Promise<boolean> => {
+    if (!onAddToCart || isOutOfStock || isProcessing) return false;
 
+    // Do not block add-to-cart on analytics errors
     try {
       await handleInteractionClick(product.id, { 
         clickTarget: 'add_to_cart_modal',
@@ -92,11 +93,11 @@ const ModalProductCard = memo(function ModalProductCard({
           modalContext: true
         }
       });
-      
-      await onAddToCart(product.id);
-    } catch (error) {
-      console.error('Failed to add to cart:', error);
-    }
+    } catch {}
+
+    // Let any API failures throw so caller can reflect error UI
+    await onAddToCart(product.id);
+    return true;
   };
 
   const handleProductView = () => {
@@ -112,6 +113,9 @@ const ModalProductCard = memo(function ModalProductCard({
     }
   };
 
+  const [added, setAdded] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -120,7 +124,7 @@ const ModalProductCard = memo(function ModalProductCard({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="absolute inset-0 z-50 flex items-center justify-center p-4"
           onClick={onClose}
           role="dialog"
           aria-modal="true"
@@ -291,12 +295,43 @@ const ModalProductCard = memo(function ModalProductCard({
                 {/* Add to Cart Button */}
                 <motion.button
                   whileTap={{ scale: 0.98 }}
-                  onClick={handleAddToCart}
-                  disabled={isOutOfStock || isProcessing}
-                  className="flex-1 py-4 rounded-xl font-semibold bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+                  onClick={async () => {
+                    if (isAdding || added) return;
+                    setIsAdding(true);
+                    try {
+                      const success = await handleAddToCart();
+                      if (success) {
+                        setAdded(true);
+                        window.dispatchEvent(new CustomEvent('cartBadgePulse'));
+                        setTimeout(() => setAdded(false), 1200);
+                      }
+                    } catch (e) {
+                      // Error already logged upstream; keep button in default state
+                    } finally {
+                      setIsAdding(false);
+                    }
+                  }}
+                  disabled={isOutOfStock || isProcessing || isAdding}
+                  className={`flex-1 py-4 rounded-xl font-semibold border-2 transition-all flex items-center justify-center gap-2 ${
+                    added
+                      ? 'bg-green-500 border-green-600 text-white'
+                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                  } ${isAdding ? 'opacity-80 cursor-not-allowed' : ''}`}
                   aria-label={`Add ${product.name} to cart`}
                 >
-                  Add To Cart
+                  {isAdding ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                      Adding...
+                    </div>
+                  ) : added ? (
+                    <div className="flex items-center gap-2">
+                      <Check className="w-5 h-5" />
+                      Added!
+                    </div>
+                  ) : (
+                    'Add To Cart'
+                  )}
                 </motion.button>
                 
                 {/* Buy Now Button */}
@@ -304,6 +339,17 @@ const ModalProductCard = memo(function ModalProductCard({
                   whileTap={{ scale: 0.98 }}
                   className="flex-1 py-4 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg"
                   aria-label={`Buy ${product.name} now`}
+                  onClick={async () => {
+                    try {
+                      if (onAddToCart) {
+                        await onAddToCart(product.id);
+                      }
+                      onClose();
+                      setTimeout(() => window.dispatchEvent(new Event('openCheckout')), 150);
+                    } catch (e) {
+                      console.error('Buy Now failed:', e);
+                    }
+                  }}
                 >
                   Buy Now
                 </motion.button>

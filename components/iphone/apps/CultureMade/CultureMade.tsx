@@ -91,6 +91,13 @@ function CultureMadeInner() {
     }));
   }, [dispatch, userId, sessionId]);
 
+  // Global event to open checkout from anywhere (e.g., Buy Now)
+  useEffect(() => {
+    const handler = () => setShowCheckoutScreen(true);
+    window.addEventListener('openCheckout', handler);
+    return () => window.removeEventListener('openCheckout', handler);
+  }, []);
+
   const currentTab = tabs.find(tab => tab.id === activeTab);
   const CurrentScreen = currentTab?.screen || HomeScreen;
 

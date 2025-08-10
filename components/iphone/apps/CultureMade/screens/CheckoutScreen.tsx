@@ -8,6 +8,7 @@ import { getCartSessionId } from '@/utils/cartSync';
 
 import AddressForm, { AddressFields } from '../components/AddressForm';
 import PaymentForm from '../components/PaymentForm';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import OrderConfirmation from '../components/OrderConfirmation';
 
 type StepId = 'address' | 'payment' | 'confirm';
@@ -32,6 +33,8 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const controls = useAnimation();
+  const [showSummary, setShowSummary] = useState(true);
+  const [cartSummary, setCartSummary] = useState<{ items: Array<{ name: string; variant?: string | null; qty: number; price: number }>; total: number } | null>(null);
 
   const [billing, setBilling] = useState<AddressFields>({
     first_name: '',
@@ -76,6 +79,21 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
     // Ensure we start in-place for manual exit animation control
     controls.set({ x: 0, opacity: 1 });
   }, [controls]);
+
+  // Load a lightweight cart summary for the dropdown
+  useEffect(() => {
+    (async () => {
+      try {
+        const params = new URLSearchParams(userId ? { userId } : (sessionId ? { sessionId } : {}) as Record<string, string>);
+        const res = await fetch(`/api/cart?${params.toString()}`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const json = await res.json();
+        const items = (json?.cart?.items || []).map((i: any) => ({ name: i.product_name, variant: i.variant_title || null, qty: i.quantity, price: i.total }));
+        const total = Number(json?.cart?.total || 0);
+        setCartSummary({ items, total });
+      } catch {}
+    })();
+  }, [userId, sessionId]);
 
   const handleSubmitAddresses = async () => {
     setServerError(null);
@@ -160,6 +178,41 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
         </div>
         <div className="w-9" />
       </div>
+
+      {/* Summary Dropdown */}
+      {cartSummary && (
+        <div className="bg-white border-b border-gray-200">
+          <button
+            className="w-full flex items-center justify-between px-4 py-3 text-sm"
+            onClick={() => setShowSummary((s) => !s)}
+            
+          >
+            <span className="text-gray-700 font-medium">Order summary</span>
+            {showSummary ? <ChevronUp className="h-4 w-4 text-gray-500" /> : <ChevronDown className="h-4 w-4 text-gray-500" />}
+          </button>
+          {showSummary && (
+            <div className="px-4 pb-3 space-y-2">
+              {cartSummary.items.slice(0, 3).map((it, idx) => (
+                <div key={idx} className="flex items-center justify-between text-xs text-gray-600">
+                  <div className="truncate mr-2">
+                    <span className="font-medium text-gray-800">{it.name}</span>
+                    {it.variant && <span className="text-gray-500"> • {it.variant}</span>}
+                    <span className="text-gray-500"> ×{it.qty}</span>
+                  </div>
+                  <span className="text-gray-800">${it.price.toFixed(2)}</span>
+                </div>
+              ))}
+              {cartSummary.items.length > 3 && (
+                <div className="text-xs text-gray-500">+{cartSummary.items.length - 3} more item(s)</div>
+              )}
+              <div className="border-t border-gray-200 pt-2 flex items-center justify-between text-sm">
+                <span className="font-semibold text-gray-900">Total</span>
+                <span className="font-semibold text-gray-900">${cartSummary.total.toFixed(2)}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">

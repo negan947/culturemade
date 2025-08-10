@@ -48,7 +48,25 @@ export function CartIcon({
     };
 
     window.addEventListener('cartUpdated', handleCartUpdate);
-    return () => window.removeEventListener('cartUpdated', handleCartUpdate);
+    // Pulse badge on custom event
+    const handlePulse = () => {
+      try {
+        const el = document.getElementById('cart-icon-badge');
+        if (el) {
+          el.animate([
+            { transform: 'scale(1)' },
+            { transform: 'scale(1.2)' },
+            { transform: 'scale(1)' }
+          ], { duration: 250, easing: 'ease-out' });
+        }
+      } catch {}
+    };
+    window.addEventListener('cartBadgePulse', handlePulse);
+
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+      window.removeEventListener('cartBadgePulse', handlePulse);
+    };
   }, [refreshCount]);
 
   const sizeClasses = {
@@ -96,6 +114,7 @@ export function CartIcon({
               damping: 30,
               duration: 0.2 
             }}
+            id="cart-icon-badge"
             className={`
               absolute ${currentSize.position} 
               ${currentSize.badge}
