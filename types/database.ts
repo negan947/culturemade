@@ -61,6 +61,7 @@ export interface Database {
           avatar_url: string | null;
           created_at: string | null;
           updated_at: string | null;
+          stripe_customer_id?: string | null;
         };
         Insert: {
           id: string;
@@ -70,6 +71,7 @@ export interface Database {
           avatar_url?: string | null;
           created_at?: string | null;
           updated_at?: string | null;
+          stripe_customer_id?: string | null;
         };
         Update: {
           id?: string;
@@ -79,6 +81,74 @@ export interface Database {
           avatar_url?: string | null;
           created_at?: string | null;
           updated_at?: string | null;
+          stripe_customer_id?: string | null;
+        };
+      };
+      user_preferences: {
+        Row: {
+          user_id: string;
+          email_notifications: boolean | null;
+          sms_notifications: boolean | null;
+          push_notifications: boolean | null;
+          marketing_opt_in: boolean | null;
+          size_preference: string | null;
+          language: string | null;
+          currency: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          user_id: string;
+          email_notifications?: boolean | null;
+          sms_notifications?: boolean | null;
+          push_notifications?: boolean | null;
+          marketing_opt_in?: boolean | null;
+          size_preference?: string | null;
+          language?: string | null;
+          currency?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          user_id?: string;
+          email_notifications?: boolean | null;
+          sms_notifications?: boolean | null;
+          push_notifications?: boolean | null;
+          marketing_opt_in?: boolean | null;
+          size_preference?: string | null;
+          language?: string | null;
+          currency?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+      };
+      profile_change_history: {
+        Row: {
+          id: string;
+          user_id: string;
+          changed_by: string;
+          changes: Json;
+          ip_address: string | null;
+          user_agent: string | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          changed_by: string;
+          changes: Json;
+          ip_address?: string | null;
+          user_agent?: string | null;
+          created_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          changed_by?: string;
+          changes?: Json;
+          ip_address?: string | null;
+          user_agent?: string | null;
+          created_at?: string | null;
         };
       };
       products: {

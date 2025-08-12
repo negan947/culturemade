@@ -219,26 +219,39 @@ Integration Notes:
 
 #### **3.1.1: Profile API Enhancement**
 **Build comprehensive profile management system**
-- [ ] **Profile Update API**: Enhanced profile management
-  - Create `app/api/profile/route.ts` with PUT handler
-  - Handle profile information updates (name, phone, preferences)
-  - Support avatar image upload and management
-  - Validate and sanitize all profile inputs
-  - Add profile change history tracking
+- [🔄] **Profile Update API**: Enhanced profile management
+  - Create `app/api/profile/route.ts` with GET/PUT handlers (DONE)
+  - Handle profile information updates (name, phone) with validation (DONE)
+  - Support avatar image upload and management via `app/api/profile/avatar/route.ts` (DONE)
+  - Validate and sanitize all profile inputs (DONE)
+  - Add profile change history tracking (ENDPOINT READY; SQL pending)
+  - Added preferences endpoints `app/api/profile/preferences/route.ts` (GET/PUT) (DONE; SQL pending)
   
 - [ ] **Address Management**: Multiple address support
-  - Create address CRUD endpoints for saved addresses
+  - Create address CRUD endpoints for saved addresses (IN PROGRESS: `app/api/profile/addresses/route.ts` GET/POST, `app/api/profile/addresses/[id]/route.ts` PUT/DELETE)
   - Support multiple shipping and billing addresses
-  - Add default address designation functionality
-  - Implement address validation and formatting
+  - Add default address designation functionality (IN PROGRESS)
+  - Implement address validation and formatting (IN PROGRESS)
   - Handle address deletion with order history preservation
   
 - [ ] **Preferences API**: User preference management
-  - Save notification preferences (email, SMS, push)
-  - Handle marketing subscription status
-  - Store size and fit preferences for recommendations
-  - Support language and currency preferences
+  - Save notification preferences (email, SMS, push) (ENDPOINT READY; SQL pending)
+  - Handle marketing subscription status (ENDPOINT READY; SQL pending)
+  - Store size and fit preferences for recommendations (ENDPOINT READY; SQL pending)
+  - Support language and currency preferences (ENDPOINT READY; SQL pending)
   - Add privacy setting controls
+
+Implementation notes:
+- New API endpoints added:
+  - `GET/PUT` `app/api/profile/route.ts`
+  - `POST` `app/api/profile/avatar/route.ts`
+  - `GET/POST` `app/api/profile/addresses/route.ts`
+  - `PUT/DELETE` `app/api/profile/addresses/[id]/route.ts`
+  - `GET/PUT` `app/api/profile/preferences/route.ts`
+- Database additions required (pending execution in Supabase dashboard):
+  - Create `user_preferences` table with RLS
+  - Create `profile_change_history` table with RLS
+  - Create storage bucket `user-avatars` with appropriate policies
 
 #### **3.1.2: Profile UI Components**
 **User-friendly profile management interface**

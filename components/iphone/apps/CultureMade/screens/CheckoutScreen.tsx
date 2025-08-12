@@ -36,6 +36,8 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
   const controls = useAnimation();
   const [showSummary, setShowSummary] = useState(true);
   const [cartSummary, setCartSummary] = useState<{ items: Array<{ name: string; variant?: string | null; qty: number; price: number }>; total: number } | null>(null);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  const [orderTotal, setOrderTotal] = useState<number | null>(null);
 
   const [billing, setBilling] = useState<AddressFields>({
     first_name: '',
@@ -325,13 +327,32 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
           <PaymentForm
             {...(userId ? { userId } : {})}
             {...(checkoutSessionId ? { checkoutSessionId } : {})}
-            onSuccess={() => setStep('confirm')}
+            onSuccess={async ({ paymentIntentId }) => {
+              try {
+                const res = await fetch('/api/orders', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    paymentIntentId,
+                    ...(checkoutSessionId ? { checkoutSessionId } : {}),
+                    ...(sessionId ? { sessionId } : {}),
+                  }),
+                });
+                const json = await res.json();
+                if (!res.ok || json.error) throw new Error(json.error || 'Failed to create order');
+                setOrderNumber(json.orderNumber || null);
+                setOrderTotal(typeof json.total === 'number' ? json.total : null);
+                setStep('confirm');
+              } catch (e: any) {
+                setServerError(e.message || 'Failed to finalize order');
+              }
+            }}
             onError={(msg) => setServerError(msg)}
           />
         )}
 
         {step === 'confirm' && (
-          <OrderConfirmation onDone={onClose} />
+          <OrderConfirmation orderNumber={orderNumber || undefined} total={orderTotal || undefined} onDone={onClose} />
         )}
       </div>
 
