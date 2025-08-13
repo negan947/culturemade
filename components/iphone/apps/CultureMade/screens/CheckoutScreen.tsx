@@ -8,10 +8,10 @@ import { getCartSessionId } from '@/utils/cartSync';
 
 import AddressForm, { AddressFields, validateAddress } from '../components/AddressForm';
 import PaymentForm from '../components/PaymentForm';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, X } from 'lucide-react';
 import OrderConfirmation from '../components/OrderConfirmation';
 
-type StepId = 'address' | 'payment' | 'confirm';
+type StepId = 'contact' | 'shipping' | 'payment' | 'confirm';
 
 interface CheckoutScreenProps {
   onClose: () => void;
@@ -29,7 +29,7 @@ interface AddressApiResponse {
 
 export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps) {
   const sessionId = !userId ? getCartSessionId() : undefined;
-  const [step, setStep] = useState<StepId>('address');
+  const [step, setStep] = useState<StepId>('contact');
   const [checkoutSessionId, setCheckoutSessionId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -38,22 +38,15 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
   const [cartSummary, setCartSummary] = useState<{ items: Array<{ name: string; variant?: string | null; qty: number; price: number }>; total: number } | null>(null);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [orderTotal, setOrderTotal] = useState<number | null>(null);
+  const isFinalized = step === 'confirm';
 
-  const [billing, setBilling] = useState<AddressFields>({
-    first_name: '',
-    last_name: '',
-    company: null,
-    address_line_1: '',
-    address_line_2: null,
-    city: '',
-    state_province: '',
-    postal_code: '',
-    country_code: 'US',
-    phone: null,
-  });
-  const [billingValid, setBillingValid] = useState(false);
+  // Contact step state
+  const [contactEmail, setContactEmail] = useState<string>('');
+  const [contactName, setContactName] = useState<string>('');
+  const [contactPhone, setContactPhone] = useState<string>('');
+  const [contactValid, setContactValid] = useState<boolean>(false);
 
-  const [useBillingForShipping, setUseBillingForShipping] = useState(true);
+  // Shipping entered before billing (Shopify-style)
   const [shipping, setShipping] = useState<AddressFields>({
     first_name: '',
     last_name: '',
@@ -68,11 +61,30 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
   });
   const [shippingValid, setShippingValid] = useState(false);
 
+  const [useBillingForShipping, setUseBillingForShipping] = useState(true);
+  const [billing, setBilling] = useState<AddressFields>({
+    first_name: '',
+    last_name: '',
+    company: null,
+    address_line_1: '',
+    address_line_2: null,
+    city: '',
+    state_province: '',
+    postal_code: '',
+    country_code: 'US',
+    phone: null,
+  });
+  const [billingValid, setBillingValid] = useState(false);
+
   const canContinue = useMemo(() => {
-    if (step !== 'address') return true;
-    if (useBillingForShipping) return billingValid;
-    return billingValid && shippingValid;
-  }, [step, billingValid, shippingValid, useBillingForShipping]);
+    if (step === 'contact') {
+      return contactValid;
+    }
+    if (step !== 'shipping') return true;
+    // shipping first; if billing is same as shipping, only require shipping
+    if (useBillingForShipping) return shippingValid;
+    return shippingValid && billingValid;
+  }, [step, contactValid, shippingValid, billingValid, useBillingForShipping]);
 
   useEffect(() => {
     setServerError(null);
@@ -86,16 +98,12 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
   // Persist/restore checkout form state in localStorage
   useEffect(() => {
     try {
-      const storedBilling = localStorage.getItem('cm_checkout_billing');
-      if (storedBilling) {
-        const parsed = JSON.parse(storedBilling) as AddressFields;
-        setBilling(parsed);
-        setBillingValid(validateAddress(parsed).success);
-      }
-
-      const storedUseBilling = localStorage.getItem('cm_checkout_use_billing_for_shipping');
-      if (storedUseBilling) {
-        setUseBillingForShipping(storedUseBilling === 'true');
+      const storedContact = localStorage.getItem('cm_checkout_contact');
+      if (storedContact) {
+        const parsed = JSON.parse(storedContact) as { email?: string; name?: string; phone?: string };
+        setContactEmail(parsed.email || '');
+        setContactName(parsed.name || '');
+        setContactPhone(parsed.phone || '');
       }
 
       const storedShipping = localStorage.getItem('cm_checkout_shipping');
@@ -103,15 +111,38 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
         const parsed = JSON.parse(storedShipping) as AddressFields;
         setShipping(parsed);
         setShippingValid(validateAddress(parsed).success);
+      } else {
+        // Hydrate from defaults in forms if present
+        setShipping((prev) => ({ ...prev }));
+      }
+
+      const storedUseBilling = localStorage.getItem('cm_checkout_use_billing_for_shipping');
+      if (storedUseBilling) {
+        setUseBillingForShipping(storedUseBilling === 'true');
+      }
+
+      const storedBilling = localStorage.getItem('cm_checkout_billing');
+      if (storedBilling) {
+        const parsed = JSON.parse(storedBilling) as AddressFields;
+        setBilling(parsed);
+        setBillingValid(validateAddress(parsed).success);
+      } else {
+        setBilling((prev) => ({ ...prev }));
       }
     } catch {}
   }, []);
 
   useEffect(() => {
     try {
-      localStorage.setItem('cm_checkout_billing', JSON.stringify(billing));
+      localStorage.setItem('cm_checkout_contact', JSON.stringify({ email: contactEmail, name: contactName, phone: contactPhone }));
     } catch {}
-  }, [billing]);
+  }, [contactEmail, contactName, contactPhone]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('cm_checkout_shipping', JSON.stringify(shipping));
+    } catch {}
+  }, [shipping]);
 
   useEffect(() => {
     try {
@@ -121,9 +152,9 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
 
   useEffect(() => {
     try {
-      localStorage.setItem('cm_checkout_shipping', JSON.stringify(shipping));
+      localStorage.setItem('cm_checkout_billing', JSON.stringify(billing));
     } catch {}
-  }, [shipping]);
+  }, [billing]);
 
   // Load a lightweight cart summary for the dropdown
   useEffect(() => {
@@ -144,39 +175,39 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
     setServerError(null);
     setIsSubmitting(true);
     try {
-      // Submit billing first
-      const billingRes = await fetch('/api/checkout/address', {
+      // Submit shipping first
+      const shippingRes = await fetch('/api/checkout/address', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          addressType: 'billing',
-          address: billing,
+          addressType: 'shipping',
+          address: shipping,
           ...(sessionId ? { sessionId } : {}),
           save: true,
           setDefault: true,
         }),
       });
-      const billingJson = (await billingRes.json()) as AddressApiResponse;
-      if (!billingRes.ok || billingJson.error) {
-        throw new Error(billingJson.error || 'Failed to save billing address');
+      const shippingJson = (await shippingRes.json()) as AddressApiResponse;
+      if (!shippingRes.ok || shippingJson.error) {
+        throw new Error(shippingJson.error || 'Failed to save shipping address');
       }
 
-      // Submit shipping if not using billing for shipping
+      // Submit billing if not same as shipping
       if (!useBillingForShipping) {
-        const shippingRes = await fetch('/api/checkout/address', {
+        const billingRes = await fetch('/api/checkout/address', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            addressType: 'shipping',
-            address: shipping,
+            addressType: 'billing',
+            address: billing,
             ...(sessionId ? { sessionId } : {}),
             save: true,
             setDefault: true,
           }),
         });
-        const shippingJson = (await shippingRes.json()) as AddressApiResponse;
-        if (!shippingRes.ok || shippingJson.error) {
-          throw new Error(shippingJson.error || 'Failed to save shipping address');
+        const billingJson = (await billingRes.json()) as AddressApiResponse;
+        if (!billingRes.ok || billingJson.error) {
+          throw new Error(billingJson.error || 'Failed to save billing address');
         }
       }
 
@@ -204,14 +235,34 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
   };
 
   const handleBack = async () => {
-    if (step === 'address') {
+    if (step === 'contact') {
       await controls.start({ x: '100%', opacity: 0, transition: { duration: 0.25, ease: [0.4, 0, 0.2, 1] } });
       onClose();
       return;
     }
-    if (step === 'payment') return setStep('address');
-    if (step === 'confirm') return setStep('payment');
+    if (step === 'shipping') return setStep('contact');
+    if (step === 'payment') return setStep('shipping');
+    if (step === 'confirm') return; // do not allow navigating back after confirmation
   };
+
+  // Block accidental browser back navigation via Backspace/Alt+Left on confirmation step
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (step !== 'confirm') return;
+      const target = e.target as HTMLElement | null;
+      const isTyping = !!target && (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        (target as any).isContentEditable === true
+      );
+      if (!isTyping && (e.key === 'Backspace' || (e.altKey && e.key === 'ArrowLeft'))) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown, { capture: true });
+    return () => window.removeEventListener('keydown', onKeyDown, { capture: true } as any);
+  }, [step]);
 
   return (
     <motion.div
@@ -224,19 +275,36 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
       <div className="pointer-events-none absolute bottom-0 inset-x-0 h-safe-bottom bg-white" />
       {/* Header */}
       <div className="bg-white px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-        <motion.button
-          onClick={handleBack}
-          className="p-2 rounded-full hover:bg-gray-100 text-gray-600"
-          aria-label="Back"
-          whileTap={{ scale: 0.95 }}
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </motion.button>
+        {step !== 'contact' && step !== 'confirm' ? (
+          <motion.button
+            onClick={handleBack}
+            className="p-2 rounded-full hover:bg-gray-100 text-gray-600"
+            aria-label="Back"
+            whileTap={{ scale: 0.95 }}
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </motion.button>
+        ) : (
+          <div className="w-9" />
+        )}
         <div>
           <h2 className="text-lg font-semibold text-gray-900">Checkout</h2>
-          <p className="text-xs text-gray-500">Step {step === 'address' ? '1' : step === 'payment' ? '2' : '3'} of 3</p>
+          <p className="text-xs text-gray-500">
+            Step {step === 'contact' ? '1' : step === 'shipping' ? '2' : step === 'payment' ? '3' : '4'} of 4
+          </p>
         </div>
-        <div className="w-9" />
+        {step === 'contact' ? (
+          <motion.button
+            onClick={handleBack}
+            className="p-2 rounded-full hover:bg-gray-100 text-gray-600"
+            aria-label="Close checkout"
+            whileTap={{ scale: 0.95 }}
+          >
+            <X className="h-5 w-5" />
+          </motion.button>
+        ) : (
+          <div className="w-9" />
+        )}
       </div>
 
       {/* Summary Dropdown */}
@@ -282,15 +350,68 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
           </div>
         )}
 
-        {step === 'address' && (
+        {step === 'contact' && (
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900">Contact information</h3>
+              <p className="text-xs text-gray-500 mb-3">We’ll send your receipt and updates to this email</p>
+              <div className="space-y-3">
+                <div>
+                  <label htmlFor="cm-contact-email" className="block text-xs text-gray-600 mb-1">Email</label>
+                  <input
+                    id="cm-contact-email"
+                    type="email"
+                    className="w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 border-gray-300"
+                    placeholder="you@example.com"
+                    value={contactEmail}
+                    onChange={(e) => {
+                      const v = e.target.value.trim();
+                      setContactEmail(v);
+                      setContactValid(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v));
+                    }}
+                    autoComplete="email"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="cm-contact-name" className="block text-xs text-gray-600 mb-1">Full name (optional)</label>
+                    <input
+                      id="cm-contact-name"
+                      type="text"
+                      className="w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 border-gray-300"
+                      placeholder="John Doe"
+                      value={contactName}
+                      onChange={(e) => setContactName(e.target.value)}
+                      autoCapitalize="words"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="cm-contact-phone" className="block text-xs text-gray-600 mb-1">Phone (optional)</label>
+                    <input
+                      id="cm-contact-phone"
+                      type="tel"
+                      className="w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 border-gray-300"
+                      placeholder="+15551234567"
+                      value={contactPhone}
+                      onChange={(e) => setContactPhone(e.target.value)}
+                      autoComplete="tel"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {step === 'shipping' && (
           <div className="space-y-6">
             <div>
-              <h3 className="text-sm font-semibold text-gray-900">Billing address</h3>
-              <p className="text-xs text-gray-500 mb-3">Enter your billing details</p>
+              <h3 className="text-sm font-semibold text-gray-900">Shipping address</h3>
+              <p className="text-xs text-gray-500 mb-3">Enter where your order will be shipped</p>
               <AddressForm
-                addressType="billing"
-                value={billing}
-                onChange={(v, valid) => { setBilling(v); setBillingValid(valid); }}
+                addressType="shipping"
+                value={shipping}
+                onChange={(v, valid) => { setShipping(v); setShippingValid(valid); }}
                 disabled={isSubmitting}
               />
             </div>
@@ -304,18 +425,18 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
                   onChange={(e) => setUseBillingForShipping(e.target.checked)}
                   disabled={isSubmitting}
                 />
-                <span className="text-gray-600">Shipping address is the same as billing</span>
+                <span className="text-gray-600">Billing address is the same as shipping</span>
               </label>
             </div>
 
             {!useBillingForShipping && (
               <div>
-                <h3 className="text-sm font-semibold text-gray-900">Shipping address</h3>
-                <p className="text-xs text-gray-500 mb-3">Enter where your order will be shipped</p>
+                <h3 className="text-sm font-semibold text-gray-900">Billing address</h3>
+                <p className="text-xs text-gray-500 mb-3">Enter your billing details</p>
                 <AddressForm
-                  addressType="shipping"
-                  value={shipping}
-                  onChange={(v, valid) => { setShipping(v); setShippingValid(valid); }}
+                  addressType="billing"
+                  value={billing}
+                  onChange={(v, valid) => { setBilling(v); setBillingValid(valid); }}
                   disabled={isSubmitting}
                 />
               </div>
@@ -327,6 +448,8 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
           <PaymentForm
             {...(userId ? { userId } : {})}
             {...(checkoutSessionId ? { checkoutSessionId } : {})}
+            contactEmail={contactEmail || undefined}
+            contactName={contactName || undefined}
             onSuccess={async ({ paymentIntentId }) => {
               try {
                 const res = await fetch('/api/orders', {
@@ -336,6 +459,9 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
                     paymentIntentId,
                     ...(checkoutSessionId ? { checkoutSessionId } : {}),
                     ...(sessionId ? { sessionId } : {}),
+                    ...(contactEmail ? { email: contactEmail } : {}),
+                    billing_address: useBillingForShipping ? shipping : billing,
+                    shipping_address: shipping,
                   }),
                 });
                 const json = await res.json();
@@ -357,8 +483,26 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-200 bg-white flex items-center justify-end gap-3 pb-[calc(env(safe-area-inset-bottom)+12px)] sticky bottom-0">
-        {step === 'address' && (
+      <div className="p-4 border-t border-gray-200 bg-white flex items-center justify-between gap-3 pb-[calc(env(safe-area-inset-bottom)+12px)] sticky bottom-0">
+        {step === 'contact' && (
+          <>
+            <button
+              className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+              onClick={handleBack}
+            >
+              Cancel
+            </button>
+            <button
+              className={`px-4 py-2 rounded-lg text-sm font-semibold text-white ${canContinue ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-300 cursor-not-allowed'}`}
+              disabled={!canContinue || isSubmitting}
+              onClick={() => setStep('shipping')}
+            >
+              Continue to shipping
+            </button>
+          </>
+        )}
+
+        {step === 'shipping' && (
           <button
             className={`px-4 py-2 rounded-lg text-sm font-semibold text-white ${canContinue ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-300 cursor-not-allowed'}`}
             disabled={!canContinue || isSubmitting}

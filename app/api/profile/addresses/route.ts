@@ -32,6 +32,27 @@ const addressSchema = z.object({
   phone: phoneSchema,
 });
 
+const postalCodeValidators: Record<string, RegExp> = {
+  US: /^\d{5}(-\d{4})?$/,
+  CA: /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/,
+  GB: /^(GIR 0AA|[A-Z]{1,2}\d[A-Z\d]? \d[ABD-HJLNP-UW-Z]{2})$/i,
+  AU: /^\d{4}$/,
+  DE: /^\d{5}$/,
+  FR: /^\d{5}$/,
+};
+
+function normalizePostal(country: string, code: string): string {
+  if (country === 'CA' || country === 'GB')
+    return code.toUpperCase().replace(/\s+/g, '').replace(/(.{3})/, '$1 ').trim();
+  return code;
+}
+
+function validatePostalByCountry(country: string, code: string): boolean {
+  const re = postalCodeValidators[country];
+  if (!re) return true; // Fallback: accept as free-form
+  return re.test(code);
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { user } = await getUser();
@@ -70,6 +91,14 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
     const payload = parsed.data;
 
+    const normalizedPostal = normalizePostal(payload.country_code, payload.postal_code);
+    if (!validatePostalByCountry(payload.country_code, normalizedPostal)) {
+      return NextResponse.json(
+        { error: 'Invalid postal/ZIP code for selected country' },
+        { status: 400 }
+      );
+    }
+
     if (payload.is_default) {
       await supabase
         .from('addresses')
@@ -91,7 +120,7 @@ export async function POST(request: NextRequest) {
         address_line_2: payload.address_line_2 ?? null,
         city: payload.city,
         state_province: payload.state_province,
-        postal_code: payload.postal_code,
+        postal_code: normalizedPostal,
         country_code: payload.country_code,
         phone: payload.phone ?? null,
       })

@@ -171,6 +171,8 @@ export async function POST(request: NextRequest) {
       discount_code: sessionRow.discount_code ?? '',
       item_count: String(sessionRow.items.length),
       items: itemSummaries,
+      ...(name ? { contact_name: name } : {}),
+      ...(email ? { contact_email: email } : {}),
     };
 
     let customerId: string | undefined = undefined;
@@ -192,6 +194,7 @@ export async function POST(request: NextRequest) {
       automatic_payment_methods: { enabled: true },
       metadata,
       ...(customerId ? { customer: customerId } : {}),
+      ...(email ? { receipt_email: email } : {}),
     });
 
     // Optionally persist a payments row for tracking (without order yet)

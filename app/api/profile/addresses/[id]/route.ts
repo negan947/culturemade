@@ -25,6 +25,27 @@ const addressUpdateSchema = z.object({
     .nullable(),
 });
 
+const postalCodeValidators: Record<string, RegExp> = {
+  US: /^\d{5}(-\d{4})?$/,
+  CA: /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/,
+  GB: /^(GIR 0AA|[A-Z]{1,2}\d[A-Z\d]? \d[ABD-HJLNP-UW-Z]{2})$/i,
+  AU: /^\d{4}$/,
+  DE: /^\d{5}$/,
+  FR: /^\d{5}$/,
+};
+
+function normalizePostal(country: string, code: string): string {
+  if (country === 'CA' || country === 'GB')
+    return code.toUpperCase().replace(/\s+/g, '').replace(/(.{3})/, '$1 ').trim();
+  return code;
+}
+
+function validatePostalByCountry(country: string, code: string): boolean {
+  const re = postalCodeValidators[country];
+  if (!re) return true; // Fallback: accept as free-form
+  return re.test(code);
+}
+
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { user } = await getUser();
@@ -43,6 +64,16 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     // Enforce ownership via RLS and user_id equality in update
     const updates = { ...parsed.data } as Record<string, unknown>;
+    if (updates.country_code && updates.postal_code) {
+      const normalized = normalizePostal(String(updates.country_code), String(updates.postal_code));
+      if (!validatePostalByCountry(String(updates.country_code), normalized)) {
+        return NextResponse.json(
+          { error: 'Invalid postal/ZIP code for selected country' },
+          { status: 400 }
+        );
+      }
+      updates.postal_code = normalized;
+    }
 
     // If setting default, clear others for this type
     if (updates.is_default === true && (updates.type === 'billing' || updates.type === 'shipping' || updates.type === 'both')) {

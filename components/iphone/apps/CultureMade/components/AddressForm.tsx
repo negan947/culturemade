@@ -230,7 +230,8 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
         case 'postal-code':
           if (val !== value.postal_code) updateField('postal_code', val);
           break;
-        case 'country': {
+        case 'country':
+        case 'country-name': {
           const trimmed = val.trim();
           const code = trimmed.length === 2
             ? trimmed.toUpperCase()

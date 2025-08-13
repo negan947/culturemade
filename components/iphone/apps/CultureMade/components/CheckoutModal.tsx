@@ -34,6 +34,7 @@ export default function CheckoutModal({ isOpen, onClose, userId }: CheckoutModal
   const [serverError, setServerError] = useState<string | null>(null);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [orderTotal, setOrderTotal] = useState<number | null>(null);
+  const isFinalized = step === 'confirm';
 
   const [billing, setBilling] = useState<AddressFields>({
     first_name: '',
@@ -76,6 +77,25 @@ export default function CheckoutModal({ isOpen, onClose, userId }: CheckoutModal
       setServerError(null);
     }
   }, [isOpen]);
+
+  // Block accidental back actions once confirmed
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (step !== 'confirm') return;
+      const target = e.target as HTMLElement | null;
+      const isTyping = !!target && (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        (target as any).isContentEditable === true
+      );
+      if (!isTyping && (e.key === 'Backspace' || (e.altKey && e.key === 'ArrowLeft'))) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown, { capture: true });
+    return () => window.removeEventListener('keydown', onKeyDown, { capture: true } as any);
+  }, [step]);
 
   // Persist/restore checkout form state in localStorage (modal variant)
   useEffect(() => {
@@ -192,13 +212,17 @@ export default function CheckoutModal({ isOpen, onClose, userId }: CheckoutModal
                 <h2 className="text-lg font-semibold text-gray-900">Checkout</h2>
                 <p className="text-xs text-gray-500">Step {step === 'address' ? '1' : step === 'payment' ? '2' : '3'} of 3</p>
               </div>
-              <button
-                onClick={onClose}
-                className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700"
-                aria-label="Close checkout"
-              >
-                <X className="h-5 w-5" />
-              </button>
+              {step === 'confirm' ? (
+                <div className="w-9" />
+              ) : (
+                <button
+                  onClick={onClose}
+                  className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+                  aria-label="Close checkout"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              )}
             </div>
 
             {/* Content */}
@@ -288,7 +312,7 @@ export default function CheckoutModal({ isOpen, onClose, userId }: CheckoutModal
                 onClick={() => {
                   if (step === 'address') return onClose();
                   if (step === 'payment') return setStep('address');
-                  if (step === 'confirm') return setStep('payment');
+                  if (step === 'confirm') return; // prevent going back after confirmation
                 }}
               >
                 {step === 'address' ? 'Cancel' : 'Back'}

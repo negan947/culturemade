@@ -10,11 +10,13 @@ import { getCartSessionId } from '@/utils/cartSync';
 interface PaymentFormProps {
   userId?: string;
   checkoutSessionId?: string;
+  contactEmail?: string;
+  contactName?: string;
   onSuccess: (result: { paymentIntentId: string; clientSecret: string }) => void;
   onError?: (message: string) => void;
 }
 
-export default function PaymentForm({ userId, checkoutSessionId, onSuccess, onError }: PaymentFormProps) {
+export default function PaymentForm({ userId, checkoutSessionId, contactEmail, contactName, onSuccess, onError }: PaymentFormProps) {
   const sessionId = !userId ? getCartSessionId() : undefined;
 
   const [stripe, setStripe] = useState<Stripe | null>(null);
@@ -68,6 +70,8 @@ export default function PaymentForm({ userId, checkoutSessionId, onSuccess, onEr
           body: JSON.stringify({
             ...(checkoutSessionId ? { checkoutSessionId } : {}),
             ...(sessionId ? { sessionId } : {}),
+            ...(contactEmail ? { email: contactEmail } : {}),
+            ...(contactName ? { name: contactName } : {}),
           }),
         });
         const piJson = await piRes.json();

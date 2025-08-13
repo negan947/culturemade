@@ -11,11 +11,15 @@ import {
   HelpCircle,
   LogOut,
   Bell,
-  Shield
+  Shield,
+  ChevronLeft
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { OrderDetail, OrderHistory } from '../components';
+import { OrderDetail, OrderHistory, AddressList, PreferencesForm } from '../components';
 import useAuth from '@/hooks/useAuth';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 
 interface MenuItem {
   id: string;
@@ -29,8 +33,15 @@ interface MenuItem {
 export default function ProfileScreen() {
   const { user, loading, signIn, register, signOut, error } = useAuth();
   const isLoggedIn = !!user;
-  const [view, setView] = useState<'root' | 'orders' | 'orderDetail'>('root');
+  const [view, setView] = useState<'root' | 'orders' | 'orderDetail' | 'addresses' | 'preferences'>('root');
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [authView, setAuthView] = useState<'none' | 'signIn' | 'register'>('none');
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authFullName, setAuthFullName] = useState('');
+  const [authConfirmPassword, setAuthConfirmPassword] = useState('');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [localAuthError, setLocalAuthError] = useState<string | null>(null);
 
   const accountMenuItems: MenuItem[] = [
     {
@@ -44,7 +55,7 @@ export default function ProfileScreen() {
       id: 'addresses',
       icon: MapPin,
       label: 'Addresses',
-      subtitle: '2 saved addresses',
+      subtitle: 'Manage your saved addresses',
       color: 'text-green-600'
     },
     {
@@ -65,9 +76,9 @@ export default function ProfileScreen() {
 
   const settingsMenuItems: MenuItem[] = [
     {
-      id: 'notifications',
+      id: 'preferences',
       icon: Bell,
-      label: 'Notifications',
+      label: 'Preferences',
       color: 'text-yellow-600'
     },
     {
@@ -93,6 +104,15 @@ export default function ProfileScreen() {
   const handleMenuItemPress = (item: MenuItem) => {
     if (item.id === 'orders') {
       setView('orders');
+      return;
+    }
+    if (item.id === 'addresses') {
+      setView('addresses');
+      return;
+    }
+    if (item.id === 'preferences') {
+      setView('preferences');
+      return;
     }
   };
 
@@ -102,7 +122,7 @@ export default function ProfileScreen() {
 
   if (!isLoggedIn) {
     return (
-      <div className="h-full bg-gray-50">
+      <div className="h-full bg-gray-50 relative">
         {/* Header */}
         <div className="bg-white px-4 py-3 border-b border-gray-200">
           <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
@@ -121,14 +141,14 @@ export default function ProfileScreen() {
             <div className="space-y-3">
               <motion.button
                 whileTap={{ scale: 0.95 }}
-                onClick={() => (window.location.href = '/login')}
+                onClick={() => setAuthView('signIn')}
                 className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium"
               >
                 Sign In
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.95 }}
-                onClick={() => (window.location.href = '/register')}
+                onClick={() => setAuthView('register')}
                 className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-medium"
               >
                 Create Account
@@ -137,6 +157,159 @@ export default function ProfileScreen() {
             </div>
           </motion.div>
         </div>
+
+        {/* Inline Auth Overlay */}
+        {authView !== 'none' && (
+          <div className="absolute inset-0 z-40 bg-white">
+            <div className="bg-white px-4 py-3 border-b border-gray-200 flex items-center space-x-2">
+              <button
+                className="p-2 -ml-2 rounded hover:bg-gray-100 active:bg-gray-200"
+                onClick={() => {
+                  setAuthView('none');
+                  setLocalAuthError(null);
+                }}
+                aria-label="Back"
+                title="Back"
+              >
+                <ChevronLeft className="h-5 w-5 text-gray-700" />
+              </button>
+              <h2 className="text-xl font-semibold text-gray-900">
+                {authView === 'signIn' ? 'Sign In' : 'Create Account'}
+              </h2>
+            </div>
+
+            <div className="p-4 space-y-4">
+              {localAuthError && (
+                <div className="text-sm text-red-600">{localAuthError}</div>
+              )}
+
+              {authView === 'register' && (
+                <div className="space-y-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="fullName">Full Name</Label>
+                    <Input
+                      id="fullName"
+                      placeholder="John Doe"
+                      value={authFullName}
+                      onChange={(e) => setAuthFullName(e.target.value)}
+                      disabled={authLoading}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={authEmail}
+                    onChange={(e) => setAuthEmail(e.target.value)}
+                    disabled={authLoading}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={authPassword}
+                    onChange={(e) => setAuthPassword(e.target.value)}
+                    disabled={authLoading}
+                  />
+                </div>
+                {authView === 'register' && (
+                  <div className="space-y-1">
+                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      placeholder="••••••••"
+                      value={authConfirmPassword}
+                      onChange={(e) => setAuthConfirmPassword(e.target.value)}
+                      disabled={authLoading}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-2">
+                {authView === 'signIn' ? (
+                  <Button
+                    className="w-full"
+                    disabled={authLoading}
+                    onClick={async () => {
+                      setLocalAuthError(null);
+                      setAuthLoading(true);
+                      const ok = await signIn(authEmail, authPassword);
+                      setAuthLoading(false);
+                      if (!ok) {
+                        setLocalAuthError('Unable to sign in. Please check your credentials.');
+                        return;
+                      }
+                      setAuthView('none');
+                    }}
+                  >
+                    {authLoading ? 'Signing in…' : 'Sign In'}
+                  </Button>
+                ) : (
+                  <Button
+                    className="w-full"
+                    disabled={authLoading}
+                    onClick={async () => {
+                      setLocalAuthError(null);
+                      if (authPassword !== authConfirmPassword) {
+                        setLocalAuthError("Passwords don't match");
+                        return;
+                      }
+                      if (!authFullName.trim()) {
+                        setLocalAuthError('Please enter your full name');
+                        return;
+                      }
+                      setAuthLoading(true);
+                      const ok = await register(authFullName.trim(), authEmail, authPassword);
+                      setAuthLoading(false);
+                      if (!ok) {
+                        setLocalAuthError('Unable to create account. Please try again.');
+                        return;
+                      }
+                      setAuthView('none');
+                    }}
+                  >
+                    {authLoading ? 'Creating account…' : 'Create Account'}
+                  </Button>
+                )}
+              </div>
+
+              <div className="text-center text-sm text-gray-500">
+                {authView === 'signIn' ? (
+                  <button
+                    className="text-blue-600 hover:underline"
+                    onClick={() => {
+                      setLocalAuthError(null);
+                      setAuthView('register');
+                    }}
+                  >
+                    Don't have an account? Create one
+                  </button>
+                ) : (
+                  <button
+                    className="text-blue-600 hover:underline"
+                    onClick={() => {
+                      setLocalAuthError(null);
+                      setAuthView('signIn');
+                    }}
+                  >
+                    Already have an account? Sign in
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -159,6 +332,18 @@ export default function ProfileScreen() {
         orderId={selectedOrderId}
         onBack={() => setView('orders')}
       />
+    );
+  }
+
+  if (view === 'addresses') {
+    return (
+      <AddressList onBack={() => setView('root')} />
+    );
+  }
+
+  if (view === 'preferences') {
+    return (
+      <PreferencesForm onBack={() => setView('root')} />
     );
   }
 
