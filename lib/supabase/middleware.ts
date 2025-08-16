@@ -73,11 +73,11 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Redirect unauthenticated users from admin routes
+  // Redirect unauthenticated users from admin routes to admin login
   if (isAdminRoute && !user) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirectTo', pathname);
-    return NextResponse.redirect(loginUrl);
+    const adminLoginUrl = new URL('/admin/login', request.url);
+    adminLoginUrl.searchParams.set('redirectTo', pathname);
+    return NextResponse.redirect(adminLoginUrl);
   }
 
   // Check admin role for admin routes
@@ -88,8 +88,11 @@ export async function updateSession(request: NextRequest) {
 
   // Redirect authenticated users away from auth pages
   const authRoutes = ['/login', '/register', '/reset-password'];
+  const adminAuthRoutes = ['/admin/login'];
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
+  const isAdminAuthRoute = adminAuthRoutes.some((route) => pathname.startsWith(route));
 
+  // Handle authenticated users on customer auth pages
   if (isAuthRoute && user) {
     // Check if there's a redirect URL
     const redirectTo = request.nextUrl.searchParams.get('redirectTo');
@@ -97,12 +100,20 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(new URL(redirectTo, request.url));
     }
 
-    // Default redirect based on user role
-    if (userProfile?.role === 'admin') {
-      return NextResponse.redirect(new URL('/admin', request.url));
-    } else {
-      return NextResponse.redirect(new URL('/account', request.url));
+    // Customer auth pages redirect to home (iPhone interface)
+    return NextResponse.redirect(new URL('/', request.url));
+  }
+
+  // Handle authenticated users on admin auth pages  
+  if (isAdminAuthRoute && user) {
+    // Check if there's a redirect URL
+    const redirectTo = request.nextUrl.searchParams.get('redirectTo');
+    if (redirectTo) {
+      return NextResponse.redirect(new URL(redirectTo, request.url));
     }
+
+    // Admin auth pages redirect to admin dashboard
+    return NextResponse.redirect(new URL('/admin', request.url));
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're

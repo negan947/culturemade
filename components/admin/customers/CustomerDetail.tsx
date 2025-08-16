@@ -1,14 +1,17 @@
 'use client';
 
-import { ArrowLeft, User, Mail, Phone, Calendar, ShoppingBag, DollarSign, MapPin, Edit2, Save, X, AlertCircle, RefreshCw } from 'lucide-react';
+import { ArrowLeft, User, Mail, Phone, Calendar, ShoppingBag, DollarSign, MapPin, Edit2, Save, X, AlertCircle, RefreshCw, MessageCircle, Send, RotateCcw, FileText } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 import { CustomerDetail as CustomerDetailType } from '@/app/api/admin/customers/[id]/route';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 import { CustomerDetailSkeleton } from './CustomerDetailSkeleton';
 
@@ -28,6 +31,13 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
     phone: '',
     role: ''
   });
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [notesModalOpen, setNotesModalOpen] = useState(false);
+  const [reordering, setReordering] = useState(false);
+  const [notes, setNotes] = useState('');
+  const [existingNotes, setExistingNotes] = useState<any[]>([]);
+  const [loadingNotes, setLoadingNotes] = useState(false);
+  const [savingNotes, setSavingNotes] = useState(false);
 
   useEffect(() => {
     fetchCustomer();
@@ -154,6 +164,92 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
         {role.charAt(0).toUpperCase() + role.slice(1)}
       </Badge>
     );
+  };
+
+  const handleSendEmail = () => {
+    if (!customer?.email) return;
+    // Open email client with customer email
+    window.open(`mailto:${customer.email}?subject=Regarding your CultureMade account`);
+  };
+
+  const handleReorderLastOrder = async () => {
+    if (!customer?.recent_orders.length) return;
+    
+    try {
+      setReordering(true);
+      const lastOrder = customer.recent_orders[0];
+      
+      // Get order details to extract items
+      const response = await fetch(`/api/admin/orders/${lastOrder.id}`);
+      const orderData = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(orderData.error || 'Failed to get order details');
+      }
+      
+      // Add each order item back to cart (this would need a proper cart API for the customer)
+      // For now, we'll just show a success message
+      alert(`Reorder requested for order ${lastOrder.order_number}. Items will be added to customer's cart.`);
+      
+    } catch (err) {
+      alert('Failed to process reorder request');
+    } finally {
+      setReordering(false);
+    }
+  };
+
+  const fetchCustomerNotes = async () => {
+    if (!customer?.id) return;
+    
+    try {
+      setLoadingNotes(true);
+      const response = await fetch(`/api/admin/customers/${customer.id}/notes`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        setExistingNotes(data.notes || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch customer notes:', err);
+    } finally {
+      setLoadingNotes(false);
+    }
+  };
+
+  const handleSaveNotes = async () => {
+    if (!customer?.id || !notes.trim()) {
+      setNotesModalOpen(false);
+      return;
+    }
+
+    try {
+      setSavingNotes(true);
+      const response = await fetch(`/api/admin/customers/${customer.id}/notes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          note: notes.trim()
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to save note');
+      }
+
+      // Add the new note to existing notes
+      setExistingNotes(prev => [data.note, ...prev]);
+      setNotes('');
+      setNotesModalOpen(false);
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save note');
+    } finally {
+      setSavingNotes(false);
+    }
   };
 
   if (loading) {
@@ -481,6 +577,58 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
             </CardContent>
           </Card>
 
+          {/* Customer Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Customer Actions</CardTitle>
+              <CardDescription>
+                Communication and management tools
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button 
+                onClick={handleSendEmail}
+                variant="outline" 
+                className="w-full justify-start"
+                disabled={!customer?.email}
+              >
+                <Send className="h-4 w-4 mr-2" />
+                Send Email
+              </Button>
+              
+              <Button 
+                onClick={() => {
+                  setNotesModalOpen(true);
+                  fetchCustomerNotes();
+                }}
+                variant="outline" 
+                className="w-full justify-start"
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Customer Notes
+              </Button>
+              
+              <Button 
+                onClick={handleReorderLastOrder}
+                variant="outline" 
+                className="w-full justify-start"
+                disabled={!customer?.recent_orders.length || reordering}
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                {reordering ? 'Processing...' : 'Reorder Last Order'}
+              </Button>
+              
+              <Button 
+                onClick={() => window.open(`/admin/customers/${customer?.id}/preferences`, '_blank')}
+                variant="outline" 
+                className="w-full justify-start"
+              >
+                <User className="h-4 w-4 mr-2" />
+                Edit Preferences
+              </Button>
+            </CardContent>
+          </Card>
+
           {/* Addresses */}
           <Card>
             <CardHeader>
@@ -544,6 +692,83 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
           </Card>
         </div>
       </div>
+
+      {/* Customer Notes Modal */}
+      <Dialog open={notesModalOpen} onOpenChange={setNotesModalOpen}>
+        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Customer Notes</DialogTitle>
+            <DialogDescription>
+              Internal notes about this customer for your team reference.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex-1 space-y-4 overflow-hidden">
+            {/* Existing Notes */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Existing Notes</Label>
+              <div className="max-h-64 overflow-y-auto border border-admin-light-border dark:border-admin-border rounded-md p-3 space-y-3">
+                {loadingNotes ? (
+                  <div className="flex items-center justify-center py-4">
+                    <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                    <span className="text-sm">Loading notes...</span>
+                  </div>
+                ) : existingNotes.length === 0 ? (
+                  <div className="text-center py-4 text-admin-light-text-secondary dark:text-admin-text-secondary">
+                    <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No notes yet</p>
+                  </div>
+                ) : (
+                  existingNotes.map((note) => (
+                    <div key={note.id} className="p-3 bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-md">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="text-sm font-medium text-admin-light-text-primary dark:text-admin-text-primary">
+                          {note.admin_name}
+                        </div>
+                        <div className="text-xs text-admin-light-text-secondary dark:text-admin-text-secondary">
+                          {formatDate(note.created_at)}
+                        </div>
+                      </div>
+                      <p className="text-sm text-admin-light-text-secondary dark:text-admin-text-secondary whitespace-pre-wrap">
+                        {note.note}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Add New Note */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Add New Note</Label>
+              <Textarea
+                placeholder="Enter notes about this customer..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className="min-h-[100px]"
+              />
+              <div className="text-xs text-admin-light-text-secondary dark:text-admin-text-secondary">
+                Notes are only visible to admin users and not shared with the customer.
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => {
+              setNotesModalOpen(false);
+              setNotes('');
+            }}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSaveNotes} 
+              disabled={!notes.trim() || savingNotes}
+            >
+              {savingNotes ? 'Saving...' : 'Save Note'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

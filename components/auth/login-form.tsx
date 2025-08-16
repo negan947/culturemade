@@ -59,7 +59,7 @@ export function LoginForm({ onSuccess, redirectTo = '/' }: LoginFormProps) {
           .single();
 
         if (profileError && profileError.code === 'PGRST116') {
-          // Profile doesn't exist, create one
+          // Profile doesn't exist, create one (customer by default)
           const { error: createError } = await supabase
             .from('profiles')
             .insert({
@@ -69,13 +69,14 @@ export function LoginForm({ onSuccess, redirectTo = '/' }: LoginFormProps) {
             });
 
           if (createError) {
-
+            console.error('Profile creation error:', createError);
           }
         }
 
         if (onSuccess) {
           onSuccess();
         } else {
+          // Simple redirect - no role checking
           window.location.href = redirectTo;
         }
       }
@@ -88,9 +89,50 @@ export function LoginForm({ onSuccess, redirectTo = '/' }: LoginFormProps) {
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-      {/* Add login form here */}
-    </div>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {errorMessage && (
+        <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+          {errorMessage}
+        </div>
+      )}
+
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          placeholder="Enter your email"
+          {...register('email')}
+          className={errors.email ? 'border-red-500' : ''}
+          disabled={isLoading}
+        />
+        {errors.email && (
+          <p className="text-sm text-red-600">{errors.email.message}</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="password">Password</Label>
+        <Input
+          id="password"
+          type="password"
+          placeholder="Enter your password"
+          {...register('password')}
+          className={errors.password ? 'border-red-500' : ''}
+          disabled={isLoading}
+        />
+        {errors.password && (
+          <p className="text-sm text-red-600">{errors.password.message}</p>
+        )}
+      </div>
+
+      <Button 
+        type="submit" 
+        className="w-full" 
+        disabled={isLoading}
+      >
+        {isLoading ? 'Signing in...' : 'Sign in'}
+      </Button>
+    </form>
   );
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
 import { createClient } from '@/lib/supabase/server';
 
@@ -190,6 +191,130 @@ export async function GET(
     return NextResponse.json(customerDetail);
 
   } catch (error: any) {
+    
+    if (error.message === 'Unauthorized') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error.message === 'Forbidden - Admin access required') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    }
+    
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+// Validation schema for customer updates
+const updateCustomerSchema = z.object({
+  full_name: z.string().max(255).optional(),
+  phone: z.string().max(50).optional(),
+  role: z.enum(['customer', 'admin', 'inactive', 'blocked']),
+  old_values: z.object({
+    full_name: z.string().nullable(),
+    phone: z.string().nullable(),
+    role: z.string()
+  }).optional()
+});
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const supabase = await createClient();
+    
+    // Verify admin access
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check admin role
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile || profile.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    }
+
+    const customerId = params.id;
+
+    // Parse and validate request body
+    const body = await request.json();
+    const validatedData = updateCustomerSchema.parse(body);
+
+    // Check if customer exists
+    const { data: existingProfile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, full_name, phone, role')
+      .eq('id', customerId)
+      .single();
+
+    if (profileError || !existingProfile) {
+      return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
+    }
+
+    // Prepare update data
+    const updateData: any = {};
+    if (validatedData.full_name !== undefined) {
+      updateData.full_name = validatedData.full_name;
+    }
+    if (validatedData.phone !== undefined) {
+      updateData.phone = validatedData.phone;
+    }
+    if (validatedData.role !== undefined) {
+      updateData.role = validatedData.role;
+    }
+    updateData.updated_at = new Date().toISOString();
+
+    // Update customer profile
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update(updateData)
+      .eq('id', customerId);
+
+    if (updateError) {
+      return NextResponse.json({ error: 'Failed to update customer' }, { status: 500 });
+    }
+
+    // Log admin action with change details
+    const changes = {
+      before: validatedData.old_values || existingProfile,
+      after: {
+        full_name: validatedData.full_name ?? existingProfile.full_name,
+        phone: validatedData.phone ?? existingProfile.phone,
+        role: validatedData.role ?? existingProfile.role
+      }
+    };
+
+    await supabase.from('admin_logs').insert({
+      admin_id: user.id,
+      action: 'customer_updated',
+      resource_type: 'customers',
+      resource_id: customerId,
+      metadata: {
+        changes,
+        updated_fields: Object.keys(updateData).filter(key => key !== 'updated_at')
+      }
+    });
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Customer updated successfully' 
+    });
+
+  } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ 
+        error: 'Validation failed', 
+        details: error.errors 
+      }, { status: 400 });
+    }
     
     if (error.message === 'Unauthorized') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
