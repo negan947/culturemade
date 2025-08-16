@@ -29,7 +29,7 @@ export function CustomerDetailSkeleton() {
                 <div className="h-6 w-48 bg-gray-300 dark:bg-gray-600 rounded animate-pulse" />
               </CardTitle>
               <CardDescription>
-                <div className="h-4 w-64 bg-gray-300 dark:bg-gray-600 rounded animate-pulse" />
+                <span className="h-4 w-64 bg-gray-300 dark:bg-gray-600 rounded animate-pulse inline-block" />
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -62,7 +62,7 @@ export function CustomerDetailSkeleton() {
                 <div className="h-6 w-32 bg-gray-300 dark:bg-gray-600 rounded animate-pulse" />
               </CardTitle>
               <CardDescription>
-                <div className="h-4 w-48 bg-gray-300 dark:bg-gray-600 rounded animate-pulse" />
+                <span className="h-4 w-48 bg-gray-300 dark:bg-gray-600 rounded animate-pulse inline-block" />
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -119,7 +119,7 @@ export function CustomerDetailSkeleton() {
                 <div className="h-6 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse" />
               </CardTitle>
               <CardDescription>
-                <div className="h-4 w-48 bg-gray-300 dark:bg-gray-600 rounded animate-pulse" />
+                <span className="h-4 w-48 bg-gray-300 dark:bg-gray-600 rounded animate-pulse inline-block" />
               </CardDescription>
             </CardHeader>
             <CardContent>

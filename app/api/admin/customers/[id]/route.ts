@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export interface CustomerDetail {
   id: string;
@@ -58,56 +59,62 @@ export async function GET(
     }
 
     // Check admin role
-    const { data: profile } = await supabase
+    const { data: adminProfile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single();
 
-    if (!profile || profile.role !== 'admin') {
+    if (!adminProfile || adminProfile.role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
     const customerId = params.id;
 
-    // Get customer details
-    const customerQuery = `
-      SELECT 
-        u.id,
-        u.email,
-        u.created_at as registered_at,
-        p.full_name,
-        p.phone,
-        p.role,
-        p.avatar_url,
-        p.updated_at,
-        (SELECT COUNT(*) FROM orders WHERE user_id = u.id) as order_count,
-        (SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE user_id = u.id AND status = 'completed') as total_spent,
-        (SELECT MAX(created_at) FROM orders WHERE user_id = u.id) as last_order_date,
-        CASE 
-          WHEN p.role = 'blocked' THEN 'blocked'
-          WHEN p.role = 'inactive' THEN 'inactive'
-          ELSE 'active'
-        END as status
-      FROM auth.users u
-      LEFT JOIN profiles p ON u.id = p.id
-      WHERE u.id = $1 AND u.role = 'authenticated'
-    `;
+    // Get customer profile first
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', customerId)
+      .single();
 
-    const { data: customerData, error: customerError } = await supabase.rpc('execute_sql', {
-      query: customerQuery,
-      params: [customerId]
-    });
-
-    if (customerError) {
-      return NextResponse.json({ error: 'Failed to fetch customer' }, { status: 500 });
-    }
-
-    if (!customerData || customerData.length === 0) {
+    if (profileError || !profile) {
       return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
     }
 
-    const customer = customerData[0];
+    // Get order statistics
+    const { data: orderStats, error: orderError } = await supabase
+      .from('orders')
+      .select('total_amount, status, created_at')
+      .eq('user_id', customerId);
+
+    const orderCount = orderStats?.length || 0;
+    const totalSpent = orderStats
+      ?.filter(order => order.status === 'completed')
+      ?.reduce((sum, order) => sum + (parseFloat(order.total_amount) || 0), 0) || 0;
+    const lastOrderDate = orderStats?.length > 0 
+      ? new Date(Math.max(...orderStats.map(order => new Date(order.created_at).getTime()))).toISOString()
+      : null;
+
+    // Get user email from auth using admin client
+    const adminSupabase = createAdminClient();
+    const { data: authUser, error: authUserError } = await adminSupabase.auth.admin.getUserById(customerId);
+    
+    const customer = {
+      id: profile.id,
+      email: authUser?.user?.email || '',
+      full_name: profile.full_name,
+      phone: profile.phone,
+      role: profile.role || 'customer',
+      avatar_url: profile.avatar_url,
+      registered_at: profile.created_at,
+      updated_at: profile.updated_at,
+      order_count: orderCount,
+      total_spent: totalSpent,
+      last_order_date: lastOrderDate,
+      status: profile.role === 'blocked' ? 'blocked' : 
+               profile.role === 'inactive' ? 'inactive' : 'active'
+    };
 
     // Get customer addresses
     const { data: addresses, error: addressError } = await supabase
@@ -232,13 +239,13 @@ export async function PUT(
     }
 
     // Check admin role
-    const { data: profile } = await supabase
+    const { data: adminProfile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .single();
 
-    if (!profile || profile.role !== 'admin') {
+    if (!adminProfile || adminProfile.role !== 'admin') {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
