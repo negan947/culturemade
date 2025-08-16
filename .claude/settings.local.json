@@ -31,7 +31,9 @@
       "Bash(do echo \"=== $file ===\")",
       "Bash(done)",
       "mcp__supabasecm__search_docs",
-      "mcp__supabasecm__apply_migration"
+      "mcp__supabasecm__apply_migration",
+      "WebSearch",
+      "WebSearch"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"
