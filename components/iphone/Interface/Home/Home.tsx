@@ -10,38 +10,38 @@ import HomeAppShortcut from './HomeAppShortcut';
 
 const Home = () => {
   const inApp = useSelector((state: RootState) => state.interface.inApp);
+  const isLocked = useSelector((state: RootState) => state.interface.isLocked);
   const apps = getAllApps();
 
   return (
     <motion.section
       layout
       key={'home'}
-      initial={{ opacity: 1 }}
       animate={{
         filter: inApp ? 'blur(4px)' : 'blur(0px)',
         scale: inApp ? 0.95 : 1,
-        opacity: 1,
       }}
       transition={{
         scale: {
           type: 'spring',
           bounce: 0.1,
         },
-        opacity: { duration: 0.2 },
       }}
       className='flex flex-col h-full pt-10 pb-safe-bottom sm:pb-0'
     >
       <HomeAppPage>
-        {apps.map((app) => (
+        {apps.map((app, index) => (
           <HomeAppShortcut
             appId={app.appId}
             icon={app.icon}
             key={app.appId}
             name={app.name}
+            shouldAnimateUnlock={!isLocked}
+            animationIndex={index}
           />
         ))}
       </HomeAppPage>
-      <Dock />
+      <Dock shouldAnimateUnlock={!isLocked} />
     </motion.section>
   );
 };

@@ -48,6 +48,7 @@ const HomeBar: FC<Props> = ({ handleHomeBar, handleDragEnd }) => {
     if (isLocked) {
       // Disable gestures immediately when locked
       setIsGestureEnabled(false);
+      return; // No cleanup needed
     } else {
       // Delay gesture activation by 700ms to allow unlock animation (600ms) to complete
       const timer = setTimeout(() => {
