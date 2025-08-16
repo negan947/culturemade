@@ -13,7 +13,13 @@ import {
   AlertCircle,
   Truck,
   XCircle,
-  Edit3
+  Edit3,
+  Send,
+  MessageSquare,
+  History,
+  DollarSign,
+  ArrowLeft,
+  Loader2
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -153,6 +159,17 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
   const [notes, setNotes] = useState('');
   const [status, setStatus] = useState('');
   const [fulfillmentStatus, setFulfillmentStatus] = useState('');
+  
+  // Advanced features state
+  const [showCommunication, setShowCommunication] = useState(false);
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailBody, setEmailBody] = useState('');
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [trackingNumber, setTrackingNumber] = useState('');
+  const [carrier, setCarrier] = useState('');
+  const [refundAmount, setRefundAmount] = useState('');
+  const [refundReason, setRefundReason] = useState('');
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     fetchOrder();
@@ -223,6 +240,103 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 
   const handleNotesUpdate = async () => {
     await updateOrder({ notes });
+  };
+
+  // Advanced feature handlers
+  const handleSendEmail = async () => {
+    if (!emailSubject || !emailBody) return;
+
+    try {
+      setSendingEmail(true);
+      
+      const response = await fetch(`/api/admin/orders/${orderId}/communication`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          type: 'email',
+          subject: emailSubject,
+          body: emailBody,
+          recipient: order?.email
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send email');
+      }
+
+      setEmailSubject('');
+      setEmailBody('');
+      setShowCommunication(false);
+      // Optionally show success message
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to send email');
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+
+  const handleTrackingUpdate = async () => {
+    if (!trackingNumber && !carrier) return;
+
+    try {
+      setProcessing(true);
+      
+      await updateOrder({
+        tracking_number: trackingNumber,
+        carrier: carrier,
+        fulfillment_status: 'shipped'
+      });
+
+      setTrackingNumber('');
+      setCarrier('');
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update tracking');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handlePartialRefund = async () => {
+    if (!refundAmount || !refundReason) return;
+
+    const amount = parseFloat(refundAmount);
+    if (isNaN(amount) || amount <= 0 || amount > order!.total_amount) return;
+
+    try {
+      setProcessing(true);
+      
+      const response = await fetch(`/api/admin/orders/${orderId}/refund`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          amount: amount,
+          reason: refundReason,
+          partial: true
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to process refund');
+      }
+
+      const data = await response.json();
+      // Refresh order data
+      await fetchOrder();
+      
+      setRefundAmount('');
+      setRefundReason('');
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to process refund');
+    } finally {
+      setProcessing(false);
+    }
   };
 
   const formatCurrency = (amount: number, currency: string = 'USD') => {
@@ -600,6 +714,222 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
             )}
           </div>
         )}
+      </div>
+
+      {/* Advanced Order Management */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Customer Communication */}
+        <div className="bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-admin-light-text-primary dark:text-admin-text-primary flex items-center gap-2">
+              <MessageSquare className="h-5 w-5" />
+              Customer Communication
+            </h3>
+            {!showCommunication && (
+              <Button
+                onClick={() => setShowCommunication(true)}
+                variant="outline"
+                size="sm"
+              >
+                <Send className="h-4 w-4 mr-2" />
+                Send Email
+              </Button>
+            )}
+          </div>
+
+          {showCommunication ? (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-admin-light-text-primary dark:text-admin-text-primary mb-2">
+                  Subject
+                </label>
+                <input
+                  type="text"
+                  value={emailSubject}
+                  onChange={(e) => setEmailSubject(e.target.value)}
+                  placeholder="Order Update"
+                  className="w-full bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border dark:border-admin-border rounded-lg px-3 py-2 text-admin-light-text-primary dark:text-admin-text-primary focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-transparent"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-admin-light-text-primary dark:text-admin-text-primary mb-2">
+                  Message
+                </label>
+                <Textarea
+                  value={emailBody}
+                  onChange={(e) => setEmailBody(e.target.value)}
+                  placeholder="Write your message to the customer..."
+                  className="min-h-[120px]"
+                />
+              </div>
+              
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleSendEmail}
+                  disabled={sendingEmail || !emailSubject || !emailBody}
+                  size="sm"
+                >
+                  {sendingEmail ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4 mr-2" />
+                      Send Email
+                    </>
+                  )}
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowCommunication(false);
+                    setEmailSubject('');
+                    setEmailBody('');
+                  }}
+                  variant="outline"
+                  size="sm"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="text-sm text-admin-light-text-secondary dark:text-admin-text-secondary">
+              <p className="mb-2">Send updates to: <span className="font-medium">{order?.email}</span></p>
+              <p className="text-xs text-admin-light-text-disabled dark:text-admin-text-disabled">
+                Keep customers informed about their order status, shipping updates, or other important information.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Tracking Information */}
+        <div className="bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-6">
+          <h3 className="text-lg font-semibold text-admin-light-text-primary dark:text-admin-text-primary mb-4 flex items-center gap-2">
+            <Truck className="h-5 w-5" />
+            Tracking Information
+          </h3>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-admin-light-text-primary dark:text-admin-text-primary mb-2">
+                Carrier
+              </label>
+              <select
+                value={carrier}
+                onChange={(e) => setCarrier(e.target.value)}
+                className="w-full bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border dark:border-admin-border rounded-lg px-3 py-2 text-admin-light-text-primary dark:text-admin-text-primary focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-transparent"
+              >
+                <option value="">Select Carrier</option>
+                <option value="UPS">UPS</option>
+                <option value="FedEx">FedEx</option>
+                <option value="USPS">USPS</option>
+                <option value="DHL">DHL</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-admin-light-text-primary dark:text-admin-text-primary mb-2">
+                Tracking Number
+              </label>
+              <input
+                type="text"
+                value={trackingNumber}
+                onChange={(e) => setTrackingNumber(e.target.value)}
+                placeholder="Enter tracking number"
+                className="w-full bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border dark:border-admin-border rounded-lg px-3 py-2 text-admin-light-text-primary dark:text-admin-text-primary focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-transparent"
+              />
+            </div>
+            
+            <Button
+              onClick={handleTrackingUpdate}
+              disabled={processing || (!trackingNumber && !carrier)}
+              size="sm"
+              className="w-full"
+            >
+              {processing ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                'Add Tracking Info'
+              )}
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Partial Refund */}
+      <div className="bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-6">
+        <h3 className="text-lg font-semibold text-admin-light-text-primary dark:text-admin-text-primary mb-4 flex items-center gap-2">
+          <DollarSign className="h-5 w-5" />
+          Refund Management
+        </h3>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-admin-light-text-primary dark:text-admin-text-primary mb-2">
+                  Refund Amount (Max: {order ? formatCurrency(order.total_amount) : '$0'})
+                </label>
+                <input
+                  type="number"
+                  value={refundAmount}
+                  onChange={(e) => setRefundAmount(e.target.value)}
+                  placeholder="0.00"
+                  min="0"
+                  max={order?.total_amount || 0}
+                  step="0.01"
+                  className="w-full bg-admin-light-bg-main dark:bg-admin-bg-main border border-admin-light-border dark:border-admin-border rounded-lg px-3 py-2 text-admin-light-text-primary dark:text-admin-text-primary focus:outline-none focus:ring-2 focus:ring-admin-accent focus:border-transparent"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-admin-light-text-primary dark:text-admin-text-primary mb-2">
+                  Reason for Refund
+                </label>
+                <Textarea
+                  value={refundReason}
+                  onChange={(e) => setRefundReason(e.target.value)}
+                  placeholder="Describe the reason for the refund..."
+                  className="min-h-[80px]"
+                />
+              </div>
+              
+              <Button
+                onClick={handlePartialRefund}
+                disabled={processing || !refundAmount || !refundReason}
+                size="sm"
+                variant="outline"
+                className="w-full text-red-600 border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+              >
+                {processing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  'Process Partial Refund'
+                )}
+              </Button>
+            </div>
+          </div>
+          
+          <div className="text-sm text-admin-light-text-secondary dark:text-admin-text-secondary">
+            <h4 className="font-medium text-admin-light-text-primary dark:text-admin-text-primary mb-2">Refund Information</h4>
+            <p className="mb-2">Order Total: {order ? formatCurrency(order.total_amount) : '$0'}</p>
+            <p className="mb-4">Payment Status: {order?.payment_status}</p>
+            <p className="text-xs text-admin-light-text-disabled dark:text-admin-text-disabled">
+              Partial refunds will be processed through the original payment method. 
+              The customer will receive an email confirmation once processed.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

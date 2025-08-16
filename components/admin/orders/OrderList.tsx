@@ -10,10 +10,15 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
-  XCircle
+  XCircle,
+  Download,
+  MoreVertical,
+  Trash2,
+  CheckSquare,
+  Square
 } from 'lucide-react';
 import Link from 'next/link';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 import { Button } from '@/components/ui/button';
 
@@ -122,6 +127,12 @@ export function OrderList() {
     total: 0,
     totalPages: 0
   });
+  
+  // Bulk actions state
+  const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
+  const [bulkActionLoading, setBulkActionLoading] = useState(false);
+  const [showBulkActions, setShowBulkActions] = useState(false);
+  const bulkActionsRef = useRef<HTMLDivElement>(null);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -169,6 +180,20 @@ export function OrderList() {
     }
   }, [status, search, sortBy]);
 
+  // Close bulk actions dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (bulkActionsRef.current && !bulkActionsRef.current.contains(event.target as Node)) {
+        setShowBulkActions(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const formatCurrency = (amount: number, currency: string = 'USD') => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -184,6 +209,95 @@ export function OrderList() {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  // Bulk action handlers
+  const toggleOrderSelection = (orderId: string) => {
+    const newSelected = new Set(selectedOrders);
+    if (newSelected.has(orderId)) {
+      newSelected.delete(orderId);
+    } else {
+      newSelected.add(orderId);
+    }
+    setSelectedOrders(newSelected);
+  };
+
+  const toggleAllOrders = () => {
+    if (selectedOrders.size === orders.length) {
+      setSelectedOrders(new Set());
+    } else {
+      setSelectedOrders(new Set(orders.map(order => order.id)));
+    }
+  };
+
+  const handleBulkAction = async (action: string, data?: any) => {
+    if (selectedOrders.size === 0) return;
+
+    try {
+      setBulkActionLoading(true);
+      
+      const response = await fetch('/api/admin/orders/bulk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action,
+          orderIds: Array.from(selectedOrders),
+          data
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Bulk action failed');
+      }
+
+      const result = await response.json();
+
+      if (action === 'export') {
+        // Download CSV
+        downloadCSV(result.data, result.filename);
+      } else {
+        // Refresh orders list after other actions
+        await fetchOrders();
+        setSelectedOrders(new Set());
+        setShowBulkActions(false);
+      }
+
+    } catch (error) {
+      console.error('Bulk action error:', error);
+      setError(error instanceof Error ? error.message : 'Bulk action failed');
+    } finally {
+      setBulkActionLoading(false);
+    }
+  };
+
+  const downloadCSV = (data: any[], filename: string) => {
+    if (data.length === 0) return;
+
+    // Convert to CSV
+    const headers = Object.keys(data[0]);
+    const csvContent = [
+      headers.join(','),
+      ...data.map(row => headers.map(header => {
+        const value = row[header];
+        // Escape commas and quotes in CSV values
+        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+          return `"${value.replace(/"/g, '""')}"`;
+        }
+        return value || '';
+      }).join(','))
+    ].join('\n');
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   if (loading && orders.length === 0) {
@@ -277,6 +391,81 @@ export function OrderList() {
         </div>
       </div>
 
+      {/* Bulk Actions Bar */}
+      {selectedOrders.size > 0 && (
+        <div className="bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-4">
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-admin-light-text-primary dark:text-admin-text-primary">
+              {selectedOrders.size} order{selectedOrders.size > 1 ? 's' : ''} selected
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={() => handleBulkAction('export')}
+                disabled={bulkActionLoading}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Export CSV
+              </Button>
+              
+              <div className="relative" ref={bulkActionsRef}>
+                <Button
+                  onClick={() => setShowBulkActions(!showBulkActions)}
+                  disabled={bulkActionLoading}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                  Actions
+                </Button>
+                
+                {showBulkActions && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-popover border border-admin-light-border dark:border-admin-border z-10">
+                    <div className="p-2">
+                      <h3 className="text-sm font-medium text-admin-light-text-primary dark:text-admin-text-primary mb-2 px-2">
+                        Update Status
+                      </h3>
+                      {STATUS_OPTIONS.filter(opt => opt.value !== 'all').map(option => (
+                        <button
+                          key={option.value}
+                          onClick={() => handleBulkAction('update_status', { status: option.value })}
+                          disabled={bulkActionLoading}
+                          className="w-full text-left px-2 py-1 text-sm text-admin-light-text-secondary dark:text-admin-text-secondary hover:bg-admin-light-bg-hover dark:hover:bg-admin-bg-hover rounded transition-colors duration-200"
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                      
+                      <hr className="my-2 border-admin-light-border dark:border-admin-border" />
+                      
+                      <button
+                        onClick={() => handleBulkAction('delete')}
+                        disabled={bulkActionLoading}
+                        className="w-full text-left px-2 py-1 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors duration-200 flex items-center gap-2"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Delete Orders
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <Button
+                onClick={() => setSelectedOrders(new Set())}
+                variant="ghost"
+                size="sm"
+              >
+                Clear Selection
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Orders Table */}
       <div className="bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border overflow-hidden">
         {orders.length === 0 ? (
@@ -299,6 +488,18 @@ export function OrderList() {
               <table className="w-full">
                 <thead className="bg-admin-light-bg-hover dark:bg-admin-bg-hover">
                   <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-admin-light-text-secondary dark:text-admin-text-secondary uppercase tracking-wider w-12">
+                      <button
+                        onClick={toggleAllOrders}
+                        className="flex items-center justify-center w-5 h-5"
+                      >
+                        {selectedOrders.size === orders.length && orders.length > 0 ? (
+                          <CheckSquare className="h-4 w-4 text-admin-accent" />
+                        ) : (
+                          <Square className="h-4 w-4 text-admin-light-text-disabled dark:text-admin-text-disabled" />
+                        )}
+                      </button>
+                    </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-admin-light-text-secondary dark:text-admin-text-secondary uppercase tracking-wider">
                       Order
                     </th>
@@ -325,6 +526,18 @@ export function OrderList() {
                       key={order.id}
                       className="hover:bg-admin-light-bg-hover dark:hover:bg-admin-bg-hover transition-colors duration-200"
                     >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <button
+                          onClick={() => toggleOrderSelection(order.id)}
+                          className="flex items-center justify-center w-5 h-5"
+                        >
+                          {selectedOrders.has(order.id) ? (
+                            <CheckSquare className="h-4 w-4 text-admin-accent" />
+                          ) : (
+                            <Square className="h-4 w-4 text-admin-light-text-disabled dark:text-admin-text-disabled hover:text-admin-accent" />
+                          )}
+                        </button>
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
                           <div className="text-sm font-medium text-admin-light-text-primary dark:text-admin-text-primary">
@@ -377,7 +590,17 @@ export function OrderList() {
             {/* Mobile Cards */}
             <div className="lg:hidden divide-y divide-admin-light-border dark:divide-admin-border">
               {orders.map((order) => (
-                <div key={order.id} className="p-4">
+                <div key={order.id} className="p-4 relative">
+                  <button
+                    onClick={() => toggleOrderSelection(order.id)}
+                    className="absolute top-4 right-4 flex items-center justify-center w-6 h-6"
+                  >
+                    {selectedOrders.has(order.id) ? (
+                      <CheckSquare className="h-5 w-5 text-admin-accent" />
+                    ) : (
+                      <Square className="h-5 w-5 text-admin-light-text-disabled dark:text-admin-text-disabled" />
+                    )}
+                  </button>
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <div className="text-sm font-medium text-admin-light-text-primary dark:text-admin-text-primary">

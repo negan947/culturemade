@@ -116,6 +116,9 @@ export async function PUT(
     const updateProductSchema = z.object({
       name: z.string().min(1, 'Product name is required').max(255).optional(),
       description: z.string().nullable().optional(),
+      slug: z.string().min(1, 'Slug is required').regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug can only contain lowercase letters, numbers, and hyphens').optional(),
+      seo_title: z.string().nullable().optional(),
+      seo_description: z.string().nullable().optional(),
       status: z.enum(['active', 'draft', 'archived']).optional(),
       price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, 'Invalid price').optional(),
       compare_at_price: z.string().nullable().optional().refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0), 'Invalid compare price'),
@@ -288,7 +291,7 @@ export async function PUT(
     
     console.log('API - Validation passed, parsed data:', validationResult.data);
 
-    const { category_ids, variants, images, ...productData } = validationResult.data;
+    const { category_ids, variants, images, slug, seo_title, seo_description, ...productData } = validationResult.data;
     const productId = resolvedParams.id;
 
     // First check if product exists
@@ -305,15 +308,46 @@ export async function PUT(
       );
     }
 
-    // Update main product data
-    if (Object.keys(productData).length > 0) {
-      const { error: updateError } = await supabase
+    // If slug provided, ensure uniqueness (excluding current product)
+    if (slug) {
+      const { data: slugExists } = await supabase
         .from('products')
-        .update({
-          ...productData,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', productId);
+        .select('id')
+        .eq('slug', slug)
+        .neq('id', productId)
+        .maybeSingle();
+      if (slugExists) {
+        return NextResponse.json(
+          { error: 'Slug already in use by another product' },
+          { status: 409 }
+        );
+      }
+    }
+
+    // Update main product data
+    const mainUpdate: Record<string, any> = { ...productData };
+    if (typeof slug !== 'undefined') mainUpdate.slug = slug;
+    if (typeof seo_title !== 'undefined') mainUpdate.seo_title = seo_title;
+    if (typeof seo_description !== 'undefined') mainUpdate.seo_description = seo_description;
+
+    if (Object.keys(mainUpdate).length > 0) {
+      const attemptUpdate = async (payload: Record<string, any>) => {
+        return supabase
+          .from('products')
+          .update({
+            ...payload,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', productId);
+      };
+
+      let { error: updateError } = await attemptUpdate(mainUpdate);
+      if (updateError && (updateError.message?.includes('column') || updateError.details?.includes('column'))) {
+        // Retry excluding optional SEO fields if columns do not exist yet
+        const { seo_title: _st, seo_description: _sd, ...withoutSeo } = mainUpdate as any;
+        const retry = await attemptUpdate(withoutSeo);
+        updateError = retry.error as any;
+      }
 
       if (updateError) {
         console.error('Product update error:', updateError);

@@ -7,6 +7,8 @@ import {
   Settings,
   ShoppingCart,
   Users,
+  Boxes,
+  Truck
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -14,6 +16,7 @@ import { AdminScrollFix } from '@/components/admin/admin-scroll-fix';
 import { MobileSidebar } from '@/components/admin/mobile-sidebar';
 import { DarkModeToggle } from '@/components/ui/dark-mode-toggle';
 import { getUserContext, requireAdmin } from '@/lib/supabase/auth';
+import { AdminBreadcrumbs } from '@/components/admin/breadcrumbs';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -40,10 +43,22 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
       description: 'Manage product catalog',
     },
     {
+      name: 'Inventory',
+      href: '/admin/inventory',
+      icon: 'Boxes',
+      description: 'Stock levels and adjustments',
+    },
+    {
       name: 'Orders',
       href: '/admin/orders',
       icon: 'ShoppingCart',
       description: 'View and manage orders',
+    },
+    {
+      name: 'Shipping',
+      href: '/admin/shipping',
+      icon: 'Truck',
+      description: 'Label generation and tracking',
     },
     {
       name: 'Customers',
@@ -99,8 +114,12 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
                     return Home;
                   case 'Package':
                     return Package;
+                  case 'Boxes':
+                    return Boxes;
                   case 'ShoppingCart':
                     return ShoppingCart;
+                  case 'Truck':
+                    return Truck;
                   case 'Users':
                     return Users;
                   case 'BarChart3':
@@ -169,17 +188,19 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
       <div className='flex-1 lg:ml-64'>
         {/* Top Bar */}
         <header className='bg-admin-light-bg-surface dark:bg-admin-bg-surface shadow-admin-soft border-b border-admin-light-border dark:border-admin-border h-16 flex items-center justify-between px-4 lg:px-6'>
-          <div className='flex items-center space-x-4'>
+          <div className='flex items-center gap-4'>
             {/* Mobile Menu Button */}
             <button
               className='lg:hidden p-2 text-admin-light-text-secondary dark:text-admin-text-secondary hover:text-admin-accent dark:hover:text-admin-accent transition-colors duration-200'
               id='mobile-menu-button'
+              aria-label='Open menu'
+              title='Open menu'
             >
               <Menu className='h-6 w-6' />
             </button>
-            <h2 className='text-lg lg:text-xl font-semibold text-admin-light-text-primary dark:text-admin-text-primary'>
-              Admin Dashboard
-            </h2>
+            <div className='hidden sm:block'>
+              <AdminBreadcrumbs />
+            </div>
           </div>
 
           <div className='flex items-center space-x-2 lg:space-x-4'>

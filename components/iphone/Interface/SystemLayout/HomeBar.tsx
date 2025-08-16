@@ -17,8 +17,10 @@ const HomeBar: FC<Props> = ({ handleHomeBar, handleDragEnd }) => {
   const color = useSelector(
     (state: RootState) => state.interface.statusBarColor
   );
+  const isLocked = useSelector((state: RootState) => state.interface.isLocked);
   const [isMobile, setIsMobile] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [isGestureEnabled, setIsGestureEnabled] = useState(false);
   const startPointRef = useRef<{ x: number; y: number } | null>(null);
   const homeBarRef = useRef<HTMLDivElement>(null);
 
@@ -41,9 +43,24 @@ const HomeBar: FC<Props> = ({ handleHomeBar, handleDragEnd }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // CRITICAL FIX: Delay gesture activation to prevent unlock animation interference
+  useEffect(() => {
+    if (isLocked) {
+      // Disable gestures immediately when locked
+      setIsGestureEnabled(false);
+    } else {
+      // Delay gesture activation by 700ms to allow unlock animation (600ms) to complete
+      const timer = setTimeout(() => {
+        setIsGestureEnabled(true);
+      }, 700); // 100ms buffer after unlock animation
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isLocked]);
+
   // Native touch event handlers for mobile (fallback for Framer Motion bugs)
   useEffect(() => {
-    if (!isMobile || !homeBarRef.current) return;
+    if (!isMobile || !homeBarRef.current || !isGestureEnabled) return;
 
     const element = homeBarRef.current;
     let startPoint: { x: number; y: number } | null = null;
@@ -100,13 +117,13 @@ const HomeBar: FC<Props> = ({ handleHomeBar, handleDragEnd }) => {
       element.removeEventListener('touchmove', handleTouchMove);
       element.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [isMobile, handleHomeBar, handleDragEnd]);
+  }, [isMobile, isGestureEnabled, handleHomeBar, handleDragEnd]);
 
   return (
     <motion.div
       ref={homeBarRef}
       // Use Framer Motion for desktop, native events handle mobile
-      {...(!isMobile && {
+      {...(!isMobile && isGestureEnabled && {
         onPanStart: (_e, info) => {
           startPointRef.current = { x: info.point.x, y: info.point.y };
           setIsCapturing(true);
@@ -130,7 +147,7 @@ const HomeBar: FC<Props> = ({ handleHomeBar, handleDragEnd }) => {
         WebkitUserSelect: 'none',
         userSelect: 'none'
       }}
-      className={`z-50 absolute left-0 w-full flex items-center justify-center bottom-0 pointer-events-auto ${isMobile ? 'mobile-gesture-area' : ''}`}
+      className={`z-50 absolute left-0 w-full flex items-center justify-center bottom-0 ${isGestureEnabled ? 'pointer-events-auto' : 'pointer-events-none'} ${isMobile ? 'mobile-gesture-area' : ''}`}
     >
       <motion.div
         animate={{ backgroundColor: color === 'dark' ? '#000000' : '#ffffff' }}

@@ -52,11 +52,19 @@ function ProductTableSkeleton() {
 function ProductsTable({ 
   products, 
   sort, 
-  onSort 
+  onSort,
+  selected,
+  onToggleOne,
+  onToggleAll,
+  onBulkAction
 }: { 
   products: Product[];
   sort: SortState;
   onSort: (field: SortState['field']) => void;
+  selected: Record<string, boolean>;
+  onToggleOne: (id: string, checked: boolean) => void;
+  onToggleAll: (checked: boolean) => void;
+  onBulkAction: (action: 'activate' | 'deactivate' | 'delete') => void;
 }) {
   const getStatusBadge = (status: string) => {
     const baseClasses = "px-2 py-1 text-xs font-medium rounded-full";
@@ -106,11 +114,27 @@ function ProductsTable({
     );
   }
 
+  const selectedIds = Object.keys(selected).filter(id => selected[id]);
   return (
-    <div className="overflow-x-auto admin-table-scroll" style={{ touchAction: 'pan-x pan-y' }}>
+    <div className="overflow-x-auto admin-table-scroll">
+      {products.length > 0 && (
+        <div className="flex items-center justify-between px-4 py-2">
+          <div className="text-sm text-admin-light-text-secondary dark:text-admin-text-secondary">
+            {selectedIds.length} selected
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => onBulkAction('activate')} disabled={selectedIds.length === 0} className="px-3 py-1 text-xs bg-admin-accent text-white rounded disabled:opacity-50">Activate</button>
+            <button onClick={() => onBulkAction('deactivate')} disabled={selectedIds.length === 0} className="px-3 py-1 text-xs bg-admin-light-bg-hover dark:bg-admin-bg-hover rounded disabled:opacity-50">Deactivate</button>
+            <button onClick={() => onBulkAction('delete')} disabled={selectedIds.length === 0} className="px-3 py-1 text-xs bg-red-600 text-white rounded disabled:opacity-50">Delete</button>
+          </div>
+        </div>
+      )}
       <table className="w-full min-w-[900px]">
         <thead>
           <tr className="border-b border-admin-light-border dark:border-admin-border">
+            <th className="text-left py-3 px-4">
+              <input aria-label="Select all products" type="checkbox" onChange={(e) => onToggleAll(e.target.checked)} />
+            </th>
             <th className="text-left py-3 px-4 font-medium text-admin-light-text-secondary dark:text-admin-text-secondary text-sm">
               <button 
                 onClick={() => onSort('name')}
@@ -172,6 +196,9 @@ function ProductsTable({
                 key={product.id} 
                 className="border-b border-admin-light-border-soft dark:border-admin-border-soft hover:bg-admin-light-bg-hover dark:hover:bg-admin-bg-hover transition-colors duration-150"
               >
+                <td className="py-4 px-4">
+                  <input aria-label={`Select ${product.name}`} type="checkbox" checked={!!selected[product.id]} onChange={(e) => onToggleOne(product.id, e.target.checked)} />
+                </td>
                 <td className="py-4 px-4">
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 overflow-hidden">
@@ -278,12 +305,42 @@ export default function AdminProducts() {
     field: 'created_at',
     direction: 'desc'
   });
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
 
   const handleSort = (field: SortState['field']) => {
     setSort(prev => ({
       field,
       direction: prev.field === field && prev.direction === 'asc' ? 'desc' : 'asc'
     }));
+  };
+
+  const toggleAll = (checked: boolean) => {
+    const next: Record<string, boolean> = {};
+    products.forEach(p => { next[p.id] = checked; });
+    setSelected(next);
+  };
+
+  const toggleOne = (id: string, checked: boolean) => {
+    setSelected(prev => ({ ...prev, [id]: checked }));
+  };
+
+  const bulkAction = async (action: 'activate' | 'deactivate' | 'delete') => {
+    const ids = Object.keys(selected).filter(id => selected[id]);
+    if (ids.length === 0) return;
+    const res = await fetch('/api/admin/products/bulk', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, ids }) });
+    const json = await res.json();
+    if (!res.ok) {
+      alert(json.error || 'Bulk action failed');
+      return;
+    }
+    // Reflect locally
+    if (action === 'delete') {
+      setProducts(prev => prev.filter(p => !ids.includes(p.id)));
+    } else {
+      const status = action === 'activate' ? 'active' : 'draft';
+      setProducts(prev => prev.map(p => ids.includes(p.id) ? { ...p, status } : p));
+    }
+    setSelected({});
   };
 
   useEffect(() => {
@@ -410,7 +467,11 @@ export default function AdminProducts() {
         <ProductsTable 
           products={products} 
           sort={sort} 
-          onSort={handleSort} 
+          onSort={handleSort}
+          selected={selected}
+          onToggleAll={toggleAll}
+          onToggleOne={toggleOne}
+          onBulkAction={bulkAction}
         />
       </div>
     </div>

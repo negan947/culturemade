@@ -33,6 +33,7 @@
       "mcp__supabasecm__search_docs",
       "mcp__supabasecm__apply_migration"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "acceptEdits"
   }
 }

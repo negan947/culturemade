@@ -20,6 +20,8 @@ import useAuth from '@/hooks/useAuth';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { getCartSessionId, handleCartMigration } from '@/utils/cartSync';
+import { createClient } from '@/lib/supabase/client';
 
 interface MenuItem {
   id: string;
@@ -250,6 +252,18 @@ export default function ProfileScreen() {
                         setLocalAuthError('Unable to sign in. Please check your credentials.');
                         return;
                       }
+                      try {
+                        const supabase = createClient();
+                        const { data } = await supabase.auth.getUser();
+                        const newUserId = data?.user?.id;
+                        const guestSessionId = getCartSessionId();
+                        if (newUserId && guestSessionId) {
+                          await handleCartMigration(guestSessionId, newUserId);
+                          if (typeof window !== 'undefined') {
+                            window.dispatchEvent(new Event('cartUpdated'));
+                          }
+                        }
+                      } catch {}
                       setAuthView('none');
                     }}
                   >
@@ -276,6 +290,18 @@ export default function ProfileScreen() {
                         setLocalAuthError('Unable to create account. Please try again.');
                         return;
                       }
+                      try {
+                        const supabase = createClient();
+                        const { data } = await supabase.auth.getUser();
+                        const newUserId = data?.user?.id;
+                        const guestSessionId = getCartSessionId();
+                        if (newUserId && guestSessionId) {
+                          await handleCartMigration(guestSessionId, newUserId);
+                          if (typeof window !== 'undefined') {
+                            window.dispatchEvent(new Event('cartUpdated'));
+                          }
+                        }
+                      } catch {}
                       setAuthView('none');
                     }}
                   >

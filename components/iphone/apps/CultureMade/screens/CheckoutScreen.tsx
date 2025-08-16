@@ -40,6 +40,27 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
   const [orderTotal, setOrderTotal] = useState<number | null>(null);
   const isFinalized = step === 'confirm';
 
+  // Persist helper (write-through to both localStorage and sessionStorage)
+  const persistAll = () => {
+    try {
+      const contactPayload = JSON.stringify({ email: contactEmail, name: contactName, phone: contactPhone });
+      localStorage.setItem('cm_checkout_contact', contactPayload);
+      sessionStorage.setItem('cm_checkout_contact', contactPayload);
+
+      const shippingPayload = JSON.stringify(shipping);
+      localStorage.setItem('cm_checkout_shipping', shippingPayload);
+      sessionStorage.setItem('cm_checkout_shipping', shippingPayload);
+
+      const billingPayload = JSON.stringify(billing);
+      localStorage.setItem('cm_checkout_billing', billingPayload);
+      sessionStorage.setItem('cm_checkout_billing', billingPayload);
+
+      const samePayload = String(useBillingForShipping);
+      localStorage.setItem('cm_checkout_use_billing_for_shipping', samePayload);
+      sessionStorage.setItem('cm_checkout_use_billing_for_shipping', samePayload);
+    } catch {}
+  };
+
   // Contact step state
   const [contactEmail, setContactEmail] = useState<string>('');
   const [contactName, setContactName] = useState<string>('');
@@ -104,6 +125,7 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
         setContactEmail(parsed.email || '');
         setContactName(parsed.name || '');
         setContactPhone(parsed.phone || '');
+        if (parsed.email) setContactValid(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(parsed.email));
       }
 
       const storedShipping = localStorage.getItem('cm_checkout_shipping');
@@ -131,6 +153,18 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
       }
     } catch {}
   }, []);
+
+  // Persist on tab hide/unload as a safety net
+  useEffect(() => {
+    const onBeforeUnload = () => persistAll();
+    const onVisibility = () => { if (document.visibilityState === 'hidden') persistAll(); };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      window.removeEventListener('beforeunload', onBeforeUnload);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [contactEmail, contactName, contactPhone, shipping, billing, useBillingForShipping]);
 
   useEffect(() => {
     try {
@@ -236,11 +270,12 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
 
   const handleBack = async () => {
     if (step === 'contact') {
+      persistAll();
       await controls.start({ x: '100%', opacity: 0, transition: { duration: 0.25, ease: [0.4, 0, 0.2, 1] } });
       onClose();
       return;
     }
-    if (step === 'shipping') return setStep('contact');
+    if (step === 'shipping') { persistAll(); return setStep('contact'); }
     if (step === 'payment') return setStep('shipping');
     if (step === 'confirm') return; // do not allow navigating back after confirmation
   };

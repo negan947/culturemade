@@ -19,7 +19,10 @@ export async function GET(
       .select(
         `id, order_number, user_id, email, phone, status, payment_status, fulfillment_status,
          subtotal, tax_amount, shipping_amount, discount_amount, total_amount, currency,
-         billing_address_id, shipping_address_id, notes, metadata, created_at, updated_at`
+         billing_address_id, shipping_address_id, notes, metadata, created_at, updated_at,
+         shipments:shipments(
+           id, tracking_number, carrier, status, shipped_at, delivered_at
+         )`
       )
       .eq('id', params.id)
       .eq('user_id', user.id)

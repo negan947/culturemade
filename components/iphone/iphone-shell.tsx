@@ -82,21 +82,28 @@ const IPhoneShell: FC<Props> = ({ children }) => {
         </ErrorBoundary>
 
         {/* Lock Screen Overlay */}
-        {isLocked && (
-          <motion.div
-            key='lockscreen'
-            className='absolute inset-0 z-50'
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
-            transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-            style={{ background: 'none', backdropFilter: 'none' }}
-          >
-            <ErrorBoundary level='component'>
-              <LockScreen />
-            </ErrorBoundary>
-          </motion.div>
-        )}
+        <AnimatePresence>
+          {isLocked && (
+            <motion.div
+              key='lockscreen'
+              className='absolute inset-0 z-50'
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 1 }}
+              exit={{ 
+                opacity: 0, 
+                scale: 1.1, 
+                filter: 'blur(10px)',
+                pointerEvents: 'none' // CRITICAL: Disable touch events during exit
+              }}
+              transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+              style={{ background: 'none', backdropFilter: 'none' }}
+            >
+              <ErrorBoundary level='component'>
+                <LockScreen />
+              </ErrorBoundary>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Home & AppView shared layout - Always mounted to prevent refresh animation */}
         <LayoutGroup id='iphone-interface-group'>

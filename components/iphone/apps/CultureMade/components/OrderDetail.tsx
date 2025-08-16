@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Loader2, MapPin, Package, Receipt, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Loader2, MapPin, Package, Receipt, ShieldCheck, Truck } from 'lucide-react';
 
 import { getCartSessionId } from '@/utils/cartSync';
 import { useAddToCart } from '@/hooks/useAddToCart';
@@ -34,6 +34,14 @@ type OrderDetail = {
   created_at: string;
   metadata?: any;
   items: OrderItem[];
+  shipments?: Array<{
+    id: string;
+    tracking_number: string | null;
+    carrier: string | null;
+    status: 'pending' | 'in_transit' | 'delivered' | 'returned' | null;
+    shipped_at: string | null;
+    delivered_at: string | null;
+  }> | null;
 };
 
 type OrderDetailResponse = { success: boolean; order?: OrderDetail; error?: string };
@@ -205,6 +213,41 @@ export default function OrderDetail({ orderId, onBack, userId }: OrderDetailProp
                     <AddressBlock address={order.metadata.billing_address} />
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Shipments / Tracking */}
+            {order.shipments && order.shipments.length > 0 && (
+              <div className="bg-white border border-gray-200 rounded-xl p-4">
+                <div className="font-semibold text-gray-900 mb-3 flex items-center">
+                  <Truck className="h-4 w-4 mr-2" /> Shipment Tracking
+                </div>
+                <div className="space-y-3">
+                  {order.shipments.map((s) => (
+                    <div key={s.id} className="flex items-start justify-between">
+                      <div className="text-sm text-gray-700">
+                        <div className="font-medium text-gray-900">{s.carrier || 'Carrier'}</div>
+                        {s.tracking_number && (
+                          <div className="text-xs text-blue-600">
+                            <a
+                              href={`https://track.aftership.com/${encodeURIComponent(s.carrier || '')}/${encodeURIComponent(s.tracking_number)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="hover:underline"
+                            >
+                              {s.tracking_number}
+                            </a>
+                          </div>
+                        )}
+                        <div className="text-xs text-gray-500 mt-1">
+                          {s.status || 'pending'}
+                          {s.shipped_at && ` • Shipped ${new Date(s.shipped_at).toLocaleDateString()}`}
+                          {s.delivered_at && ` • Delivered ${new Date(s.delivered_at).toLocaleDateString()}`}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 

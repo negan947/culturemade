@@ -5,6 +5,9 @@ import {
   ShoppingCart,
   TrendingUp,
   Users,
+  Eye,
+  Mail,
+  Clock,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -43,14 +46,14 @@ async function getDashboardStats(): Promise<DashboardStats> {
     .select('*', { count: 'exact', head: true })
     .eq('role', 'customer');
 
-  // Get revenue (sum of completed orders)
+  // Get revenue (sum of succeeded payments)
   const { data: revenueData } = await supabase
-    .from('orders')
-    .select('total_amount')
-    .eq('status', 'completed');
+    .from('payments')
+    .select('amount')
+    .eq('status', 'succeeded');
 
   const totalRevenue =
-    revenueData?.reduce((sum, order) => sum + (order.total_amount || 0), 0) ||
+    revenueData?.reduce((sum, payment) => sum + (Number(payment.amount) || 0), 0) ||
     0;
 
   // Get low stock products (products with variants having stock < 10)
@@ -72,12 +75,98 @@ async function getDashboardStats(): Promise<DashboardStats> {
   };
 }
 
+interface TodayStats {
+  ordersToday: number;
+  revenueToday: number;
+  newCustomersToday: number;
+  pendingOrdersToday: number;
+}
+
+async function getTodayStats(): Promise<TodayStats> {
+  const supabase = await createClient();
+
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const startIso = startOfDay.toISOString();
+
+  // Orders created today
+  const { count: ordersToday } = await supabase
+    .from('orders')
+    .select('*', { count: 'exact', head: true })
+    .gte('created_at', startIso);
+
+  // Revenue today from succeeded payments
+  const { data: paymentsToday } = await supabase
+    .from('payments')
+    .select('amount, status, created_at')
+    .eq('status', 'succeeded')
+    .gte('created_at', startIso);
+
+  const revenueToday = paymentsToday?.reduce((sum, p) => sum + (Number(p.amount) || 0), 0) || 0;
+
+  // New customers today
+  const { count: newCustomersToday } = await supabase
+    .from('profiles')
+    .select('*', { count: 'exact', head: true })
+    .eq('role', 'customer')
+    .gte('created_at', startIso);
+
+  // Pending orders today
+  const { count: pendingOrdersToday } = await supabase
+    .from('orders')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'pending')
+    .gte('created_at', startIso);
+
+  return {
+    ordersToday: ordersToday || 0,
+    revenueToday,
+    newCustomersToday: newCustomersToday || 0,
+    pendingOrdersToday: pendingOrdersToday || 0,
+  };
+}
+
+interface RecentOrder {
+  id: string;
+  order_number: string;
+  email: string;
+  total_amount: number;
+  currency: string | null;
+  status: string | null;
+  created_at: string | null;
+  profiles: { id: string; full_name: string | null } | null;
+}
+
+async function getRecentOrders(limit: number = 5): Promise<RecentOrder[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('orders')
+    .select(`
+      id,
+      order_number,
+      email,
+      total_amount,
+      currency,
+      status,
+      created_at,
+      profiles(id, full_name)
+    `)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  return data || [];
+}
+
 export default async function AdminDashboard() {
   // Ensure user is admin
   await requireAdmin();
 
   // Get dashboard statistics
-  const stats = await getDashboardStats();
+  const [stats, today, recentOrders] = await Promise.all([
+    getDashboardStats(),
+    getTodayStats(),
+    getRecentOrders(5),
+  ]);
 
   const statCards = [
     {
@@ -200,6 +289,31 @@ export default async function AdminDashboard() {
         })}
       </div>
 
+      {/* Today's KPIs */}
+      <div className='bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-4 lg:p-6'>
+        <h2 className='text-lg font-semibold text-admin-light-text-primary dark:text-admin-text-primary mb-4'>
+          Today
+        </h2>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
+          <div className='rounded-lg border border-admin-light-border dark:border-admin-border p-4'>
+            <div className='text-sm text-admin-light-text-secondary dark:text-admin-text-secondary'>Orders</div>
+            <div className='text-xl font-bold text-admin-light-text-primary dark:text-admin-text-primary'>{today.ordersToday}</div>
+          </div>
+          <div className='rounded-lg border border-admin-light-border dark:border-admin-border p-4'>
+            <div className='text-sm text-admin-light-text-secondary dark:text-admin-text-secondary'>Revenue</div>
+            <div className='text-xl font-bold text-admin-light-text-primary dark:text-admin-text-primary'>${today.revenueToday.toFixed(2)}</div>
+          </div>
+          <div className='rounded-lg border border-admin-light-border dark:border-admin-border p-4'>
+            <div className='text-sm text-admin-light-text-secondary dark:text-admin-text-secondary'>New Customers</div>
+            <div className='text-xl font-bold text-admin-light-text-primary dark:text-admin-text-primary'>{today.newCustomersToday}</div>
+          </div>
+          <div className='rounded-lg border border-admin-light-border dark:border-admin-border p-4'>
+            <div className='text-sm text-admin-light-text-secondary dark:text-admin-text-secondary'>Pending Orders</div>
+            <div className='text-xl font-bold text-admin-light-text-primary dark:text-admin-text-primary'>{today.pendingOrdersToday}</div>
+          </div>
+        </div>
+      </div>
+
       {/* Quick Actions */}
       <div className='bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-4 lg:p-6'>
         <h2 className='text-lg font-semibold text-admin-light-text-primary dark:text-admin-text-primary mb-4'>
@@ -251,6 +365,64 @@ export default async function AdminDashboard() {
             </div>
           </a>
         </div>
+      </div>
+
+      {/* Recent Orders */}
+      <div className='bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border p-4 lg:p-6'>
+        <div className='flex items-center justify-between mb-4'>
+          <h2 className='text-lg font-semibold text-admin-light-text-primary dark:text-admin-text-primary'>
+            Recent Orders
+          </h2>
+          <Link
+            href='/admin/orders'
+            className='text-sm text-admin-accent hover:text-admin-accent-hover transition-colors duration-200'
+          >
+            View all
+          </Link>
+        </div>
+        {recentOrders.length === 0 ? (
+          <div className='text-sm text-admin-light-text-secondary dark:text-admin-text-secondary'>No recent orders.</div>
+        ) : (
+          <div className='divide-y divide-admin-light-border dark:divide-admin-border'>
+            {recentOrders.map((order) => (
+              <div key={order.id} className='py-3 flex items-center justify-between'>
+                <div className='flex items-center gap-4'>
+                  <div className='text-sm font-medium text-admin-light-text-primary dark:text-admin-text-primary'>
+                    {order.order_number}
+                  </div>
+                  <div className='hidden sm:block text-sm text-admin-light-text-secondary dark:text-admin-text-secondary'>
+                    {order.profiles?.full_name || 'Guest'}
+                  </div>
+                  <div className='hidden md:flex items-center gap-1 text-xs text-admin-light-text-disabled dark:text-admin-text-disabled'>
+                    <Clock className='h-3 w-3' />
+                    {order.created_at ? new Date(order.created_at).toLocaleString() : ''}
+                  </div>
+                </div>
+                <div className='flex items-center gap-4'>
+                  <div className='text-sm text-admin-light-text-primary dark:text-admin-text-primary'>
+                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: order.currency || 'USD' }).format(Number(order.total_amount) || 0)}
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <a
+                      href={`mailto:${order.email}`}
+                      title='Email customer'
+                      className='p-2 text-admin-light-text-secondary dark:text-admin-text-secondary hover:text-admin-accent dark:hover:text-admin-accent transition-colors duration-200'
+                    >
+                      <Mail className='h-4 w-4' />
+                    </a>
+                    <Link
+                      href={`/admin/orders/${order.id}`}
+                      title='View order'
+                      className='p-2 text-admin-light-text-secondary dark:text-admin-text-secondary hover:text-admin-accent dark:hover:text-admin-accent transition-colors duration-200'
+                    >
+                      <Eye className='h-4 w-4' />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* System Status */}

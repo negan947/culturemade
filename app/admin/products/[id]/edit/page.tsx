@@ -60,6 +60,9 @@ interface Category {
 interface FormData {
   name: string;
   description: string;
+  slug: string;
+  seo_title: string;
+  seo_description: string;
   status: 'active' | 'draft' | 'archived';
   price: string;
   compare_at_price: string;
@@ -102,6 +105,9 @@ export default function EditProduct({
   const [formData, setFormData] = useState<FormData>({
     name: '',
     description: '',
+    slug: '',
+    seo_title: '',
+    seo_description: '',
     status: 'draft',
     price: '',
     compare_at_price: '',
@@ -316,7 +322,7 @@ export default function EditProduct({
         // Remove extra fields like created_at, product_id, variant_id
       }));
       
-      const requestData = {
+      const requestData: any = {
         name: formData.name,
         description: formData.description || null,
         status: formData.status,
@@ -333,6 +339,10 @@ export default function EditProduct({
         variants: cleanedVariants,
         images: cleanedImages
       };
+
+      if (formData.slug) requestData.slug = formData.slug;
+      if (formData.seo_title) requestData.seo_title = formData.seo_title;
+      if (formData.seo_description) requestData.seo_description = formData.seo_description;
       
       console.log('=== FRONTEND DEBUG START ===');
       console.log('Frontend - Sending request data (full):', JSON.stringify(requestData, null, 2));
@@ -605,12 +615,26 @@ export default function EditProduct({
               
               <div>
                 <label className="block text-sm font-medium text-admin-light-text-primary dark:text-admin-text-primary mb-2">
+                  URL Handle (slug)
+                </label>
+                <input
+                  type="text"
+                  value={formData.slug}
+                  onChange={(e) => updateFormData('slug', e.target.value.toLowerCase())}
+                  className="w-full px-3 py-2 border border-admin-light-border dark:border-admin-border rounded-lg bg-admin-light-bg-main dark:bg-admin-bg-main text-admin-light-text-primary dark:text-admin-text-primary focus:ring-2 focus:ring-admin-accent focus:border-transparent"
+                  placeholder="auto-generated-from-name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-admin-light-text-primary dark:text-admin-text-primary mb-2">
                   Status *
                 </label>
                 <select
                   value={formData.status}
                   onChange={(e) => updateFormData('status', e.target.value as 'active' | 'draft' | 'archived')}
                   className="w-full px-3 py-2 border border-admin-light-border dark:border-admin-border rounded-lg bg-admin-light-bg-main dark:bg-admin-bg-main text-admin-light-text-primary dark:text-admin-text-primary focus:ring-2 focus:ring-admin-accent focus:border-transparent"
+                  aria-label="Product status"
                 >
                   <option value="draft">Draft</option>
                   <option value="active">Active</option>
@@ -854,6 +878,7 @@ export default function EditProduct({
                       <button
                         onClick={() => deleteImage(index)}
                         className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                        aria-label={`Remove image ${index + 1}`}
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -882,6 +907,51 @@ export default function EditProduct({
                 })}
               </div>
             )}
+          </div>
+        )}
+      </div>
+
+      {/* SEO */}
+      <div className="bg-admin-light-bg-surface dark:bg-admin-bg-surface rounded-lg shadow-admin-soft border border-admin-light-border dark:border-admin-border">
+        <div 
+          className="flex items-center justify-between p-6 cursor-pointer"
+          onClick={() => toggleSection('seo')}
+        >
+          <h2 className="text-lg font-semibold text-admin-light-text-primary dark:text-admin-text-primary">
+            Search Engine Optimization
+          </h2>
+          {expandedSections.seo ? (
+            <ChevronUp className="w-5 h-5 text-admin-light-text-secondary dark:text-admin-text-secondary" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-admin-light-text-secondary dark:text-admin-text-secondary" />
+          )}
+        </div>
+        {expandedSections.seo && (
+          <div className="px-6 pb-6 space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-admin-light-text-primary dark:text-admin-text-primary mb-2">
+                Page Title
+              </label>
+              <input
+                type="text"
+                value={formData.seo_title}
+                onChange={(e) => updateFormData('seo_title', e.target.value)}
+                className="w-full px-3 py-2 border border-admin-light-border dark:border-admin-border rounded-lg bg-admin-light-bg-main dark:bg-admin-bg-main text-admin-light-text-primary dark:text-admin-text-primary focus:ring-2 focus:ring-admin-accent focus:border-transparent"
+                placeholder="Auto-generated from product name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-admin-light-text-primary dark:text-admin-text-primary mb-2">
+                Meta Description
+              </label>
+              <textarea
+                value={formData.seo_description}
+                onChange={(e) => updateFormData('seo_description', e.target.value)}
+                rows={3}
+                className="w-full px-3 py-2 border border-admin-light-border dark:border-admin-border rounded-lg bg-admin-light-bg-main dark:bg-admin-bg-main text-admin-light-text-primary dark:text-admin-text-primary focus:ring-2 focus:ring-admin-accent focus:border-transparent"
+                placeholder="Brief description for search engines"
+              />
+            </div>
           </div>
         )}
       </div>
@@ -927,6 +997,7 @@ export default function EditProduct({
                     <button
                       onClick={() => deleteVariant(index)}
                       className="p-1 text-red-500 hover:text-red-700 transition-colors"
+                      aria-label={`Delete Variant ${index + 1}`}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -1024,6 +1095,7 @@ export default function EditProduct({
                         onChange={(e) => updateVariant(index, 'quantity', parseInt(e.target.value) || 0)}
                         className="w-full px-2 py-1 text-sm border border-admin-light-border dark:border-admin-border rounded bg-admin-light-bg-surface dark:bg-admin-bg-surface text-admin-light-text-primary dark:text-admin-text-primary focus:ring-1 focus:ring-admin-accent focus:border-transparent"
                         min="0"
+                        aria-label={`Quantity for Variant ${index + 1}`}
                       />
                     </div>
                   </div>
