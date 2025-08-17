@@ -86,15 +86,16 @@ const nextConfig: NextConfig = {
       'via.placeholder.com', // Additional placeholder service
     ],
 
-    // Configure image formats
-    formats: ['image/webp', 'image/avif'],
+    // Configure image formats (AVIF first for better compression, WebP fallback)
+    formats: ['image/avif', 'image/webp'],
 
-    // Configure image sizes
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Configure image sizes optimized for iPhone and desktop
+    deviceSizes: [410, 640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 200, 256, 400, 800],
 
-    // Allow unoptimized images for development
-    unoptimized: process.env.NODE_ENV === 'development',
+    // Enable image optimization in all environments for better performance testing
+    unoptimized: false,
+
   },
 
   // Configure security headers

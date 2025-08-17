@@ -52,6 +52,33 @@ export function getTransformedImageUrl(
 }
 
 /**
+ * Check if browser supports AVIF format
+ */
+function supportsAvif(): boolean {
+  if (typeof window === 'undefined') return false;
+  
+  const canvas = document.createElement('canvas');
+  canvas.width = 1;
+  canvas.height = 1;
+  
+  try {
+    return canvas.toDataURL('image/avif').indexOf('data:image/avif') === 0;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Get optimal image format based on browser support
+ */
+function getOptimalFormat(): 'avif' | 'webp' | 'jpeg' {
+  if (typeof window === 'undefined') return 'webp'; // SSR fallback
+  
+  if (supportsAvif()) return 'avif';
+  return 'webp'; // Modern browsers support WebP
+}
+
+/**
  * Product image URL generators with preset transformations
  */
 export const productImageUrl = {
@@ -63,40 +90,40 @@ export const productImageUrl = {
   },
 
   /**
-   * Thumbnail - 200x200px, WebP, 80% quality
+   * Thumbnail - 200x200px, optimal format, 80% quality
    */
   thumbnail: (imagePath: string): string => {
     return getTransformedImageUrl('product-images', imagePath, {
       width: 200,
       height: 200,
       quality: 80,
-      format: 'webp',
+      format: getOptimalFormat(),
       resize: 'cover',
     });
   },
 
   /**
-   * Medium - 400x400px, WebP, 85% quality
+   * Medium - 400x400px, optimal format, 85% quality
    */
   medium: (imagePath: string): string => {
     return getTransformedImageUrl('product-images', imagePath, {
       width: 400,
       height: 400,
       quality: 85,
-      format: 'webp',
+      format: getOptimalFormat(),
       resize: 'cover',
     });
   },
 
   /**
-   * Large - 800x800px, WebP, 90% quality
+   * Large - 800x800px, optimal format, 90% quality
    */
   large: (imagePath: string): string => {
     return getTransformedImageUrl('product-images', imagePath, {
       width: 800,
       height: 800,
       quality: 90,
-      format: 'webp',
+      format: getOptimalFormat(),
       resize: 'cover',
     });
   },
@@ -157,7 +184,7 @@ export const categoryImageUrl = {
       width: 150,
       height: 150,
       quality: 80,
-      format: 'webp',
+      format: getOptimalFormat(),
       resize: 'cover',
     });
   },
@@ -176,7 +203,7 @@ export const variantImageUrl = {
       width: 100,
       height: 100,
       quality: 80,
-      format: 'webp',
+      format: getOptimalFormat(),
       resize: 'cover',
     });
   },

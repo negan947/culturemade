@@ -2,9 +2,11 @@
 
 import { motion, PanInfo, useAnimation } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ZoomIn, RefreshCw } from 'lucide-react';
+import Image from 'next/image';
 import { useState, useRef, useCallback, useEffect } from 'react';
 
 import { ProductImage } from '@/types/api';
+import { getProductImageWithFallback } from '@/lib/utils/image-utils';
 
 
 interface ProductImageGalleryProps {
@@ -171,11 +173,9 @@ const ProductImageGallery = ({
           whileTap={{ scale: 0.98 }}
           animate={controls}
         >
-          <motion.img
+          <motion.div
             key={currentImage.id}
-            src={hasCurrentImageError ? placeholderImage : currentImage.url}
-            alt={currentImage.alt_text || `${productName} product image ${currentIndex + 1}`}
-            className={`w-full h-full object-cover transition-transform duration-300 ${
+            className={`relative w-full h-full transition-transform duration-300 ${
               isZoomed ? 'scale-150 cursor-zoom-out' : 'cursor-zoom-in'
             }`}
             initial={{ opacity: 0, scale: 0.9 }}
@@ -185,12 +185,32 @@ const ProductImageGallery = ({
               duration: 0.3,
               ease: [0.25, 0.46, 0.45, 0.94]
             }}
-            onLoadStart={() => handleImageLoadStart(currentImage.id)}
-            onLoad={() => handleImageLoad(currentImage.id)}
-            onError={() => handleImageError(currentImage.id)}
             onDoubleClick={handleDoubleClick}
-            loading="eager" // Load current image immediately
-          />
+          >
+            {hasCurrentImageError ? (
+              <Image
+                src={placeholderImage}
+                alt={`${productName} - placeholder image`}
+                fill
+                className="object-cover"
+                sizes="(max-width: 410px) 100vw, 400px"
+                priority={currentIndex === 0}
+              />
+            ) : (
+              <Image
+                src={getProductImageWithFallback(currentImage.url, 'large', productName) || placeholderImage}
+                alt={currentImage.alt_text || `${productName} product image ${currentIndex + 1}`}
+                fill
+                className="object-cover"
+                sizes="(max-width: 410px) 100vw, 400px"
+                priority={currentIndex === 0} // Only prioritize first image
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                onLoad={() => handleImageLoad(currentImage.id)}
+                onError={() => handleImageError(currentImage.id)}
+              />
+            )}
+          </motion.div>
         </motion.div>
 
         {/* Loading Skeleton */}

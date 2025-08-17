@@ -25,7 +25,7 @@ export default function ProductImage({
   productName,
   className = '',
   priority = false,
-  sizes = '(max-width: 410px) 50vw, 200px',
+  sizes = '(max-width: 410px) 50vw, (max-width: 768px) 33vw, 200px',
   onLoad,
   onError
 }: ProductImageProps) {
