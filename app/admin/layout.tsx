@@ -13,10 +13,10 @@ import {
 import Link from 'next/link';
 
 import { AdminScrollFix } from '@/components/admin/admin-scroll-fix';
+import { AdminBreadcrumbs } from '@/components/admin/breadcrumbs';
 import { MobileSidebar } from '@/components/admin/mobile-sidebar';
 import { DarkModeToggle } from '@/components/ui/dark-mode-toggle';
 import { getUserContext, requireAdmin } from '@/lib/supabase/auth';
-import { AdminBreadcrumbs } from '@/components/admin/breadcrumbs';
 
 interface AdminLayoutProps {
   children: React.ReactNode;

@@ -5,8 +5,8 @@ import { ChevronLeft, ChevronRight, ZoomIn, RefreshCw } from 'lucide-react';
 import Image from 'next/image';
 import { useState, useRef, useCallback, useEffect } from 'react';
 
-import { ProductImage } from '@/types/api';
 import { getProductImageWithFallback } from '@/lib/utils/image-utils';
+import { ProductImage } from '@/types/api';
 
 
 interface ProductImageGalleryProps {

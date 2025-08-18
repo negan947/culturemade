@@ -1,8 +1,8 @@
 'use client';
 
+import { loadStripe, Stripe, StripeElements, StripePaymentRequest, PaymentRequestPaymentMethodEvent } from '@stripe/stripe-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { loadStripe, Stripe, StripeElements, StripePaymentRequest, PaymentRequestPaymentMethodEvent } from '@stripe/stripe-js';
 
 import { validateClientEnv } from '@/lib/validations/env';
 import { getCartSessionId } from '@/utils/cartSync';
@@ -187,7 +187,7 @@ export default function PaymentForm({ userId, checkoutSessionId, contactEmail, c
       {applePayAvailable && (
         <div className="mb-2">
           <div ref={prButtonRef} />
-          <p className="text-[11px] text-gray-500 mt-1">You can pay with Apple Pay on supported devices.</p>
+          <p className="text-[11px] text-gray-400 mt-1">You can pay with Apple Pay on supported devices.</p>
         </div>
       )}
 

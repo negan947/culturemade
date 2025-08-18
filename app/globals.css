@@ -41,6 +41,8 @@ body {
   -webkit-touch-callout: none;
 }
 
+/* Simple border overlay solution for Chrome pixelation */
+
 /* Enhanced scrolling support */
 .scrollable {
   -webkit-overflow-scrolling: touch;
@@ -92,6 +94,7 @@ body {
   width: 0 !important;
   height: 0 !important;
 }
+
 
 /* Drag scroll visual feedback */
 .drag-scroll-container {

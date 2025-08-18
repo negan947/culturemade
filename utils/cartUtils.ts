@@ -97,7 +97,7 @@ export async function addToCart(request: AddToCartRequest): Promise<AddToCartRes
     throw new Error('MCP integration required - call with this query: ' + existingQuery);
     
     // Placeholder for MCP result parsing - unreachable code after throw
-    let existingItems: any[] = [];
+    const existingItems: any[] = [];
 
     let cartItem: CartItem;
     

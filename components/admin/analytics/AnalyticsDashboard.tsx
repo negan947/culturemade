@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import {
   DollarSign,
   ShoppingCart,
@@ -13,6 +12,7 @@ import {
   BarChart3,
   UserCheck,
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 import { formatCurrency, formatNumber } from '@/utils/formatting';
 

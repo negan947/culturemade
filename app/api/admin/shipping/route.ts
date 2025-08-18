@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
-import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/supabase/auth';
+import { createClient } from '@/lib/supabase/server';
 
 const ShippingLabelSchema = z.object({
   orderIds: z.array(z.string().uuid()),

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
-import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/supabase/auth';
+import { createClient } from '@/lib/supabase/server';
 
 const BulkActionSchema = z.object({
   action: z.enum(['update_status', 'export', 'delete']),

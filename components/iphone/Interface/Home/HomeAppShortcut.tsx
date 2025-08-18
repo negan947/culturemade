@@ -66,15 +66,16 @@ const HomeAppShortcut: FC<Props> = ({ appId, icon, name, shouldAnimateUnlock = f
         layoutId={appId}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className='w-full aspect-square'
+        className='iphone-app-icon w-full aspect-square'
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95, filter: 'brightness(70%)' }}
         style={{
-          borderRadius: 15,
+          borderRadius: '15px',
           backgroundImage: icon
             ? `url('/images/icons/${icon}.png')`
             : "url('/images/icons/empty.png')",
-          backgroundSize: 'contain',
+          backgroundSize: 'calc(100% + 2px)', // 1px wider overlay
+          backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           filter: 'brightness(100%)',
         }}

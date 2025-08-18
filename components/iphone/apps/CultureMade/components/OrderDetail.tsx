@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Loader2, MapPin, Package, Receipt, ShieldCheck, Truck } from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { getCartSessionId } from '@/utils/cartSync';
 import { useAddToCart } from '@/hooks/useAddToCart';
+import { getCartSessionId } from '@/utils/cartSync';
 
 type OrderItem = {
   id: string;

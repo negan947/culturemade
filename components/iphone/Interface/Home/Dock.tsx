@@ -12,7 +12,16 @@ const Dock = ({ shouldAnimateUnlock = false }: Props) => {
     { color: '#0018bb', id: 'swift', icon: 'mail' },
   ];
   return (
-    <div className='mt-auto grid grid-cols-4 gap-7 gap-y-5 p-4 m-4 rounded-[30px] bg-zinc-300/30 backdrop-blur-md'>
+    <div 
+      className='iphone-dock mt-auto grid grid-cols-4 gap-7 gap-y-5 p-4 m-4 bg-zinc-300/30 backdrop-blur-md'
+      style={{
+        borderRadius: '30px',
+        // 1px wider background - subtle but effective
+        backgroundImage: 'linear-gradient(rgba(161, 161, 170, 0.3), rgba(161, 161, 170, 0.3))',
+        backgroundSize: 'calc(100% + 2px) calc(100% + 2px)',
+        backgroundPosition: 'center',
+      }}
+    >
       {colors.map((app, index) => (
         <HomeAppShortcut 
           key={app.id} 

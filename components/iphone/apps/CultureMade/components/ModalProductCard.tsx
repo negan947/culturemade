@@ -177,20 +177,20 @@ const ModalProductCard = memo(function ModalProductCard({
               stiffness: 300,
               mass: 0.8
             }}
-            className="relative bg-white rounded-2xl max-w-md w-full max-h-[90vh] flex flex-col shadow-2xl"
+            className="relative bg-admin-bg-surface rounded-2xl max-w-md w-full max-h-[90vh] flex flex-col shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Product Image with Overlay Effects */}
-            <div className="relative aspect-square bg-gray-50 rounded-t-2xl">
+            <div className="relative aspect-square bg-admin-bg-hover rounded-t-2xl">
               {/* Close Button - positioned over image */}
               <div className="absolute top-4 left-4 z-20">
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   onClick={onClose}
-                  className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors shadow-lg"
+                  className="p-2 bg-admin-bg-surface/90 backdrop-blur-sm rounded-full hover:bg-admin-bg-surface transition-colors shadow-lg"
                   aria-label="Close product details"
                 >
-                  <X className="w-6 h-6 text-gray-700" />
+                  <X className="w-6 h-6 text-admin-text-primary" />
                 </motion.button>
               </div>
               
@@ -231,10 +231,10 @@ const ModalProductCard = memo(function ModalProductCard({
             >
               {/* Product Title */}
               <div>
-                <p className="text-gray-500 text-sm mb-1">Thin Choise</p>
+                <p className="text-admin-text-secondary text-sm mb-1">Thin Choise</p>
                 <h2 
                   id={`modal-title-${product.id}`}
-                  className="text-2xl font-bold text-gray-900 leading-tight mb-3"
+                  className="text-2xl font-bold text-admin-text-primary leading-tight mb-3"
                 >
                   {product.name}
                 </h2>
@@ -249,7 +249,7 @@ const ModalProductCard = memo(function ModalProductCard({
                       />
                     ))}
                   </div>
-                  <span className="text-gray-400 text-sm">110 Reviews</span>
+                  <span className="text-admin-text-disabled text-sm">110 Reviews</span>
                 </div>
               </div>
               
@@ -267,7 +267,7 @@ const ModalProductCard = memo(function ModalProductCard({
                   </span>
                   {isOnSale && originalPriceText && (
                     <>
-                      <span className="text-lg text-gray-400 line-through">
+                      <span className="text-lg text-admin-text-disabled line-through">
                         {originalPriceText}
                       </span>
                       {savingsText && (
@@ -315,13 +315,13 @@ const ModalProductCard = memo(function ModalProductCard({
                   className={`flex-1 py-4 rounded-xl font-semibold border-2 transition-all flex items-center justify-center gap-2 ${
                     added
                       ? 'bg-green-500 border-green-600 text-white'
-                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                      : 'bg-admin-bg-main border-admin-border text-admin-text-primary hover:bg-admin-bg-hover'
                   } ${isAdding ? 'opacity-80 cursor-not-allowed' : ''}`}
                   aria-label={`Add ${product.name} to cart`}
                 >
                   {isAdding ? (
                     <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-admin-text-secondary border-t-transparent rounded-full animate-spin" />
                       Adding...
                     </div>
                   ) : added ? (
@@ -362,10 +362,10 @@ const ModalProductCard = memo(function ModalProductCard({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
               >
-                <h3 className="font-semibold text-gray-900 text-lg">Details</h3>
+                <h3 className="font-semibold text-admin-text-primary text-lg">Details</h3>
                 <p 
                   id={`modal-description-${product.id}`}
-                  className="text-gray-600 text-sm leading-relaxed"
+                  className="text-admin-text-secondary text-sm leading-relaxed"
                 >
                   {product.description || 'No description available for this product.'}
                 </p>

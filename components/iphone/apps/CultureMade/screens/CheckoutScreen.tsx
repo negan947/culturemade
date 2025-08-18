@@ -2,14 +2,14 @@
 
 import { motion, useAnimation } from 'framer-motion';
 import { ChevronLeft } from 'lucide-react';
+import { ChevronDown, ChevronUp, X } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { getCartSessionId } from '@/utils/cartSync';
 
 import AddressForm, { AddressFields, validateAddress } from '../components/AddressForm';
-import PaymentForm from '../components/PaymentForm';
-import { ChevronDown, ChevronUp, X } from 'lucide-react';
 import OrderConfirmation from '../components/OrderConfirmation';
+import PaymentForm from '../components/PaymentForm';
 
 type StepId = 'contact' | 'shipping' | 'payment' | 'confirm';
 
@@ -301,19 +301,19 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
 
   return (
     <motion.div
-      className="relative h-full w-full bg-white flex flex-col pt-[48px] pb-3"
+      className="relative h-full w-full bg-gray-900 flex flex-col pt-[48px] pb-3"
       animate={controls}
       initial={{ x: 0, opacity: 1 }}
     >
       {/* Safe-area fillers to match header/footer color */}
-      <div className="pointer-events-none absolute top-0 inset-x-0 h-safe-top bg-white" />
-      <div className="pointer-events-none absolute bottom-0 inset-x-0 h-safe-bottom bg-white" />
+      <div className="pointer-events-none absolute top-0 inset-x-0 h-safe-top bg-gray-900" />
+      <div className="pointer-events-none absolute bottom-0 inset-x-0 h-safe-bottom bg-gray-900" />
       {/* Header */}
-      <div className="bg-white px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+      <div className="bg-gray-900 px-4 py-3 border-b border-gray-700 flex items-center justify-between">
         {step !== 'contact' && step !== 'confirm' ? (
           <motion.button
             onClick={handleBack}
-            className="p-2 rounded-full hover:bg-gray-100 text-gray-600"
+            className="p-2 rounded-full hover:bg-gray-800 text-gray-400"
             aria-label="Back"
             whileTap={{ scale: 0.95 }}
           >
@@ -323,15 +323,15 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
           <div className="w-9" />
         )}
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Checkout</h2>
-          <p className="text-xs text-gray-500">
+          <h2 className="text-lg font-semibold text-gray-100">Checkout</h2>
+          <p className="text-xs text-gray-400">
             Step {step === 'contact' ? '1' : step === 'shipping' ? '2' : step === 'payment' ? '3' : '4'} of 4
           </p>
         </div>
         {step === 'contact' ? (
           <motion.button
             onClick={handleBack}
-            className="p-2 rounded-full hover:bg-gray-100 text-gray-600"
+            className="p-2 rounded-full hover:bg-gray-800 text-gray-400"
             aria-label="Close checkout"
             whileTap={{ scale: 0.95 }}
           >
@@ -344,33 +344,33 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
 
       {/* Summary Dropdown */}
       {cartSummary && (
-        <div className="bg-white border-b border-gray-200">
+        <div className="bg-gray-900 border-b border-gray-700">
           <button
             className="w-full flex items-center justify-between px-4 py-3 text-sm"
             onClick={() => setShowSummary((s) => !s)}
             
           >
-            <span className="text-gray-700 font-medium">Order summary</span>
-            {showSummary ? <ChevronUp className="h-4 w-4 text-gray-500" /> : <ChevronDown className="h-4 w-4 text-gray-500" />}
+            <span className="text-gray-300 font-medium">Order summary</span>
+            {showSummary ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
           </button>
           {showSummary && (
             <div className="px-4 pb-3 space-y-2">
               {cartSummary.items.slice(0, 3).map((it, idx) => (
-                <div key={idx} className="flex items-center justify-between text-xs text-gray-600">
+                <div key={idx} className="flex items-center justify-between text-xs text-gray-400">
                   <div className="truncate mr-2">
-                    <span className="font-medium text-gray-800">{it.name}</span>
-                    {it.variant && <span className="text-gray-500"> • {it.variant}</span>}
-                    <span className="text-gray-500"> ×{it.qty}</span>
+                    <span className="font-medium text-gray-200">{it.name}</span>
+                    {it.variant && <span className="text-gray-400"> • {it.variant}</span>}
+                    <span className="text-gray-400"> ×{it.qty}</span>
                   </div>
-                  <span className="text-gray-800">${it.price.toFixed(2)}</span>
+                  <span className="text-gray-200">${it.price.toFixed(2)}</span>
                 </div>
               ))}
               {cartSummary.items.length > 3 && (
-                <div className="text-xs text-gray-500">+{cartSummary.items.length - 3} more item(s)</div>
+                <div className="text-xs text-gray-400">+{cartSummary.items.length - 3} more item(s)</div>
               )}
-              <div className="border-t border-gray-200 pt-2 flex items-center justify-between text-sm">
-                <span className="font-semibold text-gray-900">Total</span>
-                <span className="font-semibold text-gray-900">${cartSummary.total.toFixed(2)}</span>
+              <div className="border-t border-gray-700 pt-2 flex items-center justify-between text-sm">
+                <span className="font-semibold text-gray-100">Total</span>
+                <span className="font-semibold text-gray-100">${cartSummary.total.toFixed(2)}</span>
               </div>
             </div>
           )}
@@ -378,7 +378,7 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
       )}
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto culturemade-scrollable p-4 space-y-4 bg-gray-50">
+      <div className="flex-1 overflow-y-auto culturemade-scrollable p-4 space-y-4 bg-gray-800">
         {serverError && (
           <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3">
             {serverError}
@@ -388,15 +388,15 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
         {step === 'contact' && (
           <div className="space-y-4">
             <div>
-              <h3 className="text-sm font-semibold text-gray-900">Contact information</h3>
-              <p className="text-xs text-gray-500 mb-3">We’ll send your receipt and updates to this email</p>
+              <h3 className="text-sm font-semibold text-gray-100">Contact information</h3>
+              <p className="text-xs text-gray-400 mb-3">We'll send your receipt and updates to this email</p>
               <div className="space-y-3">
                 <div>
-                  <label htmlFor="cm-contact-email" className="block text-xs text-gray-600 mb-1">Email</label>
+                  <label htmlFor="cm-contact-email" className="block text-xs text-gray-300 mb-1">Email</label>
                   <input
                     id="cm-contact-email"
                     type="email"
-                    className="w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 border-gray-300"
+                    className="w-full rounded-lg border px-3 py-2 text-sm bg-gray-700 text-gray-100 border-gray-600"
                     placeholder="you@example.com"
                     value={contactEmail}
                     onChange={(e) => {
@@ -409,11 +409,11 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="cm-contact-name" className="block text-xs text-gray-600 mb-1">Full name (optional)</label>
+                    <label htmlFor="cm-contact-name" className="block text-xs text-gray-300 mb-1">Full name (optional)</label>
                     <input
                       id="cm-contact-name"
                       type="text"
-                      className="w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 border-gray-300"
+                      className="w-full rounded-lg border px-3 py-2 text-sm bg-gray-700 text-gray-100 border-gray-600"
                       placeholder="John Doe"
                       value={contactName}
                       onChange={(e) => setContactName(e.target.value)}
@@ -421,11 +421,11 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
                     />
                   </div>
                   <div>
-                    <label htmlFor="cm-contact-phone" className="block text-xs text-gray-600 mb-1">Phone (optional)</label>
+                    <label htmlFor="cm-contact-phone" className="block text-xs text-gray-300 mb-1">Phone (optional)</label>
                     <input
                       id="cm-contact-phone"
                       type="tel"
-                      className="w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 border-gray-300"
+                      className="w-full rounded-lg border px-3 py-2 text-sm bg-gray-700 text-gray-100 border-gray-600"
                       placeholder="+15551234567"
                       value={contactPhone}
                       onChange={(e) => setContactPhone(e.target.value)}
@@ -441,8 +441,8 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
         {step === 'shipping' && (
           <div className="space-y-6">
             <div>
-              <h3 className="text-sm font-semibold text-gray-900">Shipping address</h3>
-              <p className="text-xs text-gray-500 mb-3">Enter where your order will be shipped</p>
+              <h3 className="text-sm font-semibold text-gray-100">Shipping address</h3>
+              <p className="text-xs text-gray-400 mb-3">Enter where your order will be shipped</p>
               <AddressForm
                 addressType="shipping"
                 value={shipping}
@@ -451,8 +451,8 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
               />
             </div>
 
-            <div className="border rounded-xl p-3">
-              <label className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="border border-gray-600 rounded-xl p-3">
+              <label className="flex items-center gap-2 text-sm text-gray-300">
                 <input
                   type="checkbox"
                   className="h-4 w-4"
@@ -460,14 +460,14 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
                   onChange={(e) => setUseBillingForShipping(e.target.checked)}
                   disabled={isSubmitting}
                 />
-                <span className="text-gray-600">Billing address is the same as shipping</span>
+                <span className="text-gray-300">Billing address is the same as shipping</span>
               </label>
             </div>
 
             {!useBillingForShipping && (
               <div>
-                <h3 className="text-sm font-semibold text-gray-900">Billing address</h3>
-                <p className="text-xs text-gray-500 mb-3">Enter your billing details</p>
+                <h3 className="text-sm font-semibold text-gray-100">Billing address</h3>
+                <p className="text-xs text-gray-400 mb-3">Enter your billing details</p>
                 <AddressForm
                   addressType="billing"
                   value={billing}
@@ -518,17 +518,17 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-200 bg-white flex items-center justify-between gap-3 pb-[calc(env(safe-area-inset-bottom)+12px)] sticky bottom-0">
+      <div className="p-4 border-t border-gray-700 bg-gray-900 flex items-center justify-between gap-3 pb-[calc(env(safe-area-inset-bottom)+12px)] sticky bottom-0">
         {step === 'contact' && (
           <>
             <button
-              className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+              className="px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:bg-gray-800"
               onClick={handleBack}
             >
               Cancel
             </button>
             <button
-              className={`px-4 py-2 rounded-lg text-sm font-semibold text-white ${canContinue ? 'bg-admin-accent hover:bg-admin-accent-hover' : 'bg-gray-400 cursor-not-allowed'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold text-white ${canContinue ? 'bg-admin-accent hover:bg-admin-accent-hover' : 'bg-gray-600 cursor-not-allowed'}`}
               disabled={!canContinue || isSubmitting}
               onClick={() => setStep('shipping')}
             >
@@ -539,7 +539,7 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
 
         {step === 'shipping' && (
           <button
-            className={`px-4 py-2 rounded-lg text-sm font-semibold text-white ${canContinue ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-300 cursor-not-allowed'}`}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold text-white ${canContinue ? 'bg-admin-accent hover:bg-admin-accent-hover' : 'bg-gray-600 cursor-not-allowed'}`}
             disabled={!canContinue || isSubmitting}
             onClick={handleSubmitAddresses}
           >

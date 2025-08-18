@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import { Smartphone, ArrowRight, Shield } from 'lucide-react';
+import Link from 'next/link';
 
 export default function LoginPage() {
   return (

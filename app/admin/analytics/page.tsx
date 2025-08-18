@@ -1,8 +1,8 @@
 import React, { Suspense } from 'react';
 
-import { requireAdmin } from '@/lib/supabase/auth';
 import { AnalyticsDashboard } from '@/components/admin/analytics/AnalyticsDashboard';
 import { AnalyticsLoadingSkeleton } from '@/components/admin/analytics/AnalyticsLoadingSkeleton';
+import { requireAdmin } from '@/lib/supabase/auth';
 
 export default async function AdminAnalytics() {
   await requireAdmin();

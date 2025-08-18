@@ -4,8 +4,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-import { createClient } from '@/lib/supabase/server';
 import { getUser } from '@/lib/supabase/auth';
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * POST /api/analytics/events - Store analytics events

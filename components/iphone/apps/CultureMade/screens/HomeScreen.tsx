@@ -138,8 +138,8 @@ export default function HomeScreen() {
           
           const container = e.currentTarget;
           let isScrolling = false;
-          let startY = e.pageY;
-          let startScrollTop = container.scrollTop;
+          const startY = e.pageY;
+          const startScrollTop = container.scrollTop;
 
           const handleMouseMove = (e: MouseEvent) => {
             if (!isScrolling) return;

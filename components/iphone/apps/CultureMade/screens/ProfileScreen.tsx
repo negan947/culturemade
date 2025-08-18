@@ -15,13 +15,15 @@ import {
   ChevronLeft
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { OrderDetail, OrderHistory, AddressList, PreferencesForm } from '../components';
-import useAuth from '@/hooks/useAuth';
+
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { getCartSessionId, handleCartMigration } from '@/utils/cartSync';
+import useAuth from '@/hooks/useAuth';
 import { createClient } from '@/lib/supabase/client';
+import { getCartSessionId, handleCartMigration } from '@/utils/cartSync';
+
+import { OrderDetail, OrderHistory, AddressList, PreferencesForm } from '../components';
 
 interface MenuItem {
   id: string;

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { sendOrderConfirmationEmail } from '@/lib/services/email';
 import { getStripe } from '@/lib/stripe';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getUser } from '@/lib/supabase/auth';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
-import { sendOrderConfirmationEmail } from '@/lib/services/email';
 import { z } from '@/lib/validations';
 
 type CheckoutSessionItem = {

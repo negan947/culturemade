@@ -11,18 +11,19 @@ import {
 import { useState, useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { useSelector, useDispatch } from 'react-redux';
-import type { AppDispatch } from '@/store/store';
+
 
 import { loadItemCount } from '@/store/cart-slice';
+import type { AppDispatch } from '@/store/store';
 import { store } from '@/store/store';
 import { RootState } from '@/store/store';
 import { getCartSessionId } from '@/utils/cartSync';
 
 import { CartDrawer, CartIcon } from './components';
-import CheckoutScreen from './screens/CheckoutScreen';
 // Import screen components
 import CartScreen from './screens/CartScreen';
 import CategoriesScreen from './screens/CategoriesScreen';
+import CheckoutScreen from './screens/CheckoutScreen';
 import HomeScreen from './screens/HomeScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import SearchScreen from './screens/SearchScreen';
@@ -136,8 +137,8 @@ function CultureMadeInner() {
               
               const container = e.currentTarget;
               let isScrolling = false;
-              let startY = e.pageY;
-              let startScrollTop = container.scrollTop;
+              const startY = e.pageY;
+              const startScrollTop = container.scrollTop;
 
               const handleMouseMove = (e: MouseEvent) => {
                 if (!isScrolling) return;

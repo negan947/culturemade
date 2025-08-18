@@ -62,25 +62,44 @@ const IPhoneShell: FC<Props> = ({ children }) => {
   return (
     <div className='select-none flex justify-center items-center h-screen-dvh sm:h-screen bg-black overflow-hidden pt-safe-top pb-safe-bottom sm:pt-0 sm:pb-0'>
       <motion.div
-        className='relative overflow-hidden bg-black sm:border-[14px] sm:border-black sm:rounded-[60px] sm:shadow-2xl w-full h-full sm:h-[890px] sm:w-[410px]'
+        className='iphone-shell relative overflow-hidden bg-black sm:border-[14px] sm:border-black sm:shadow-2xl w-full h-full sm:h-[890px] sm:w-[410px]'
         style={{
           aspectRatio: '18/39',
+          borderRadius: '60px',
         }}
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Unified Background Layer - Extended for mobile corner coverage */}
+        {/* Base Background Layer */}
         <div
           className='absolute inset-0 w-full h-full'
           style={{
             ...iOSWallpaperStyles,
-            // Ensure background extends beyond any potential gaps on mobile
-            backgroundSize: 'cover',
+            backgroundSize: '102%', // Slightly larger to cover corners
             backgroundPosition: 'center center',
             backgroundRepeat: 'no-repeat',
-            minHeight: '100%',
-            minWidth: '100%'
+          }}
+        />
+        
+        {/* Extended background overlay - slightly darker to reduce bleeding
+     contrast */}
+      
+        <div
+          className='absolute w-full h-full'
+          style={{
+            backgroundImage: "url('/images/wallpaper-cm.jpg')",
+            backgroundSize: '104%', // Even larger to cover bleeding better
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat',
+            borderRadius: '58px',
+            top: '-1px',
+            left: '-1px',
+            width: 'calc(100% + 3px)',
+           height: 'calc(100% + 1px)',
+            // Subtle darkening overlay to reduce white bleeding contrast
+           backgroundBlendMode: 'multiply',
+          backgroundColor: 'rgba(245, 245, 245, 0.98)', // Very slight gray
           }}
         />
 

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { z } from '@/lib/validations';
 import { getUser } from '@/lib/supabase/auth';
 import { createClient } from '@/lib/supabase/server';
+import { z } from '@/lib/validations';
 
 const profileUpdateSchema = z.object({
   full_name: z.string().trim().min(1).max(100).optional(),

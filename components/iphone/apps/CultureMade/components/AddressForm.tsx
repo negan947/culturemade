@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ALL_COUNTRY_CODES, buildCountryNameMaps } from '@/lib/utils/countries';
 
+import { ALL_COUNTRY_CODES, buildCountryNameMaps } from '@/lib/utils/countries';
 import { z } from '@/lib/validations';
 
 export type AddressType = 'billing' | 'shipping';
@@ -266,7 +266,7 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
     <div ref={rootRef} className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label htmlFor={`${addressType}-given-name`} className="block text-xs text-gray-600 mb-1">First name</label>
+          <label htmlFor={`${addressType}-given-name`} className="block text-xs text-gray-300 mb-1">First name</label>
           <input
             className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('first_name') ? 'border-red-500' : 'border-gray-300'}`}
             value={value.first_name}
@@ -280,10 +280,10 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
             autoCapitalize="words"
             spellCheck={false}
           />
-          {getError('first_name') && <p className="mt-1 text-xs text-red-600">{getError('first_name')}</p>}
+          {getError('first_name') && <p className="mt-1 text-xs text-red-400">{getError('first_name')}</p>}
         </div>
         <div>
-          <label htmlFor={`${addressType}-family-name`} className="block text-xs text-gray-600 mb-1">Last name</label>
+          <label htmlFor={`${addressType}-family-name`} className="block text-xs text-gray-300 mb-1">Last name</label>
           <input
             className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('last_name') ? 'border-red-500' : 'border-gray-300'}`}
             value={value.last_name}
@@ -297,12 +297,12 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
             autoCapitalize="words"
             spellCheck={false}
           />
-          {getError('last_name') && <p className="mt-1 text-xs text-red-600">{getError('last_name')}</p>}
+          {getError('last_name') && <p className="mt-1 text-xs text-red-400">{getError('last_name')}</p>}
         </div>
       </div>
 
       <div>
-        <label htmlFor={`${addressType}-organization`} className="block text-xs text-gray-600 mb-1">Company (optional)</label>
+        <label htmlFor={`${addressType}-organization`} className="block text-xs text-gray-300 mb-1">Company (optional)</label>
         <input
           className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('company') ? 'border-red-500' : 'border-gray-300'}`}
           value={value.company ?? ''}
@@ -315,11 +315,11 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
           autoComplete={`${sectionToken} ${addressType} organization`}
           spellCheck={false}
         />
-        {getError('company') && <p className="mt-1 text-xs text-red-600">{getError('company')}</p>}
+        {getError('company') && <p className="mt-1 text-xs text-red-400">{getError('company')}</p>}
       </div>
 
       <div>
-        <label htmlFor={`${addressType}-address-line1`} className="block text-xs text-gray-600 mb-1">Address line 1</label>
+        <label htmlFor={`${addressType}-address-line1`} className="block text-xs text-gray-300 mb-1">Address line 1</label>
         <input
           className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('address_line_1') ? 'border-red-500' : 'border-gray-300'}`}
           value={value.address_line_1}
@@ -332,11 +332,11 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
           autoComplete={`${sectionToken} ${addressType} address-line1`}
           spellCheck={false}
         />
-        {getError('address_line_1') && <p className="mt-1 text-xs text-red-600">{getError('address_line_1')}</p>}
+        {getError('address_line_1') && <p className="mt-1 text-xs text-red-400">{getError('address_line_1')}</p>}
       </div>
 
       <div>
-        <label htmlFor={`${addressType}-address-line2`} className="block text-xs text-gray-600 mb-1">Address line 2 (optional)</label>
+        <label htmlFor={`${addressType}-address-line2`} className="block text-xs text-gray-300 mb-1">Address line 2 (optional)</label>
         <input
           className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('address_line_2') ? 'border-red-500' : 'border-gray-300'}`}
           value={value.address_line_2 ?? ''}
@@ -349,12 +349,12 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
           autoComplete={`${sectionToken} ${addressType} address-line2`}
           spellCheck={false}
         />
-        {getError('address_line_2') && <p className="mt-1 text-xs text-red-600">{getError('address_line_2')}</p>}
+        {getError('address_line_2') && <p className="mt-1 text-xs text-red-400">{getError('address_line_2')}</p>}
       </div>
 
       <div className="grid grid-cols-3 gap-3">
         <div className="col-span-2">
-          <label htmlFor={`${addressType}-address-level2`} className="block text-xs text-gray-600 mb-1">City</label>
+          <label htmlFor={`${addressType}-address-level2`} className="block text-xs text-gray-300 mb-1">City</label>
           <input
             className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('city') ? 'border-red-500' : 'border-gray-300'}`}
             value={value.city}
@@ -367,10 +367,10 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
             autoComplete={`${sectionToken} ${addressType} address-level2`}
             spellCheck={false}
           />
-          {getError('city') && <p className="mt-1 text-xs text-red-600">{getError('city')}</p>}
+          {getError('city') && <p className="mt-1 text-xs text-red-400">{getError('city')}</p>}
         </div>
         <div>
-          <label htmlFor={`${addressType}-address-level1`} className="block text-xs text-gray-600 mb-1">State/Province</label>
+          <label htmlFor={`${addressType}-address-level1`} className="block text-xs text-gray-300 mb-1">State/Province</label>
           <input
             className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('state_province') ? 'border-red-500' : 'border-gray-300'}`}
             value={value.state_province}
@@ -383,13 +383,13 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
             autoComplete={`${sectionToken} ${addressType} address-level1`}
             spellCheck={false}
           />
-          {getError('state_province') && <p className="mt-1 text-xs text-red-600">{getError('state_province')}</p>}
+          {getError('state_province') && <p className="mt-1 text-xs text-red-400">{getError('state_province')}</p>}
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
         <div>
-          <label htmlFor={`${addressType}-postal-code`} className="block text-xs text-gray-600 mb-1">Postal code</label>
+          <label htmlFor={`${addressType}-postal-code`} className="block text-xs text-gray-300 mb-1">Postal code</label>
           <input
             className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('postal_code') ? 'border-red-500' : 'border-gray-300'}`}
             value={value.postal_code}
@@ -403,10 +403,10 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
             inputMode={postalInputMode as any}
             spellCheck={false}
           />
-          {getError('postal_code') && <p className="mt-1 text-xs text-red-600">{getError('postal_code')}</p>}
+          {getError('postal_code') && <p className="mt-1 text-xs text-red-400">{getError('postal_code')}</p>}
         </div>
         <div className="col-span-2">
-          <label htmlFor={`${addressType}-country`} className="block text-xs text-gray-600 mb-1">Country</label>
+          <label htmlFor={`${addressType}-country`} className="block text-xs text-gray-300 mb-1">Country</label>
           {/* Hidden ISO code input to allow Chrome to autofill the 2-letter country code */}
           <input
             type="text"
@@ -469,12 +469,12 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
               return <option key={code} value={name} />;
             })}
           </datalist>
-          {getError('country_code') && <p className="mt-1 text-xs text-red-600">{getError('country_code')}</p>}
+          {getError('country_code') && <p className="mt-1 text-xs text-red-400">{getError('country_code')}</p>}
         </div>
       </div>
 
       <div>
-        <label htmlFor={`${addressType}-tel`} className="block text-xs text-gray-600 mb-1">Phone (optional)</label>
+        <label htmlFor={`${addressType}-tel`} className="block text-xs text-gray-300 mb-1">Phone (optional)</label>
         <input
           className={`w-full rounded-lg border px-3 py-2 text-sm bg-white text-gray-900 placeholder:text-gray-400 dark:bg-gray-900 dark:text-gray-100 ${getError('phone') ? 'border-red-500' : 'border-gray-300'}`}
           value={value.phone ?? ''}
@@ -487,7 +487,7 @@ export default function AddressForm({ addressType, value, onChange, disabled }: 
           autoComplete={`${sectionToken} ${addressType} tel`}
           inputMode="tel"
         />
-        {getError('phone') && <p className="mt-1 text-xs text-red-600">{getError('phone')}</p>}
+        {getError('phone') && <p className="mt-1 text-xs text-red-400">{getError('phone')}</p>}
       </div>
     </div>
   );

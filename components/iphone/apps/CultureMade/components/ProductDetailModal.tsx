@@ -125,18 +125,18 @@ const ProductDetailModal = ({
               stiffness: 400,
               duration: 0.4 
             }}
-            className="relative w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-hidden shadow-2xl"
+            className="relative w-full max-w-lg bg-admin-bg-surface rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-100 p-4">
+            <div className="sticky top-0 z-10 bg-admin-bg-surface/90 backdrop-blur-sm border-b border-admin-border p-4">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <h2 className="text-lg font-semibold text-gray-900 truncate">
+                  <h2 className="text-lg font-semibold text-admin-text-primary truncate">
                     {product.name}
                   </h2>
                   {product.categories && product.categories.length > 0 && (
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-admin-text-secondary">
                       {product.categories[0]?.name}
                     </p>
                   )}
@@ -144,7 +144,7 @@ const ProductDetailModal = ({
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   onClick={onClose}
-                  className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 text-admin-text-secondary hover:text-admin-text-primary hover:bg-admin-bg-hover rounded-full transition-colors"
                   aria-label="Close modal"
                 >
                   <X className="h-6 w-6" />
@@ -173,7 +173,7 @@ const ProductDetailModal = ({
                 />
 
                 {/* Add to Cart Button */}
-                <div className="sticky bottom-0 bg-white pt-4 border-t border-gray-100">
+                <div className="sticky bottom-0 bg-admin-bg-surface pt-4 border-t border-admin-border">
                   <motion.button
                     whileTap={{ scale: 0.98 }}
                     onClick={handleAddToCartClick}
@@ -184,8 +184,8 @@ const ProductDetailModal = ({
                       ${addToCartSuccess
                         ? 'bg-green-500 text-white'
                         : inventoryStatus?.isAvailable
-                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        ? 'bg-admin-accent text-white hover:bg-admin-accent-hover'
+                        : 'bg-admin-text-disabled text-admin-text-secondary cursor-not-allowed'
                       }
                     `}
                   >
@@ -207,7 +207,7 @@ const ProductDetailModal = ({
                   </motion.button>
 
                   {inventoryStatus?.stockLevel && (
-                    <p className="text-center text-sm text-gray-600 mt-2">
+                    <p className="text-center text-sm text-admin-text-secondary mt-2">
                       {getStockLevelText(inventoryStatus)}
                     </p>
                   )}

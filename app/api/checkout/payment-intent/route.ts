@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getStripe, toStripeAmountCents } from '@/lib/stripe';
 import { getUser } from '@/lib/supabase/auth';
 import { createClient } from '@/lib/supabase/server';
-import { getStripe, toStripeAmountCents } from '@/lib/stripe';
 import { z } from '@/lib/validations';
 
 // Input: either checkoutSessionId (preferred) or sessionId for guest carts

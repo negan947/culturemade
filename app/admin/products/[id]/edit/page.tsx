@@ -6,9 +6,9 @@ import { useRouter } from 'next/navigation';
 import { useState, useEffect, use } from 'react';
 import { toast } from 'sonner';
 
+import ProductPlaceholder from '@/components/ui/ProductPlaceholder';
 import { createClient } from '@/lib/supabase/client';
 import { getProductImageWithFallback } from '@/lib/utils/image-utils';
-import ProductPlaceholder from '@/components/ui/ProductPlaceholder';
 
 interface Product {
   id: string;

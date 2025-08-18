@@ -10,14 +10,14 @@ import {
   ArrowUp,
   ArrowDown
 } from 'lucide-react';
-import Link from 'next/link';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
+import ProductPlaceholder from '@/components/ui/ProductPlaceholder';
 import { createClient } from '@/lib/supabase/client';
 import { getProductImageWithFallback } from '@/lib/utils/image-utils';
-import ProductPlaceholder from '@/components/ui/ProductPlaceholder';
 
 
 interface Product {
