@@ -126,7 +126,7 @@ export default function ProfileScreen() {
     return (
       <div className="h-full bg-gray-900 relative">
         {/* Header */}
-        <div className="bg-gray-800 px-4 py-3 border-b border-gray-700">
+        <div className="bg-gray-900 px-4 py-3 border-b border-gray-700">
           <h1 className="text-2xl font-bold text-white">Profile</h1>
         </div>
 
@@ -163,7 +163,7 @@ export default function ProfileScreen() {
         {/* Inline Auth Overlay */}
         {authView !== 'none' && (
           <div className="absolute inset-0 z-40 bg-gray-900">
-            <div className="bg-gray-800 px-4 py-3 border-b border-gray-700 flex items-center space-x-2">
+            <div className="bg-gray-900 px-4 py-3 border-b border-gray-700 flex items-center space-x-2">
               <button
                 className="p-2 -ml-2 rounded hover:bg-gray-700 active:bg-gray-600"
                 onClick={() => {
@@ -376,8 +376,8 @@ export default function ProfileScreen() {
   return (
     <div className="h-full bg-gray-900">
       {/* Header */}
-      <div className="bg-gray-800 px-4 py-3 border-b border-gray-700">
-        <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
+      <div className="bg-gray-900 px-4 py-3 border-b border-gray-700">
+        <h1 className="text-2xl font-bold text-white">Profile</h1>
       </div>
 
       <div className="flex-1 overflow-y-auto culturemade-scrollable">
@@ -423,7 +423,7 @@ export default function ProfileScreen() {
 
         {/* Account Section */}
         <div className="px-4 py-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Account</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">Account</h3>
           <div className="space-y-2">
             {accountMenuItems.map((item, index) => (
               <motion.button
@@ -455,7 +455,7 @@ export default function ProfileScreen() {
 
         {/* Settings Section */}
         <div className="px-4 pb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Settings</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">Settings</h3>
           <div className="space-y-2">
             {settingsMenuItems.map((item, index) => (
               <motion.button

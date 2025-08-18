@@ -65,7 +65,7 @@ export default function CartScreen() {
   if (isLoading) {
     return (
       <div className="h-full bg-gray-900">
-        <div className="bg-gray-800 px-4 py-3 border-b border-gray-700">
+        <div className="bg-gray-900 px-4 py-3 border-b border-gray-700">
           <h1 className="text-2xl font-bold text-white">Shopping Cart</h1>
         </div>
         <div className="flex-1 flex items-center justify-center">
@@ -79,7 +79,7 @@ export default function CartScreen() {
   if (error) {
     return (
       <div className="h-full bg-gray-900">
-        <div className="bg-gray-800 px-4 py-3 border-b border-gray-700">
+        <div className="bg-gray-900 px-4 py-3 border-b border-gray-700">
           <h1 className="text-2xl font-bold text-white">Shopping Cart</h1>
         </div>
         <div className="flex-1 flex items-center justify-center px-4">
@@ -105,7 +105,7 @@ export default function CartScreen() {
     return (
       <div className="h-full bg-gray-900">
         {/* Header */}
-        <div className="bg-gray-800 px-4 py-3 border-b border-gray-700">
+        <div className="bg-gray-900 px-4 py-3 border-b border-gray-700">
           <h1 className="text-2xl font-bold text-white">Shopping Cart</h1>
         </div>
 
@@ -134,10 +134,10 @@ export default function CartScreen() {
   return (
     <div className="h-full bg-gray-900 flex flex-col">
       {/* Header */}
-      <div className="bg-white px-4 py-3 border-b border-gray-200">
+      <div className="bg-gray-900 px-4 py-3 border-b border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Cart Management</h1>
+            <h1 className="text-2xl font-bold text-white">Shopping Cart</h1>
             <p className="text-sm text-gray-400">Review and edit your items</p>
           </div>
           <div className="flex items-center space-x-2">

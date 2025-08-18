@@ -139,7 +139,7 @@ export default function SearchScreen() {
   return (
     <div className="h-full bg-gray-900 flex flex-col">
       {/* Search Header */}
-      <div className="bg-gray-800 px-4 py-3 border-b border-gray-700">
+      <div className="bg-gray-900 px-4 py-3 border-b border-gray-700">
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-2xl font-bold text-white">Search</h1>
           {hasSearched && (

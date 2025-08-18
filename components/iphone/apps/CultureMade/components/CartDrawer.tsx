@@ -38,11 +38,44 @@ export function CartDrawer({ isOpen, onClose, userId, onCheckout }: CartDrawerPr
 
   const [removingItem, setRemovingItem] = useState<string | null>(null);
 
-  // Refresh cart when drawer opens
+  // Refresh cart when drawer opens and prevent body scroll
   useEffect(() => {
     if (isOpen) {
       refreshCart();
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = 'hidden';
+      
+      // Prevent scroll wheel and keyboard scrolling
+      const preventScroll = (e: WheelEvent | KeyboardEvent) => {
+        if (e instanceof KeyboardEvent) {
+          // Prevent arrow keys, page up/down, space, home, end
+          if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', ' ', 'Home', 'End'].includes(e.key)) {
+            e.preventDefault();
+          }
+        } else {
+          // Prevent scroll wheel
+          e.preventDefault();
+        }
+      };
+
+      // Add event listeners
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('keydown', preventScroll, { passive: false });
+
+      return () => {
+        // Cleanup event listeners
+        window.removeEventListener('wheel', preventScroll);
+        window.removeEventListener('keydown', preventScroll);
+      };
+    } else {
+      // Restore body scroll when modal closes
+      document.body.style.overflow = 'unset';
     }
+
+    // Cleanup function to restore scroll on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [isOpen, refreshCart]);
 
   const handleQuantityUpdate = async (cartItemId: string, newQuantity: number) => {
@@ -98,17 +131,17 @@ export function CartDrawer({ isOpen, onClose, userId, onCheckout }: CartDrawerPr
               stiffness: 400,
               duration: 0.4
             }}
-            className="absolute bottom-0 left-0 right-0 bg-white z-50 max-h-[80vh] rounded-t-3xl shadow-2xl overflow-hidden"
+            className="absolute bottom-0 left-0 right-0 bg-admin-bg-surface z-50 max-h-[80vh] rounded-t-3xl shadow-admin-popover overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+            <div className="flex items-center justify-between p-4 border-b border-admin-border">
               <div className="flex items-center space-x-2">
-                <ShoppingBag className="h-6 w-6 text-blue-600" />
-                <h2 className="text-lg font-semibold text-gray-900">
+                <ShoppingBag className="h-6 w-6 text-admin-accent" />
+                <h2 className="text-lg font-semibold text-admin-text-primary">
                   Shopping Cart
                 </h2>
                 {!isEmpty && (
-                  <span className="bg-blue-100 text-blue-800 text-sm font-medium px-2 py-1 rounded-full">
+                  <span className="bg-admin-accent/10 text-admin-accent text-sm font-medium px-2 py-1 rounded-full">
                     {summary?.itemCount || 0}
                   </span>
                 )}
@@ -118,7 +151,7 @@ export function CartDrawer({ isOpen, onClose, userId, onCheckout }: CartDrawerPr
                 {!isEmpty && (
                   <button
                     onClick={handleClearCart}
-                    className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                    className="p-2 text-admin-text-secondary hover:text-admin-error hover:bg-admin-error/10 rounded-full transition-colors"
                     aria-label="Clear cart"
                   >
                     <Trash2 className="h-5 w-5" />
@@ -126,7 +159,7 @@ export function CartDrawer({ isOpen, onClose, userId, onCheckout }: CartDrawerPr
                 )}
                 <button
                   onClick={onClose}
-                  className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 text-admin-text-secondary hover:text-admin-text-primary hover:bg-admin-bg-hover rounded-full transition-colors"
                   aria-label="Close cart"
                 >
                   <X className="h-6 w-6" />
@@ -142,12 +175,12 @@ export function CartDrawer({ isOpen, onClose, userId, onCheckout }: CartDrawerPr
                 </div>
               ) : error ? (
                 <div className="flex-1 flex flex-col items-center justify-center py-12 px-4">
-                  <div className="text-red-600 text-center">
+                  <div className="text-admin-error text-center">
                     <p className="font-medium">Failed to load cart</p>
-                    <p className="text-sm text-gray-600 mt-1">{error}</p>
+                    <p className="text-sm text-admin-text-secondary mt-1">{error}</p>
                     <button
                       onClick={refreshCart}
-                      className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                      className="mt-3 px-4 py-2 bg-admin-accent text-white rounded-lg text-sm hover:bg-admin-accent-hover transition-colors"
                     >
                       Try Again
                     </button>
@@ -155,14 +188,14 @@ export function CartDrawer({ isOpen, onClose, userId, onCheckout }: CartDrawerPr
                 </div>
               ) : isEmpty ? (
                 <div className="flex-1 flex flex-col items-center justify-center py-12 px-4">
-                  <ShoppingBag className="h-16 w-16 text-gray-300 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Your cart is empty</h3>
-                  <p className="text-gray-600 text-center mb-6">
+                  <ShoppingBag className="h-16 w-16 text-admin-text-disabled mb-4" />
+                  <h3 className="text-lg font-medium text-admin-text-primary mb-2">Your cart is empty</h3>
+                  <p className="text-admin-text-secondary text-center mb-6">
                     Add some items to get started shopping
                   </p>
                   <button
                     onClick={onClose}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                    className="px-6 py-3 bg-admin-accent text-white rounded-lg font-medium hover:bg-admin-accent-hover transition-colors"
                   >
                     Continue Shopping
                   </button>
@@ -199,26 +232,26 @@ export function CartDrawer({ isOpen, onClose, userId, onCheckout }: CartDrawerPr
 
                   {/* Cart Summary & Checkout */}
                   {summary && (
-                    <div className="border-t border-gray-200 p-4 bg-white">
+                    <div className="border-t border-admin-border p-4 bg-admin-bg-surface">
                       {/* Summary Details */}
                       <div className="space-y-2 mb-4">
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Subtotal</span>
+                          <span className="text-admin-text-secondary">Subtotal</span>
                           <span className="font-medium">{formatPrice(summary.subtotal)}</span>
                         </div>
                         
                         {summary.tax > 0 && (
                           <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Tax</span>
+                            <span className="text-admin-text-secondary">Tax</span>
                             <span className="font-medium">{formatPrice(summary.tax)}</span>
                           </div>
                         )}
                         
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">
+                          <span className="text-admin-text-secondary">
                             Shipping
                             {summary.shipping === 0 && (
-                              <span className="text-green-600 ml-1">(Free)</span>
+                              <span className="text-admin-success ml-1">(Free)</span>
                             )}
                           </span>
                           <span className="font-medium">
@@ -226,10 +259,10 @@ export function CartDrawer({ isOpen, onClose, userId, onCheckout }: CartDrawerPr
                           </span>
                         </div>
                         
-                        <div className="border-t border-gray-200 pt-2">
+                        <div className="border-t border-admin-border pt-2">
                           <div className="flex justify-between">
-                            <span className="font-semibold text-gray-900">Total</span>
-                            <span className="font-bold text-lg text-blue-600">
+                            <span className="font-semibold text-admin-text-primary">Total</span>
+                            <span className="font-bold text-lg text-admin-accent">
                               {formatPrice(summary.total)}
                             </span>
                           </div>
@@ -238,7 +271,7 @@ export function CartDrawer({ isOpen, onClose, userId, onCheckout }: CartDrawerPr
 
                       {/* Checkout - Primary Action */}
                       <button
-                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-4 rounded-xl font-bold text-lg shadow-lg hover:from-blue-700 hover:to-blue-800 active:scale-98 transition-all duration-200"
+                        className="w-full bg-gradient-to-r from-admin-accent to-admin-accent-hover text-white py-4 px-4 rounded-xl font-bold text-lg shadow-admin-soft hover:from-admin-accent-hover hover:to-admin-accent-subtle active:scale-98 transition-all duration-200"
                         onClick={onCheckout}
                       >
                         Checkout • {formatPrice(summary.total)}
@@ -247,7 +280,7 @@ export function CartDrawer({ isOpen, onClose, userId, onCheckout }: CartDrawerPr
                       {/* Continue Shopping */}
                       <button
                         onClick={onClose}
-                        className="w-full mt-3 text-gray-600 py-2.5 px-4 font-medium hover:bg-gray-50 rounded-lg transition-colors text-sm"
+                        className="w-full mt-3 text-admin-text-secondary py-2.5 px-4 font-medium hover:bg-admin-bg-hover rounded-lg transition-colors text-sm"
                       >
                         Continue Shopping
                       </button>

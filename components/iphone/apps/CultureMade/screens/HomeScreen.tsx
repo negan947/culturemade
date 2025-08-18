@@ -122,7 +122,7 @@ export default function HomeScreen() {
   return (
     <div className="h-full bg-gray-900 flex flex-col">
       {/* Header */}
-      <div className="bg-gray-800 px-4 py-3 border-b border-gray-700 flex-shrink-0">
+      <div className="bg-gray-900 px-4 py-3 border-b border-gray-700 flex-shrink-0">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-white">CultureMade</h1>
           <div className="w-8 h-8 bg-gray-600 rounded-full"></div>

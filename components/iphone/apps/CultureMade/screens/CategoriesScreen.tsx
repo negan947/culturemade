@@ -67,7 +67,7 @@ export default function CategoriesScreen() {
   return (
     <div className="h-full bg-gray-900">
       {/* Header */}
-      <div className="bg-gray-800 px-4 py-3 border-b border-gray-700">
+      <div className="bg-gray-900 px-4 py-3 border-b border-gray-700">
         <h1 className="text-2xl font-bold text-white">Categories</h1>
         <p className="text-gray-400 text-sm mt-1">Browse by category</p>
       </div>
