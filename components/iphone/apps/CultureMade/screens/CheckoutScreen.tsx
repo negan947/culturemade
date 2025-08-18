@@ -378,7 +378,7 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
       )}
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+      <div className="flex-1 overflow-y-auto culturemade-scrollable p-4 space-y-4 bg-gray-50">
         {serverError && (
           <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3">
             {serverError}

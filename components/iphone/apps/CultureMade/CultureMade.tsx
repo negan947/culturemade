@@ -116,7 +116,7 @@ function CultureMadeInner() {
   };
 
   return (
-    <div className="h-full w-full bg-white flex flex-col">
+    <div className="h-full w-full bg-gray-900 flex flex-col">
       {/* Main Content Area - Fixed for scrolling */}
       <div className="flex-1 overflow-hidden pt-12">
         <AnimatePresence mode="wait">
@@ -129,7 +129,7 @@ function CultureMadeInner() {
               duration: 0.3, 
               ease: [0.25, 0.46, 0.45, 0.94] // iOS-style easing
             }}
-            className="h-full overflow-y-auto scrollable drag-scroll-container"
+            className="h-full overflow-y-auto scrollable culturemade-scrollable drag-scroll-container"
             onMouseDown={(e) => {
               // Only enable drag scrolling on desktop (non-touch devices)
               if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
@@ -169,7 +169,7 @@ function CultureMadeInner() {
       </div>
 
       {/* Bottom Tab Navigation */}
-      <div className="bg-white border-t border-gray-200">
+      <div className="bg-gray-800 border-t border-gray-700">
         <div className="flex justify-around items-center px-2 py-1">
           {tabs.map((tab) => {
             // Cart tab is never "active" since it only opens drawer
@@ -198,8 +198,8 @@ function CultureMadeInner() {
                       className=""
                       iconClassName={`w-6 h-6 transition-colors duration-200 ${
                         isActive 
-                          ? 'text-blue-500' 
-                          : 'text-gray-500'
+                          ? 'text-blue-400' 
+                          : 'text-gray-400'
                       }`}
                       badgeClassName="bg-red-500 text-white"
                       size="md"
@@ -209,8 +209,8 @@ function CultureMadeInner() {
                     <Icon 
                       className={`w-6 h-6 transition-colors duration-200 ${
                         isActive 
-                          ? 'text-blue-500' 
-                          : 'text-gray-500'
+                          ? 'text-blue-400' 
+                          : 'text-gray-400'
                       }`}
                       fill={isActive ? 'currentColor' : 'none'}
                     />
@@ -219,8 +219,8 @@ function CultureMadeInner() {
                 <span 
                   className={`text-xs mt-1 transition-colors duration-200 ${
                     isActive 
-                      ? 'text-blue-500 font-medium' 
-                      : 'text-gray-500'
+                      ? 'text-blue-400 font-medium' 
+                      : 'text-gray-400'
                   }`}
                 >
                   {tab.name}
@@ -244,7 +244,7 @@ function CultureMadeInner() {
 
       {/* Checkout Screen (full-screen inside app) */}
       {showCheckoutScreen && (
-        <div className="absolute inset-0 z-40 bg-white pt-safe-top pb-safe-bottom">
+        <div className="absolute inset-0 z-40 bg-gray-900 pt-safe-top pb-safe-bottom">
           <CheckoutScreen
             onClose={() => setShowCheckoutScreen(false)}
             {...(userId ? { userId } : {})}

@@ -120,18 +120,18 @@ export default function HomeScreen() {
   };
 
   return (
-    <div className="h-full bg-gray-50 flex flex-col">
+    <div className="h-full bg-gray-900 flex flex-col">
       {/* Header */}
-      <div className="bg-white px-4 py-3 border-b border-gray-200 flex-shrink-0">
+      <div className="bg-gray-800 px-4 py-3 border-b border-gray-700 flex-shrink-0">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">CultureMade</h1>
-          <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+          <h1 className="text-2xl font-bold text-white">CultureMade</h1>
+          <div className="w-8 h-8 bg-gray-600 rounded-full"></div>
         </div>
       </div>
 
       {/* Scrollable Content - Hybrid: Native mobile + Drag desktop */}
       <div 
-        className="flex-1 overflow-y-auto overscroll-contain scrollable drag-scroll-container"
+        className="flex-1 overflow-y-auto overscroll-contain scrollable culturemade-scrollable drag-scroll-container"
         onMouseDown={(e) => {
           // Only enable drag scrolling on desktop (non-touch devices)
           if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
@@ -181,7 +181,7 @@ export default function HomeScreen() {
 
         {/* Quick Actions */}
         <div className="px-4 py-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Shop by Category</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">Shop by Category</h3>
           <div className="grid grid-cols-2 gap-3">
             {[
               { icon: Sparkles, label: "New Arrivals", color: "bg-pink-100 text-pink-600" },
@@ -194,12 +194,12 @@ export default function HomeScreen() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="bg-white rounded-lg p-4 shadow-sm border border-gray-200"
+                className="bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-700"
               >
                 <div className={`w-10 h-10 rounded-lg ${item.color} flex items-center justify-center mb-3`}>
                   <item.icon className="w-5 h-5" />
                 </div>
-                <h4 className="font-medium text-gray-900 text-sm">{item.label}</h4>
+                <h4 className="font-medium text-white text-sm">{item.label}</h4>
               </motion.div>
             ))}
           </div>
@@ -208,19 +208,19 @@ export default function HomeScreen() {
         {/* Featured Products Section */}
         <div className="px-4 pb-8">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Featured Products</h3>
-            <button className="text-blue-600 text-sm font-medium">See All</button>
+            <h3 className="text-lg font-semibold text-white">Featured Products</h3>
+            <button className="text-blue-400 text-sm font-medium">See All</button>
           </div>
           
           {/* Loading State */}
           {loading && (
             <div className="grid grid-cols-2 gap-3">
               {[1, 2, 3, 4].map((item) => (
-                <div key={item} className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 animate-pulse">
-                  <div className="aspect-square bg-gray-200"></div>
+                <div key={item} className="bg-gray-800 rounded-lg overflow-hidden shadow-sm border border-gray-700 animate-pulse">
+                  <div className="aspect-square bg-gray-700"></div>
                   <div className="p-3">
-                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-4 bg-gray-700 rounded mb-2"></div>
+                    <div className="h-3 bg-gray-700 rounded w-1/2"></div>
                   </div>
                 </div>
               ))}
@@ -229,12 +229,12 @@ export default function HomeScreen() {
 
           {/* Error State */}
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-800 text-sm font-medium">Error Loading Products</p>
-              <p className="text-red-700 text-xs mt-1">{error}</p>
+            <div className="bg-red-900/20 border border-red-700 rounded-lg p-4">
+              <p className="text-red-300 text-sm font-medium">Error Loading Products</p>
+              <p className="text-red-400 text-xs mt-1">{error}</p>
               <button 
                 onClick={() => window.location.reload()} 
-                className="text-red-600 text-xs mt-2 underline"
+                className="text-red-400 text-xs mt-2 underline"
               >
                 Try Again
               </button>
@@ -269,7 +269,7 @@ export default function HomeScreen() {
                   // TODO: Implement load more functionality
                   console.log('Load more products');
                 }}
-                className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                className="w-full bg-blue-500 text-white py-3 rounded-lg font-medium hover:bg-blue-600 transition-colors"
               >
                 Load More Products
               </button>
@@ -278,9 +278,9 @@ export default function HomeScreen() {
 
           {/* Empty State */}
           {!loading && !error && products.length === 0 && (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-              <p className="text-gray-500 text-sm">No products available</p>
-              <p className="text-gray-400 text-xs mt-1">Check back later for new arrivals</p>
+            <div className="bg-gray-800 border border-gray-700 rounded-lg p-8 text-center">
+              <p className="text-gray-400 text-sm">No products available</p>
+              <p className="text-gray-500 text-xs mt-1">Check back later for new arrivals</p>
             </div>
           )}
 

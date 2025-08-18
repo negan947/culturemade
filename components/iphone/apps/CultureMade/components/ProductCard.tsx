@@ -107,7 +107,7 @@ const ProductCard = memo(function ProductCard({
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.15, ease: 'easeOut' }}
         onClick={handleClick}
-        className={`bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 cursor-pointer hover:shadow-md transition-all ${
+        className={`bg-gray-800 rounded-lg overflow-hidden shadow-sm border border-gray-700 cursor-pointer hover:shadow-md transition-all ${
           cardClasses.cardClasses
         } ${loading || isProcessing ? 'pointer-events-none opacity-60' : ''} ${className || ''}`}
         role="button"
@@ -161,21 +161,21 @@ const ProductCard = memo(function ProductCard({
 
       {/* Product Details */}
       <div className="p-3" id={`product-${product.id}-details`}>
-        <h3 className="font-medium text-gray-900 text-sm mb-1 line-clamp-2 leading-snug">
+        <h3 className="font-medium text-white text-sm mb-1 line-clamp-2 leading-snug">
           {product.name}
         </h3>
         
         {/* Pricing - Using Advanced Pricing System */}
         <div className="flex items-center gap-2 mb-1" role="group" aria-label="Product pricing">
           <span 
-            className="text-blue-600 font-semibold text-sm"
+            className="text-blue-400 font-semibold text-sm"
             aria-label={`Current price: ${priceText}`}
           >
             {priceText}
           </span>
           {isOnSale && originalPriceText && (
             <span 
-              className="text-gray-400 text-xs line-through"
+              className="text-gray-500 text-xs line-through"
               aria-label={`Original price: ${originalPriceText}`}
             >
               {originalPriceText}
@@ -193,7 +193,7 @@ const ProductCard = memo(function ProductCard({
             {product.categories.slice(0, 2).map((category) => (
               <span
                 key={category.id}
-                className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded"
+                className="text-xs text-gray-300 bg-gray-700 px-2 py-0.5 rounded"
                 role="text"
               >
                 {category.name}
@@ -201,7 +201,7 @@ const ProductCard = memo(function ProductCard({
             ))}
             {product.categories.length > 2 && (
               <span 
-                className="text-xs text-gray-400"
+                className="text-xs text-gray-500"
                 aria-label={`${product.categories.length - 2} more categories`}
               >
                 +{product.categories.length - 2}
@@ -213,7 +213,7 @@ const ProductCard = memo(function ProductCard({
         {/* Inventory Status - Using Advanced Inventory System */}
         {showStockWarning && (
           <div 
-            className="text-xs text-orange-600 mt-1 font-medium"
+            className="text-xs text-orange-400 mt-1 font-medium"
             role="status"
             aria-label={`Inventory status: ${stockText}`}
           >

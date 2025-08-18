@@ -64,12 +64,12 @@ export default function CartScreen() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="h-full bg-gray-50">
-        <div className="bg-white px-4 py-3 border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-gray-900">Shopping Cart</h1>
+      <div className="h-full bg-gray-900">
+        <div className="bg-gray-800 px-4 py-3 border-b border-gray-700">
+          <h1 className="text-2xl font-bold text-white">Shopping Cart</h1>
         </div>
         <div className="flex-1 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
         </div>
       </div>
     );
@@ -78,19 +78,19 @@ export default function CartScreen() {
   // Error state
   if (error) {
     return (
-      <div className="h-full bg-gray-50">
-        <div className="bg-white px-4 py-3 border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-gray-900">Shopping Cart</h1>
+      <div className="h-full bg-gray-900">
+        <div className="bg-gray-800 px-4 py-3 border-b border-gray-700">
+          <h1 className="text-2xl font-bold text-white">Shopping Cart</h1>
         </div>
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="text-center">
-            <div className="text-red-600 mb-4">
+            <div className="text-red-400 mb-4">
               <p className="font-medium">Failed to load cart</p>
-              <p className="text-sm text-gray-600 mt-1">{error}</p>
+              <p className="text-sm text-gray-400 mt-1">{error}</p>
             </div>
             <button
               onClick={refreshCart}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
             >
               Try Again
             </button>
@@ -103,10 +103,10 @@ export default function CartScreen() {
   // Empty cart state
   if (isEmpty) {
     return (
-      <div className="h-full bg-gray-50">
+      <div className="h-full bg-gray-900">
         {/* Header */}
-        <div className="bg-white px-4 py-3 border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-gray-900">Shopping Cart</h1>
+        <div className="bg-gray-800 px-4 py-3 border-b border-gray-700">
+          <h1 className="text-2xl font-bold text-white">Shopping Cart</h1>
         </div>
 
         {/* Empty Cart */}
@@ -116,12 +116,12 @@ export default function CartScreen() {
             animate={{ opacity: 1, scale: 1 }}
             className="text-center"
           >
-            <ShoppingBag className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Your cart is empty</h3>
-            <p className="text-gray-500 mb-6">Add some products to get started</p>
+            <ShoppingBag className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-white mb-2">Your cart is empty</h3>
+            <p className="text-gray-400 mb-6">Add some products to get started</p>
             <motion.button
               whileTap={{ scale: 0.95 }}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium"
+              className="bg-blue-500 text-white px-6 py-3 rounded-lg font-medium"
             >
               Start Shopping
             </motion.button>
@@ -132,22 +132,22 @@ export default function CartScreen() {
   }
 
   return (
-    <div className="h-full bg-gray-50 flex flex-col">
+    <div className="h-full bg-gray-900 flex flex-col">
       {/* Header */}
       <div className="bg-white px-4 py-3 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Cart Management</h1>
-            <p className="text-sm text-gray-500">Review and edit your items</p>
+            <h1 className="text-2xl font-bold text-white">Cart Management</h1>
+            <p className="text-sm text-gray-400">Review and edit your items</p>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="text-gray-500 text-sm">
+            <span className="text-gray-400 text-sm">
               {summary?.itemCount || 0} items
             </span>
             {items.length > 0 && (
               <button
                 onClick={handleClearCart}
-                className="text-sm text-red-600 hover:text-red-700 font-medium"
+                className="text-sm text-red-400 hover:text-red-300 font-medium"
               >
                 Clear All
               </button>
@@ -158,7 +158,7 @@ export default function CartScreen() {
 
       {/* Cart Items - Hybrid: Native mobile + Drag desktop */}
       <div 
-        className="flex-1 overflow-y-auto overscroll-contain scrollable drag-scroll-container"
+        className="flex-1 overflow-y-auto overscroll-contain scrollable culturemade-scrollable drag-scroll-container"
         onMouseDown={(e) => {
           // Only enable drag scrolling on desktop (non-touch devices)
           if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
@@ -215,7 +215,7 @@ export default function CartScreen() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="bg-white rounded-lg shadow-sm border border-gray-200"
+                className="bg-gray-800 rounded-lg shadow-sm border border-gray-700"
               >
                 <CartItem
                   item={cartItemData}
@@ -232,36 +232,36 @@ export default function CartScreen() {
 
       {/* Cart Summary */}
       {summary && (
-        <div className="bg-white border-t border-gray-200 px-4 py-4">
+        <div className="bg-gray-800 border-t border-gray-700 px-4 py-4">
           <div className="space-y-2 mb-4">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Subtotal</span>
-              <span className="text-gray-900">{formatPrice(summary.subtotal)}</span>
+              <span className="text-gray-400">Subtotal</span>
+              <span className="text-white">{formatPrice(summary.subtotal)}</span>
             </div>
             
             {summary.tax > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Tax</span>
-                <span className="text-gray-900">{formatPrice(summary.tax)}</span>
+                <span className="text-gray-400">Tax</span>
+                <span className="text-white">{formatPrice(summary.tax)}</span>
               </div>
             )}
             
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">
+              <span className="text-gray-400">
                 Shipping
                 {summary.shipping === 0 && (
                   <span className="text-green-600 ml-1">(Free)</span>
                 )}
               </span>
-              <span className="text-gray-900">
+              <span className="text-white">
                 {summary.shipping === 0 ? 'Free' : formatPrice(summary.shipping)}
               </span>
             </div>
             
-            <div className="border-t border-gray-200 pt-2">
+            <div className="border-t border-gray-700 pt-2">
               <div className="flex justify-between">
-                <span className="font-semibold text-gray-900">Total</span>
-                <span className="font-semibold text-gray-900 text-lg">
+                <span className="font-semibold text-white">Total</span>
+                <span className="font-semibold text-white text-lg">
                   {formatPrice(summary.total)}
                 </span>
               </div>

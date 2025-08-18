@@ -2,6 +2,7 @@ import { motion, useAnimation } from 'framer-motion';
 import { FC, MouseEvent, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
+import { getApp } from '@/components/iphone/apps/getApp';
 import { interfaceActions } from '@/store/interface-slice';
 
 interface Props {
@@ -56,6 +57,11 @@ const HomeAppShortcut: FC<Props> = ({ appId, icon, name, shouldAnimateUnlock = f
         animate={imgAnimation}
         onClick={() => {
           dispatch(interfaceActions.changeCurrentApp(appId));
+          // Set the status bar color based on the app's configuration
+          const app = getApp(appId);
+          if (app) {
+            dispatch(interfaceActions.changeStatusBarColor(app.statusBarColor));
+          }
         }}
         layoutId={appId}
         onMouseMove={handleMouseMove}
