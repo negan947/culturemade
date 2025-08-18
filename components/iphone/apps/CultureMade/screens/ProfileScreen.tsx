@@ -51,7 +51,7 @@ export default function ProfileScreen() {
       icon: Clock,
       label: 'Order History',
       subtitle: '3 recent orders',
-      color: 'text-blue-600'
+      color: 'text-admin-accent'
     },
     {
       id: 'addresses',
@@ -99,7 +99,7 @@ export default function ProfileScreen() {
       id: 'help',
       icon: HelpCircle,
       label: 'Help & Support',
-      color: 'text-blue-600'
+      color: 'text-admin-accent'
     }
   ];
 
@@ -144,7 +144,7 @@ export default function ProfileScreen() {
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setAuthView('signIn')}
-                className="w-full bg-blue-500 text-white py-3 rounded-lg font-medium"
+                className="w-full bg-admin-accent text-white py-3 rounded-lg font-medium"
               >
                 Sign In
               </motion.button>
@@ -313,7 +313,7 @@ export default function ProfileScreen() {
               <div className="text-center text-sm text-gray-500">
                 {authView === 'signIn' ? (
                   <button
-                    className="text-blue-600 hover:underline"
+                    className="text-admin-accent hover:underline"
                     onClick={() => {
                       setLocalAuthError(null);
                       setAuthView('register');
@@ -323,7 +323,7 @@ export default function ProfileScreen() {
                   </button>
                 ) : (
                   <button
-                    className="text-blue-600 hover:underline"
+                    className="text-admin-accent hover:underline"
                     onClick={() => {
                       setLocalAuthError(null);
                       setAuthView('signIn');
@@ -388,13 +388,13 @@ export default function ProfileScreen() {
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center space-x-4"
           >
-             <div className="w-16 h-16 bg-blue-800 rounded-full flex items-center justify-center">
-              <User className="h-8 w-8 text-blue-400" />
+             <div className="w-16 h-16 bg-admin-accent-subtle rounded-full flex items-center justify-center">
+              <User className="h-8 w-8 text-admin-accent-hover" />
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-semibold text-white">{user?.email || 'Customer'}</h2>
               <p className="text-gray-400">Signed in</p>
-              <p className="text-sm text-blue-400 mt-1">Premium Member</p>
+              <p className="text-sm text-admin-accent-hover mt-1">Premium Member</p>
             </div>
           </motion.div>
         </div>
@@ -403,7 +403,7 @@ export default function ProfileScreen() {
         <div className="bg-gray-800 px-4 py-4 border-b border-gray-700">
           <div className="grid grid-cols-3 gap-4">
             {[
-              { label: 'Orders', value: '12', color: 'text-blue-600' },
+              { label: 'Orders', value: '12', color: 'text-admin-accent' },
               { label: 'Wishlist', value: '5', color: 'text-red-600' },
               { label: 'Points', value: '250', color: 'text-green-600' }
             ].map((stat, index) => (

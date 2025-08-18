@@ -125,7 +125,7 @@ const ProductInfoSection = memo(function ProductInfoSection({
             {product.categories.map((category) => (
               <span
                 key={category.id}
-                className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full"
+                className="inline-flex items-center px-3 py-1 bg-purple-100 text-admin-accent text-sm font-medium rounded-full"
               >
                 {category.name}
               </span>
@@ -142,7 +142,7 @@ const ProductInfoSection = memo(function ProductInfoSection({
             Secure Payment
           </div>
           <div className="flex items-center text-gray-600">
-            <Truck className="w-4 h-4 mr-2 text-blue-500" />
+            <Truck className="w-4 h-4 mr-2 text-admin-accent" />
             Free Shipping
           </div>
           <div className="flex items-center text-gray-600">

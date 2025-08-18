@@ -168,7 +168,7 @@ const ProductCard = memo(function ProductCard({
         {/* Pricing - Using Advanced Pricing System */}
         <div className="flex items-center gap-2 mb-1" role="group" aria-label="Product pricing">
           <span 
-            className="text-blue-400 font-semibold text-sm"
+            className="text-admin-accent font-semibold text-sm"
             aria-label={`Current price: ${priceText}`}
           >
             {priceText}

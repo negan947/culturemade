@@ -209,7 +209,7 @@ export default function HomeScreen() {
         <div className="px-4 pb-8">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-white">Featured Products</h3>
-            <button className="text-blue-400 text-sm font-medium">See All</button>
+            <button className="text-admin-accent-hover text-sm font-medium">See All</button>
           </div>
           
           {/* Loading State */}
@@ -269,7 +269,7 @@ export default function HomeScreen() {
                   // TODO: Implement load more functionality
                   console.log('Load more products');
                 }}
-                className="w-full bg-blue-500 text-white py-3 rounded-lg font-medium hover:bg-blue-600 transition-colors"
+                className="w-full bg-admin-accent text-white py-3 rounded-lg font-medium hover:bg-admin-accent-hover transition-colors"
               >
                 Load More Products
               </button>

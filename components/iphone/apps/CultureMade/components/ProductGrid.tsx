@@ -42,7 +42,7 @@ const ProductGrid = memo(function ProductGrid({
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={onRetry}
-            className="bg-blue-500 text-white px-6 py-2 rounded-lg font-medium text-sm active:bg-blue-600 transition-colors"
+            className="bg-admin-accent text-white px-6 py-2 rounded-lg font-medium text-sm active:bg-admin-accent-hover transition-colors"
           >
             Try Again
           </motion.button>

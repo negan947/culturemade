@@ -171,7 +171,7 @@ export function CartDrawer({ isOpen, onClose, userId, onCheckout }: CartDrawerPr
             <div className="flex flex-col max-h-[calc(80vh-120px)]">
               {isLoading ? (
                 <div className="flex-1 flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-admin-accent"></div>
                 </div>
               ) : error ? (
                 <div className="flex-1 flex flex-col items-center justify-center py-12 px-4">

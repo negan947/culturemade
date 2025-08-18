@@ -201,7 +201,7 @@ function CultureMadeInner() {
                       className=""
                       iconClassName={`w-6 h-6 transition-colors duration-200 ${
                         isActive 
-                          ? 'text-blue-400' 
+                          ? 'text-admin-accent' 
                           : 'text-gray-400'
                       }`}
                       badgeClassName="bg-red-500 text-white"
@@ -212,7 +212,7 @@ function CultureMadeInner() {
                     <Icon 
                       className={`w-6 h-6 transition-colors duration-200 ${
                         isActive 
-                          ? 'text-blue-400' 
+                          ? 'text-admin-accent' 
                           : 'text-gray-400'
                       }`}
                       fill={isActive ? 'currentColor' : 'none'}
@@ -222,7 +222,7 @@ function CultureMadeInner() {
                 <span 
                   className={`text-xs mt-1 transition-colors duration-200 ${
                     isActive 
-                      ? 'text-blue-400 font-medium' 
+                      ? 'text-admin-accent font-medium' 
                       : 'text-gray-400'
                   }`}
                 >

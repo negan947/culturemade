@@ -528,7 +528,7 @@ export default function CheckoutScreen({ onClose, userId }: CheckoutScreenProps)
               Cancel
             </button>
             <button
-              className={`px-4 py-2 rounded-lg text-sm font-semibold text-white ${canContinue ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-300 cursor-not-allowed'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold text-white ${canContinue ? 'bg-admin-accent hover:bg-admin-accent-hover' : 'bg-gray-400 cursor-not-allowed'}`}
               disabled={!canContinue || isSubmitting}
               onClick={() => setStep('shipping')}
             >

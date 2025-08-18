@@ -198,7 +198,7 @@ export default function PaymentForm({ userId, checkoutSessionId, contactEmail, c
       <button
         disabled={isLoading || !clientSecret || isConfirming}
         onClick={handleConfirm}
-        className={`w-full px-4 py-2 rounded-lg text-sm font-semibold text-white ${isLoading || !clientSecret || isConfirming ? 'bg-blue-300' : 'bg-blue-600 hover:bg-blue-700'}`}
+        className={`w-full px-4 py-2 rounded-lg text-sm font-semibold text-white ${isLoading || !clientSecret || isConfirming ? 'bg-gray-400' : 'bg-admin-accent hover:bg-admin-accent-hover'}`}
       >
         {isLoading ? 'Loading payment...' : isConfirming ? 'Processing…' : 'Pay now'}
       </button>

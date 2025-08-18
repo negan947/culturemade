@@ -139,7 +139,7 @@ export default function SearchBar({
       case 'recent':
         return <Clock className="w-4 h-4 text-gray-400" />;
       case 'category':
-        return <Tag className="w-4 h-4 text-blue-500" />;
+        return <Tag className="w-4 h-4 text-admin-accent" />;
       case 'trending':
         return <Flame className="w-4 h-4 text-orange-500" />;
       case 'product':
@@ -177,9 +177,9 @@ export default function SearchBar({
             bg-gray-100 rounded-lg 
             text-gray-900 placeholder-gray-500 
             border-2 border-transparent
-            focus:outline-none focus:border-blue-500 focus:bg-white
+            focus:outline-none focus:border-admin-accent focus:bg-white
             transition-all duration-200 ease-out
-            ${isFocused ? 'bg-white border-blue-500 shadow-sm' : ''}
+            ${isFocused ? 'bg-white border-admin-accent shadow-sm' : ''}
           `}
           animate={{
             scale: isFocused ? 1.02 : 1,
@@ -212,7 +212,7 @@ export default function SearchBar({
               exit={{ opacity: 0 }}
               className="absolute inset-y-0 right-0 flex items-center pr-3"
             >
-              <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
+              <Loader2 className="w-5 h-5 text-admin-accent animate-spin" />
             </motion.div>
           )}
         </AnimatePresence>

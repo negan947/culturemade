@@ -150,7 +150,7 @@ export default function CartItem({
         )}
         
         <div className="flex items-center justify-between mt-1">
-          <span className={`font-semibold text-blue-600 ${currentSize.price}`}>
+          <span className={`font-semibold text-admin-accent ${currentSize.price}`}>
             {formatPrice(item.price)}
           </span>
           <span className={`text-gray-500 ${currentSize.variant}`}>

@@ -172,7 +172,7 @@ export default function AddressList({ onBack }: AddressListProps) {
   return (
     <div className="h-full bg-gray-50">
       <div className="bg-white px-4 py-3 border-b border-gray-200 flex items-center">
-        <button onClick={onBack} className="mr-3 text-blue-600">Back</button>
+        <button onClick={onBack} className="mr-3 text-admin-accent">Back</button>
         <h1 className="text-2xl font-bold text-gray-900">Addresses</h1>
       </div>
 
@@ -181,7 +181,7 @@ export default function AddressList({ onBack }: AddressListProps) {
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={openCreate}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium"
+            className="w-full bg-admin-accent text-white py-3 rounded-lg font-medium"
           >
             Add New Address
           </motion.button>
@@ -292,7 +292,7 @@ export default function AddressList({ onBack }: AddressListProps) {
                 whileTap={{ scale: 0.97 }}
                 onClick={handleSubmit}
                 disabled={!formValid}
-                className={`px-4 py-2 rounded-lg font-medium ${formValid ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
+                className={`px-4 py-2 rounded-lg font-medium ${formValid ? 'bg-admin-accent text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
               >
                 {isEditing ? 'Save Changes' : 'Save Address'}
               </motion.button>

@@ -69,7 +69,7 @@ export default function CartScreen() {
           <h1 className="text-2xl font-bold text-white">Shopping Cart</h1>
         </div>
         <div className="flex-1 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-admin-accent"></div>
         </div>
       </div>
     );
@@ -90,7 +90,7 @@ export default function CartScreen() {
             </div>
             <button
               onClick={refreshCart}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              className="px-4 py-2 bg-admin-accent text-white rounded-lg hover:bg-admin-accent-hover transition-colors"
             >
               Try Again
             </button>
@@ -121,7 +121,7 @@ export default function CartScreen() {
             <p className="text-gray-400 mb-6">Add some products to get started</p>
             <motion.button
               whileTap={{ scale: 0.95 }}
-              className="bg-blue-500 text-white px-6 py-3 rounded-lg font-medium"
+              className="bg-admin-accent text-white px-6 py-3 rounded-lg font-medium"
             >
               Start Shopping
             </motion.button>

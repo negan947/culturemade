@@ -232,7 +232,7 @@ const ProductImageGallery = ({
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={() => retryImage(currentImage.id)}
-              className="flex items-center gap-2 px-3 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium active:bg-blue-600 transition-colors"
+              className="flex items-center gap-2 px-3 py-2 bg-admin-accent text-white rounded-lg text-sm font-medium active:bg-admin-accent-hover transition-colors"
               style={{ minHeight: '44px' }} // iOS touch target
             >
               <RefreshCw className="w-4 h-4" />
@@ -293,7 +293,7 @@ const ProductImageGallery = ({
               onClick={() => goToImage(index)}
               className={`w-2 h-2 rounded-full transition-all duration-200 ${
                 index === currentIndex 
-                  ? 'bg-blue-500 w-6' 
+                  ? 'bg-admin-accent w-6' 
                   : 'bg-gray-300 active:bg-gray-400'
               }`}
               role="tab"

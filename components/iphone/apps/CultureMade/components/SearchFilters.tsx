@@ -239,7 +239,7 @@ export default function SearchFilters({
         <div className="flex items-center">
           <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
           {getActiveFiltersCount() > 0 && (
-            <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-600 text-xs font-medium rounded-full">
+            <span className="ml-2 px-2 py-1 bg-purple-100 text-admin-accent text-xs font-medium rounded-full">
               {getActiveFiltersCount()}
             </span>
           )}
@@ -247,7 +247,7 @@ export default function SearchFilters({
         <div className="flex items-center gap-2">
           <button
             onClick={clearAllFilters}
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+            className="text-sm text-admin-accent hover:text-admin-accent-hover font-medium"
           >
             Clear All
           </button>
@@ -300,17 +300,17 @@ export default function SearchFilters({
                         onClick={() => handleSortChange(option.value as SearchFilters['sort'], option.direction)}
                         className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors ${
                           isSelected 
-                            ? 'bg-blue-50 border border-blue-200' 
+                            ? 'bg-purple-50 border border-purple-200' 
                             : 'bg-gray-50 hover:bg-gray-100'
                         }`}
                       >
                         <div className="flex items-center">
                           <Icon className={`w-4 h-4 mr-3 ${
-                            isSelected ? 'text-blue-600' : 'text-gray-400'
+                            isSelected ? 'text-admin-accent' : 'text-gray-400'
                           }`} />
                           <div className="text-left">
                             <div className={`font-medium ${
-                              isSelected ? 'text-blue-900' : 'text-gray-900'
+                              isSelected ? 'text-admin-accent-subtle' : 'text-gray-900'
                             }`}>
                               {option.label}
                             </div>
@@ -320,7 +320,7 @@ export default function SearchFilters({
                           </div>
                         </div>
                         {isSelected && (
-                          <Check className="w-5 h-5 text-blue-600" />
+                          <Check className="w-5 h-5 text-admin-accent" />
                         )}
                       </button>
                     );
@@ -365,13 +365,13 @@ export default function SearchFilters({
                         onClick={() => handleCategoryChange(category.id)}
                         className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors ${
                           filters.category === category.id
-                            ? 'bg-blue-50 border border-blue-200'
+                            ? 'bg-purple-50 border border-purple-200'
                             : 'bg-gray-50 hover:bg-gray-100'
                         }`}
                       >
                         <div className="flex items-center">
                           <span className={`font-medium ${
-                            filters.category === category.id ? 'text-blue-900' : 'text-gray-900'
+                            filters.category === category.id ? 'text-admin-accent-subtle' : 'text-gray-900'
                           }`}>
                             {category.name}
                           </span>
@@ -382,7 +382,7 @@ export default function SearchFilters({
                           )}
                         </div>
                         {filters.category === category.id && (
-                          <Check className="w-5 h-5 text-blue-600" />
+                          <Check className="w-5 h-5 text-admin-accent" />
                         )}
                       </button>
                     ))}
@@ -428,17 +428,17 @@ export default function SearchFilters({
                         onClick={() => handlePriceRangeChange(range)}
                         className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors ${
                           isPriceRangeSelected(range)
-                            ? 'bg-blue-50 border border-blue-200'
+                            ? 'bg-purple-50 border border-purple-200'
                             : 'bg-gray-50 hover:bg-gray-100'
                         }`}
                       >
                         <span className={`font-medium ${
-                          isPriceRangeSelected(range) ? 'text-blue-900' : 'text-gray-900'
+                          isPriceRangeSelected(range) ? 'text-admin-accent-subtle' : 'text-gray-900'
                         }`}>
                           {range.label}
                         </span>
                         {isPriceRangeSelected(range) && (
-                          <Check className="w-5 h-5 text-blue-600" />
+                          <Check className="w-5 h-5 text-admin-accent" />
                         )}
                       </button>
                     ))}
@@ -507,7 +507,7 @@ export default function SearchFilters({
                       type="checkbox"
                       checked={filters.inStock || false}
                       onChange={(e) => handleAvailabilityChange('inStock', e.target.checked)}
-                      className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      className="w-5 h-5 text-admin-accent border-gray-300 rounded focus:ring-admin-accent"
                     />
                     <span className="ml-3 text-gray-700">In Stock Only</span>
                   </label>
@@ -517,7 +517,7 @@ export default function SearchFilters({
                       type="checkbox"
                       checked={filters.onSale || false}
                       onChange={(e) => handleAvailabilityChange('onSale', e.target.checked)}
-                      className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      className="w-5 h-5 text-admin-accent border-gray-300 rounded focus:ring-admin-accent"
                     />
                     <span className="ml-3 text-gray-700">On Sale</span>
                   </label>
@@ -527,7 +527,7 @@ export default function SearchFilters({
                       type="checkbox"
                       checked={filters.featured || false}
                       onChange={(e) => handleAvailabilityChange('featured', e.target.checked)}
-                      className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      className="w-5 h-5 text-admin-accent border-gray-300 rounded focus:ring-admin-accent"
                     />
                     <div className="ml-3 flex items-center">
                       <Star className="w-4 h-4 text-yellow-500 mr-1" />

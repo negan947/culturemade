@@ -87,7 +87,7 @@ export default function PreferencesForm({ onBack }: PreferencesFormProps) {
   return (
     <div className="h-full bg-gray-50">
       <div className="bg-white px-4 py-3 border-b border-gray-200 flex items-center">
-        <button onClick={onBack} className="mr-3 text-blue-600">Back</button>
+        <button onClick={onBack} className="mr-3 text-admin-accent">Back</button>
         <h1 className="text-2xl font-bold text-gray-900">Preferences</h1>
       </div>
 
@@ -183,7 +183,7 @@ export default function PreferencesForm({ onBack }: PreferencesFormProps) {
                 whileTap={{ scale: 0.97 }}
                 onClick={save}
                 disabled={saving}
-                className={`px-4 py-2 rounded-lg font-medium ${saving ? 'bg-gray-200 text-gray-500' : 'bg-blue-600 text-white'}`}
+                className={`px-4 py-2 rounded-lg font-medium ${saving ? 'bg-gray-200 text-gray-500' : 'bg-admin-accent text-white'}`}
               >
                 {saving ? 'Saving…' : 'Save'}
               </motion.button>

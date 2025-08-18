@@ -161,7 +161,7 @@ export function CartIcon({
             className={`
               absolute inset-0 
               ${currentSize.icon}
-              bg-blue-500 rounded-full
+              bg-admin-accent rounded-full
               pointer-events-none
             `}
           />

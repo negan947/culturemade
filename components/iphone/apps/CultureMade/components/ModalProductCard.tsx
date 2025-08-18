@@ -262,7 +262,7 @@ const ModalProductCard = memo(function ModalProductCard({
                 transition={{ delay: 0.2 }}
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-3xl font-bold text-blue-600">
+                  <span className="text-3xl font-bold text-admin-accent">
                     {priceText}
                   </span>
                   {isOnSale && originalPriceText && (
@@ -337,7 +337,7 @@ const ModalProductCard = memo(function ModalProductCard({
                 {/* Buy Now Button */}
                 <motion.button
                   whileTap={{ scale: 0.98 }}
-                  className="flex-1 py-4 rounded-xl font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg"
+                  className="flex-1 py-4 rounded-xl font-semibold text-white bg-admin-accent hover:bg-admin-accent-hover transition-colors shadow-lg"
                   aria-label={`Buy ${product.name} now`}
                   onClick={async () => {
                     try {
