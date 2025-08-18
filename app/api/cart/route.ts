@@ -92,6 +92,7 @@ export async function GET(request: NextRequest) {
         id,
         name,
         slug,
+        price,
         product_images(url, alt_text, position)
       `)
       .in('id', productIds);

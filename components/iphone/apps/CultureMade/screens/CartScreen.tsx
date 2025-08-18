@@ -195,16 +195,17 @@ export default function CartScreen() {
         <div className="px-4 py-4 space-y-4">
           {items.map((item, index) => {
             // Transform cart item to match CartItemData interface
-            const itemPrice = item.variant_price || 0;
+            const itemPrice = parseFloat(item.price?.toString() || '0');
+            const itemTotal = parseFloat(item.total?.toString() || '0');
             const cartItemData = {
               id: item.id,
               product_name: item.product_name || 'Unknown Product',
-              ...(item.variant_name !== undefined ? { variant_title: item.variant_name } : {}),
+              ...(item.variant_title !== undefined ? { variant_title: item.variant_title } : {}),
               price: itemPrice,
               quantity: item.quantity,
-              total: itemPrice * item.quantity,
-              ...(item.product_image !== undefined ? { image_url: item.product_image } : {}),
-              image_alt: item.product_name || 'Product Image',
+              total: itemTotal,
+              ...(item.image_url !== undefined ? { image_url: item.image_url } : {}),
+              ...(item.image_alt !== undefined ? { image_alt: item.image_alt } : {}),
               // inventory_quantity omitted since not available
               is_available: true, // Assume available since it's in cart
             };

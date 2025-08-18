@@ -209,11 +209,12 @@ export function CartDrawer({ isOpen, onClose, userId, onCheckout }: CartDrawerPr
                       const transformedItem = {
                         id: item.id,
                         product_name: item.product_name || 'Unknown Product',
-                        ...(item.variant_name && { variant_title: item.variant_name }),
-                        price: parseFloat(item.variant_price?.toString() || '0'),
+                        ...(item.variant_title && { variant_title: item.variant_title }),
+                        price: parseFloat(item.price?.toString() || '0'),
                         quantity: item.quantity,
-                        total: parseFloat(item.variant_price?.toString() || '0') * item.quantity,
-                        ...(item.product_image && { image_url: item.product_image }),
+                        total: parseFloat(item.total?.toString() || '0'),
+                        ...(item.image_url && { image_url: item.image_url }),
+                        ...(item.image_alt && { image_alt: item.image_alt }),
                         is_available: true
                       };
                       

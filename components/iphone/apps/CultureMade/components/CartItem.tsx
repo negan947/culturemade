@@ -119,7 +119,7 @@ export default function CartItem({
       exit={{ opacity: 0, y: -20 }}
       className={`
         flex items-center space-x-3 
-        bg-gray-50 rounded-xl 
+        bg-admin-bg-surface rounded-xl 
         ${currentSize.container}
         ${isOutOfStock ? 'opacity-60' : ''}
         ${className}
@@ -139,12 +139,12 @@ export default function CartItem({
 
       {/* Product Details */}
       <div className="flex-1 min-w-0">
-        <h4 className={`font-medium text-gray-900 truncate ${currentSize.title}`}>
+        <h4 className={`font-medium text-admin-text-primary truncate ${currentSize.title}`}>
           {item.product_name}
         </h4>
         
         {item.variant_title && (
-          <p className={`text-gray-500 truncate ${currentSize.variant}`}>
+          <p className={`text-admin-text-secondary truncate ${currentSize.variant}`}>
             {item.variant_title}
           </p>
         )}
@@ -153,7 +153,7 @@ export default function CartItem({
           <span className={`font-semibold text-admin-accent ${currentSize.price}`}>
             {formatPrice(item.price)}
           </span>
-          <span className={`text-gray-500 ${currentSize.variant}`}>
+          <span className={`text-admin-text-secondary ${currentSize.variant}`}>
             Total: {formatPrice(item.total)}
           </span>
         </div>
@@ -181,7 +181,7 @@ export default function CartItem({
             disabled={isDisabled || item.quantity <= 1}
             className={`
               ${currentSize.button}
-              text-gray-500 hover:text-gray-700 hover:bg-white 
+              text-admin-text-secondary hover:text-admin-text-primary hover:bg-admin-bg-hover 
               rounded-full transition-colors 
               disabled:opacity-50 disabled:cursor-not-allowed
               flex items-center justify-center
@@ -192,7 +192,7 @@ export default function CartItem({
           </button>
           
           <span className={`
-            ${currentSize.quantity} text-center font-medium text-gray-900
+            ${currentSize.quantity} text-center font-medium text-admin-text-primary
           `}>
             {item.quantity}
           </span>
@@ -202,7 +202,7 @@ export default function CartItem({
             disabled={isDisabled || Boolean(item.inventory_quantity && item.quantity >= item.inventory_quantity)}
             className={`
               ${currentSize.button}
-              text-gray-500 hover:text-gray-700 hover:bg-white 
+              text-admin-text-secondary hover:text-admin-text-primary hover:bg-admin-bg-hover 
               rounded-full transition-colors 
               disabled:opacity-50 disabled:cursor-not-allowed
               flex items-center justify-center
@@ -220,7 +220,7 @@ export default function CartItem({
             disabled={isDisabled}
             className={`
               ${currentSize.button}
-              text-gray-400 hover:text-red-600 hover:bg-red-50 
+              text-admin-text-disabled hover:text-red-600 hover:bg-red-50 
               rounded-full transition-colors 
               disabled:opacity-50 disabled:cursor-not-allowed
               flex items-center justify-center ml-1
@@ -267,7 +267,7 @@ export function CartItemSkeleton({
   return (
     <div className={`
       flex items-center space-x-3 
-      bg-gray-50 rounded-xl 
+      bg-admin-bg-surface rounded-xl 
       ${currentSize.container}
       animate-pulse
       ${className}
@@ -275,26 +275,26 @@ export function CartItemSkeleton({
       {/* Image Skeleton */}
       {showImage && (
         <div className={`
-          ${currentSize.image} bg-gray-300 rounded-lg flex-shrink-0
+          ${currentSize.image} bg-admin-bg-hover rounded-lg flex-shrink-0
         `} />
       )}
 
       {/* Content Skeleton */}
       <div className="flex-1 space-y-2">
-        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-        <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+        <div className="h-4 bg-admin-bg-hover rounded w-3/4"></div>
+        <div className="h-3 bg-admin-bg-hover rounded w-1/2"></div>
         <div className="flex justify-between">
-          <div className="h-3 bg-gray-300 rounded w-16"></div>
-          <div className="h-3 bg-gray-300 rounded w-20"></div>
+          <div className="h-3 bg-admin-bg-hover rounded w-16"></div>
+          <div className="h-3 bg-admin-bg-hover rounded w-20"></div>
         </div>
       </div>
 
       {/* Controls Skeleton */}
       <div className="flex items-center space-x-1">
-        <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
-        <div className="w-6 h-4 bg-gray-300 rounded"></div>
-        <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
-        <div className="w-6 h-6 bg-gray-300 rounded-full ml-1"></div>
+        <div className="w-6 h-6 bg-admin-bg-hover rounded-full"></div>
+        <div className="w-6 h-4 bg-admin-bg-hover rounded"></div>
+        <div className="w-6 h-6 bg-admin-bg-hover rounded-full"></div>
+        <div className="w-6 h-6 bg-admin-bg-hover rounded-full ml-1"></div>
       </div>
     </div>
   );

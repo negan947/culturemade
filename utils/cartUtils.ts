@@ -13,9 +13,15 @@ export interface CartItem {
   variant_id: string;
   quantity: number;
   created_at: string;
-  updated_at: string;
-  // Expanded fields from joins
+  updated_at?: string;
+  // Expanded fields from API joins (standardized naming)
   product_name?: string;
+  variant_title?: string;
+  price: number;
+  total: number;
+  image_url?: string | null;
+  image_alt?: string;
+  // Legacy fields for compatibility
   product_image?: string;
   variant_name?: string;
   variant_price?: number;
