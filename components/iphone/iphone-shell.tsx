@@ -70,10 +70,18 @@ const IPhoneShell: FC<Props> = ({ children }) => {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Unified Background Layer */}
+        {/* Unified Background Layer - Extended for mobile corner coverage */}
         <div
           className='absolute inset-0 w-full h-full'
-          style={iOSWallpaperStyles}
+          style={{
+            ...iOSWallpaperStyles,
+            // Ensure background extends beyond any potential gaps on mobile
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat',
+            minHeight: '100%',
+            minWidth: '100%'
+          }}
         />
 
         {/* System UI */}

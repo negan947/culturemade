@@ -169,8 +169,11 @@ function CultureMadeInner() {
       </div>
 
       {/* Bottom Tab Navigation */}
-      <div className="bg-gray-800 border-t border-gray-700">
-        <div className="flex justify-around items-center px-2 py-1">
+      <div className="relative bg-gray-800 border-t border-gray-700">
+        {/* Visual background extension under HomeBar */}
+        <div className="absolute inset-x-0 top-0 bottom-0 bg-gray-800 z-0" style={{ height: 'calc(100% + 50px)' }} />
+        
+        <div className="relative z-10 flex justify-around items-center px-2 py-3 pb-2">
           {tabs.map((tab) => {
             // Cart tab is never "active" since it only opens drawer
             const isActive = tab.id === 'cart' ? false : activeTab === tab.id;
