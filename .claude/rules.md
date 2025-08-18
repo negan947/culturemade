@@ -97,4 +97,8 @@
 - **MARK TASKS COMPLETED** immediately when finished - never batch completions
 - **UPDATE CURRENT ACTIVE TASK** section in progress.md after each completion
 - **SYNCHRONIZE** CLAUDE.md and .claude/ files after major milestones
+- **UPDATE IMPLEMENTATION FILES** when completing tasks from specific implementation plans:
+  - Update `CATEGORIES_IMPLEMENTATION.md` when completing category-related tasks
+  - Update any other `*_IMPLEMENTATION.md` files when completing related tasks
+  - Mark tasks as [✅] and update completion percentages
 - **Example final todo**: "Update .claude/progress.md to mark Task X.X.X as completed (MANDATORY)"

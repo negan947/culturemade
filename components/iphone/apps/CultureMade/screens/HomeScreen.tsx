@@ -284,23 +284,6 @@ export default function HomeScreen() {
             </div>
           )}
 
-          {/* Debug: Add extra content to test scrolling */}
-          {!loading && !error && products.length > 0 && (
-            <div className="mt-8 space-y-4">
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="text-sm text-blue-800">End of products - scroll test</p>
-              </div>
-              <div className="bg-green-50 p-4 rounded-lg">
-                <p className="text-sm text-green-800">More content here</p>
-              </div>
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <p className="text-sm text-purple-800">Even more content</p>
-              </div>
-              <div className="bg-orange-50 p-4 rounded-lg">
-                <p className="text-sm text-orange-800">Final test content</p>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
